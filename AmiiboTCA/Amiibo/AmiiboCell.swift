@@ -9,12 +9,27 @@ import SwiftUI
 
 struct AmiiboCell: View {
     var body: some View {
-        Text(/*@START_MENU_TOKEN@*/"Hello, World!"/*@END_MENU_TOKEN@*/)
+        HStack {
+            Image("koopa")
+                .resizable()
+                .aspectRatio(contentMode: .fit)
+                
+            
+            VStack(alignment: .leading) {
+                Text("Koopa")
+                    .font(.largeTitle)
+                Text("Mario Series")
+                    .font(.caption)
+            }
+        }
+        .frame(height: 100)
     }
 }
 
 struct AmiiboCell_Previews: PreviewProvider {
     static var previews: some View {
         AmiiboCell()
+            .previewLayout(.fixed(width: 300, height: 180))
+            
     }
 }
