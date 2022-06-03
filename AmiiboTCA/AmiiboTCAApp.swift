@@ -11,7 +11,7 @@ import SwiftUI
 struct AmiiboTCAApp: App {
     var body: some Scene {
         WindowGroup {
-            ContentView()
+            RootView()
         }
     }
 }
