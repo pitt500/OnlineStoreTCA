@@ -11,8 +11,8 @@ struct AmiiboListView: View {
     var body: some View {
         NavigationView {
             List {
-                ForEach(0..<5) { index in
-                    Text("\(index)")
+                ForEach(0..<5) { _ in
+                    AmiiboCell()
                 }
             }
             .navigationTitle("Amiibos")
