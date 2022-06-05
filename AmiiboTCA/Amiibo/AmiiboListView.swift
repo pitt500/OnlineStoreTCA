@@ -8,6 +8,8 @@
 import SwiftUI
 
 struct AmiiboListView: View {
+    @State private var shouldShowCartView = false
+    
     var body: some View {
         NavigationView {
             List {
@@ -16,6 +18,20 @@ struct AmiiboListView: View {
                 }
             }
             .navigationTitle("Amiibos")
+            .navigationBarItems(trailing: cartButton)
+        }
+        .sheet(isPresented: $shouldShowCartView) {
+            CartView()
+        }
+    }
+    
+    var cartButton: some View {
+        Button {
+            self.shouldShowCartView.toggle()
+        } label: {
+            Image(systemName: "cart.circle.fill")
+                .font(Font.system(.title))
+                .foregroundColor(.red)
         }
     }
 }
