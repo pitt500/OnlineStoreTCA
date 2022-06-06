@@ -16,6 +16,10 @@
 		B5DA7CA72849DDB800AFA436 /* AmiiboCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5DA7CA62849DDB800AFA436 /* AmiiboCell.swift */; };
 		B5DA7CAA284D2F5500AFA436 /* CartView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5DA7CA9284D2F5500AFA436 /* CartView.swift */; };
 		B5DA7CAE284D427800AFA436 /* ComposableArchitecture in Frameworks */ = {isa = PBXBuildFile; productRef = B5DA7CAD284D427800AFA436 /* ComposableArchitecture */; };
+		B5DA7CB1284D43BC00AFA436 /* AmiiboDomain.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5DA7CB0284D43BC00AFA436 /* AmiiboDomain.swift */; };
+		B5DA7CB3284D449600AFA436 /* Amiibo.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5DA7CB2284D449600AFA436 /* Amiibo.swift */; };
+		B5DA7CB6284D4ACF00AFA436 /* APIError.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5DA7CB5284D4ACF00AFA436 /* APIError.swift */; };
+		B5DA7CB8284D4B5900AFA436 /* SystemEnvironment.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5DA7CB7284D4B5900AFA436 /* SystemEnvironment.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -28,6 +32,10 @@
 		B5DA7CA42849DCF000AFA436 /* ProfileView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileView.swift; sourceTree = "<group>"; };
 		B5DA7CA62849DDB800AFA436 /* AmiiboCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AmiiboCell.swift; sourceTree = "<group>"; };
 		B5DA7CA9284D2F5500AFA436 /* CartView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CartView.swift; sourceTree = "<group>"; };
+		B5DA7CB0284D43BC00AFA436 /* AmiiboDomain.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AmiiboDomain.swift; sourceTree = "<group>"; };
+		B5DA7CB2284D449600AFA436 /* Amiibo.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Amiibo.swift; sourceTree = "<group>"; };
+		B5DA7CB5284D4ACF00AFA436 /* APIError.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = APIError.swift; sourceTree = "<group>"; };
+		B5DA7CB7284D4B5900AFA436 /* SystemEnvironment.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SystemEnvironment.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -61,6 +69,7 @@
 		B5DA7C5B283D2E6A00AFA436 /* AmiiboTCA */ = {
 			isa = PBXGroup;
 			children = (
+				B5DA7CB4284D4AC000AFA436 /* System */,
 				B5DA7CA8284D2F4500AFA436 /* Cart */,
 				B5DA7CA12849DCD800AFA436 /* Profile */,
 				B5DA7CA02849DCD000AFA436 /* Amiibo */,
@@ -83,6 +92,7 @@
 		B5DA7CA02849DCD000AFA436 /* Amiibo */ = {
 			isa = PBXGroup;
 			children = (
+				B5DA7CAF284D439F00AFA436 /* Domain */,
 				B5DA7CA22849DCE700AFA436 /* AmiiboListView.swift */,
 				B5DA7CA62849DDB800AFA436 /* AmiiboCell.swift */,
 			);
@@ -103,6 +113,24 @@
 				B5DA7CA9284D2F5500AFA436 /* CartView.swift */,
 			);
 			path = Cart;
+			sourceTree = "<group>";
+		};
+		B5DA7CAF284D439F00AFA436 /* Domain */ = {
+			isa = PBXGroup;
+			children = (
+				B5DA7CB0284D43BC00AFA436 /* AmiiboDomain.swift */,
+				B5DA7CB2284D449600AFA436 /* Amiibo.swift */,
+			);
+			path = Domain;
+			sourceTree = "<group>";
+		};
+		B5DA7CB4284D4AC000AFA436 /* System */ = {
+			isa = PBXGroup;
+			children = (
+				B5DA7CB5284D4ACF00AFA436 /* APIError.swift */,
+				B5DA7CB7284D4B5900AFA436 /* SystemEnvironment.swift */,
+			);
+			path = System;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -181,12 +209,16 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				B5DA7CB8284D4B5900AFA436 /* SystemEnvironment.swift in Sources */,
+				B5DA7CB3284D449600AFA436 /* Amiibo.swift in Sources */,
 				B5DA7CAA284D2F5500AFA436 /* CartView.swift in Sources */,
 				B5DA7CA52849DCF000AFA436 /* ProfileView.swift in Sources */,
 				B5DA7CA32849DCE700AFA436 /* AmiiboListView.swift in Sources */,
 				B5DA7C5D283D2E6A00AFA436 /* AmiiboTCAApp.swift in Sources */,
 				B5DA7C9F2849DBD800AFA436 /* RootView.swift in Sources */,
+				B5DA7CB1284D43BC00AFA436 /* AmiiboDomain.swift in Sources */,
 				B5DA7CA72849DDB800AFA436 /* AmiiboCell.swift in Sources */,
+				B5DA7CB6284D4ACF00AFA436 /* APIError.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
