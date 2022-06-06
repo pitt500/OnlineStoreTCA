@@ -75,6 +75,7 @@
 		B5DA7C5B283D2E6A00AFA436 /* AmiiboTCA */ = {
 			isa = PBXGroup;
 			children = (
+				B5DA7C5C283D2E6A00AFA436 /* AmiiboTCAApp.swift */,
 				B5DA7CBE284DC4C500AFA436 /* Root */,
 				B5DA7CB4284D4AC000AFA436 /* System */,
 				B5DA7CA8284D2F4500AFA436 /* Cart */,
@@ -152,7 +153,6 @@
 		B5DA7CBE284DC4C500AFA436 /* Root */ = {
 			isa = PBXGroup;
 			children = (
-				B5DA7C5C283D2E6A00AFA436 /* AmiiboTCAApp.swift */,
 				B5DA7C9E2849DBD800AFA436 /* RootView.swift */,
 			);
 			path = Root;
