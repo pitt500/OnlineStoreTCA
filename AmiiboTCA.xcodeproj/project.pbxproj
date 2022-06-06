@@ -73,12 +73,11 @@
 		B5DA7C5B283D2E6A00AFA436 /* AmiiboTCA */ = {
 			isa = PBXGroup;
 			children = (
+				B5DA7CBE284DC4C500AFA436 /* Root */,
 				B5DA7CB4284D4AC000AFA436 /* System */,
 				B5DA7CA8284D2F4500AFA436 /* Cart */,
 				B5DA7CA12849DCD800AFA436 /* Profile */,
 				B5DA7CA02849DCD000AFA436 /* Amiibo */,
-				B5DA7C5C283D2E6A00AFA436 /* AmiiboTCAApp.swift */,
-				B5DA7C9E2849DBD800AFA436 /* RootView.swift */,
 				B5DA7C60283D2E6B00AFA436 /* Assets.xcassets */,
 				B5DA7C62283D2E6B00AFA436 /* Preview Content */,
 			);
@@ -145,6 +144,15 @@
 				B5DA7CBC284DC0FB00AFA436 /* OrderItem.swift */,
 			);
 			path = Domain;
+			sourceTree = "<group>";
+		};
+		B5DA7CBE284DC4C500AFA436 /* Root */ = {
+			isa = PBXGroup;
+			children = (
+				B5DA7C5C283D2E6A00AFA436 /* AmiiboTCAApp.swift */,
+				B5DA7C9E2849DBD800AFA436 /* RootView.swift */,
+			);
+			path = Root;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
