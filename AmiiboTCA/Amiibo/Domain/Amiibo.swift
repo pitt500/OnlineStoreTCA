@@ -19,4 +19,5 @@ enum Franchise: String {
     case zelda = "The Legend of Zelda"
     case metalGear = "Metal Gear Solid"
     case pokemon = "Pokemon"
+    case metroid = "Metroid"
 }
