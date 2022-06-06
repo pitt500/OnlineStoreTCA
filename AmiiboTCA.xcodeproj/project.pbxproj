@@ -20,6 +20,8 @@
 		B5DA7CB3284D449600AFA436 /* Amiibo.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5DA7CB2284D449600AFA436 /* Amiibo.swift */; };
 		B5DA7CB6284D4ACF00AFA436 /* APIError.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5DA7CB5284D4ACF00AFA436 /* APIError.swift */; };
 		B5DA7CB8284D4B5900AFA436 /* SystemEnvironment.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5DA7CB7284D4B5900AFA436 /* SystemEnvironment.swift */; };
+		B5DA7CBB284DBEC300AFA436 /* CartDomain.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5DA7CBA284DBEC300AFA436 /* CartDomain.swift */; };
+		B5DA7CBD284DC0FB00AFA436 /* OrderItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5DA7CBC284DC0FB00AFA436 /* OrderItem.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -36,6 +38,8 @@
 		B5DA7CB2284D449600AFA436 /* Amiibo.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Amiibo.swift; sourceTree = "<group>"; };
 		B5DA7CB5284D4ACF00AFA436 /* APIError.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = APIError.swift; sourceTree = "<group>"; };
 		B5DA7CB7284D4B5900AFA436 /* SystemEnvironment.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SystemEnvironment.swift; sourceTree = "<group>"; };
+		B5DA7CBA284DBEC300AFA436 /* CartDomain.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CartDomain.swift; sourceTree = "<group>"; };
+		B5DA7CBC284DC0FB00AFA436 /* OrderItem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OrderItem.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -110,6 +114,7 @@
 		B5DA7CA8284D2F4500AFA436 /* Cart */ = {
 			isa = PBXGroup;
 			children = (
+				B5DA7CB9284DBEB000AFA436 /* Domain */,
 				B5DA7CA9284D2F5500AFA436 /* CartView.swift */,
 			);
 			path = Cart;
@@ -131,6 +136,15 @@
 				B5DA7CB7284D4B5900AFA436 /* SystemEnvironment.swift */,
 			);
 			path = System;
+			sourceTree = "<group>";
+		};
+		B5DA7CB9284DBEB000AFA436 /* Domain */ = {
+			isa = PBXGroup;
+			children = (
+				B5DA7CBA284DBEC300AFA436 /* CartDomain.swift */,
+				B5DA7CBC284DC0FB00AFA436 /* OrderItem.swift */,
+			);
+			path = Domain;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -214,8 +228,10 @@
 				B5DA7CAA284D2F5500AFA436 /* CartView.swift in Sources */,
 				B5DA7CA52849DCF000AFA436 /* ProfileView.swift in Sources */,
 				B5DA7CA32849DCE700AFA436 /* AmiiboListView.swift in Sources */,
+				B5DA7CBD284DC0FB00AFA436 /* OrderItem.swift in Sources */,
 				B5DA7C5D283D2E6A00AFA436 /* AmiiboTCAApp.swift in Sources */,
 				B5DA7C9F2849DBD800AFA436 /* RootView.swift in Sources */,
+				B5DA7CBB284DBEC300AFA436 /* CartDomain.swift in Sources */,
 				B5DA7CB1284D43BC00AFA436 /* AmiiboDomain.swift in Sources */,
 				B5DA7CA72849DDB800AFA436 /* AmiiboCell.swift in Sources */,
 				B5DA7CB6284D4ACF00AFA436 /* APIError.swift in Sources */,

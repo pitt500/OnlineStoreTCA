@@ -10,7 +10,6 @@ import SwiftUI
 struct CartView: View {
     var body: some View {
         NavigationView {
-            
             List {
                 ForEach(0..<10) { _ in
                     AmiiboCell()
