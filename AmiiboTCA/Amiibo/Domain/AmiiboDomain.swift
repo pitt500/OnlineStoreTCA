@@ -28,7 +28,7 @@ struct AmiiboDomain {
         var mainQueue: () -> AnySchedulerOf<DispatchQueue>
     }
     
-    let reducer = Reducer<
+    static let reducer = Reducer<
         State,
         Action,
         Environment
