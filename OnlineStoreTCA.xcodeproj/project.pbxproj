@@ -8,7 +8,6 @@
 
 /* Begin PBXBuildFile section */
 		B5A5CFB5289C257900AC3E5E /* OnlineStoreTCAApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5A5CFB4289C257900AC3E5E /* OnlineStoreTCAApp.swift */; };
-		B5A5CFB7289C257900AC3E5E /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5A5CFB6289C257900AC3E5E /* ContentView.swift */; };
 		B5A5CFB9289C257B00AC3E5E /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = B5A5CFB8289C257B00AC3E5E /* Assets.xcassets */; };
 		B5A5CFBC289C257B00AC3E5E /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = B5A5CFBB289C257B00AC3E5E /* Preview Assets.xcassets */; };
 		B5B41FA028AD3B8A008B12B7 /* ComposableArchitecture in Frameworks */ = {isa = PBXBuildFile; productRef = B5B41F9F28AD3B8A008B12B7 /* ComposableArchitecture */; };
@@ -17,7 +16,6 @@
 /* Begin PBXFileReference section */
 		B5A5CFB1289C257900AC3E5E /* OnlineStoreTCA.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = OnlineStoreTCA.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		B5A5CFB4289C257900AC3E5E /* OnlineStoreTCAApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnlineStoreTCAApp.swift; sourceTree = "<group>"; };
-		B5A5CFB6289C257900AC3E5E /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
 		B5A5CFB8289C257B00AC3E5E /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		B5A5CFBB289C257B00AC3E5E /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -34,6 +32,28 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		B525334328AD3DCE00B29A17 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			path = Products;
+			sourceTree = "<group>";
+		};
+		B525334428AD3DD500B29A17 /* Profile */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			path = Profile;
+			sourceTree = "<group>";
+		};
+		B525334528AD3DDF00B29A17 /* Root */ = {
+			isa = PBXGroup;
+			children = (
+				B5A5CFB4289C257900AC3E5E /* OnlineStoreTCAApp.swift */,
+			);
+			path = Root;
+			sourceTree = "<group>";
+		};
 		B5A5CFA8289C257900AC3E5E = {
 			isa = PBXGroup;
 			children = (
@@ -53,8 +73,9 @@
 		B5A5CFB3289C257900AC3E5E /* OnlineStoreTCA */ = {
 			isa = PBXGroup;
 			children = (
-				B5A5CFB4289C257900AC3E5E /* OnlineStoreTCAApp.swift */,
-				B5A5CFB6289C257900AC3E5E /* ContentView.swift */,
+				B525334528AD3DDF00B29A17 /* Root */,
+				B525334428AD3DD500B29A17 /* Profile */,
+				B525334328AD3DCE00B29A17 /* Products */,
 				B5A5CFB8289C257B00AC3E5E /* Assets.xcassets */,
 				B5A5CFBA289C257B00AC3E5E /* Preview Content */,
 			);
@@ -145,7 +166,6 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				B5A5CFB7289C257900AC3E5E /* ContentView.swift in Sources */,
 				B5A5CFB5289C257900AC3E5E /* OnlineStoreTCAApp.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

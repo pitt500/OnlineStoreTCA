@@ -11,7 +11,7 @@ import SwiftUI
 struct OnlineStoreTCAApp: App {
     var body: some Scene {
         WindowGroup {
-            ContentView()
+            Text("Hello")
         }
     }
 }
