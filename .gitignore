@@ -1,6 +1,5 @@
-
-# Created by https://www.toptal.com/developers/gitignore/api/xcode,macos,swift
-# Edit at https://www.toptal.com/developers/gitignore?templates=xcode,macos,swift
+# Created by https://www.toptal.com/developers/gitignore/api/xcode,swift,macos
+# Edit at https://www.toptal.com/developers/gitignore?templates=xcode,swift,macos
 
 ### macOS ###
 # General
@@ -30,6 +29,10 @@ Icon
 Network Trash Folder
 Temporary Items
 .apdisk
+
+### macOS Patch ###
+# iCloud generated files
+*.icloud
 
 ### Swift ###
 # Xcode
@@ -127,4 +130,4 @@ iOSInjectionProject/
 /*.gcno
 **/xcshareddata/WorkspaceSettings.xcsettings
 
-# End of https://www.toptal.com/developers/gitignore/api/xcode,macos,swift
+# End of https://www.toptal.com/developers/gitignore/api/xcode,swift,macos
