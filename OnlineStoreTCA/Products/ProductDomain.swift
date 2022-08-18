@@ -10,7 +10,7 @@ import ComposableArchitecture
 
 struct ProductDomain {
     struct State: Equatable {
-        var products: [Product]
+        var products: [Product] = []
     }
     
     enum Action: Equatable {
@@ -22,7 +22,7 @@ struct ProductDomain {
         var fetchProducts: () async throws -> [Product]
     }
     
-    let reducer = Reducer<
+    static let reducer = Reducer<
         State, Action, Environment
     > { state, action, environment in
         switch action {
