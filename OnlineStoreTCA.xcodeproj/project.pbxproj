@@ -10,6 +10,9 @@
 		B525334728AD3F6000B29A17 /* ProductDomain.swift in Sources */ = {isa = PBXBuildFile; fileRef = B525334628AD3F6000B29A17 /* ProductDomain.swift */; };
 		B525334C28ADCBCE00B29A17 /* Product.swift in Sources */ = {isa = PBXBuildFile; fileRef = B525334B28ADCBCE00B29A17 /* Product.swift */; };
 		B525334E28ADD6DE00B29A17 /* ProductListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B525334D28ADD6DE00B29A17 /* ProductListView.swift */; };
+		B525335128AE87C700B29A17 /* CartDomain.swift in Sources */ = {isa = PBXBuildFile; fileRef = B525335028AE87C700B29A17 /* CartDomain.swift */; };
+		B525335328AE883B00B29A17 /* CartItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = B525335228AE883B00B29A17 /* CartItem.swift */; };
+		B525335528AE8C5600B29A17 /* CartView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B525335428AE8C5600B29A17 /* CartView.swift */; };
 		B5A5CFB5289C257900AC3E5E /* OnlineStoreTCAApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5A5CFB4289C257900AC3E5E /* OnlineStoreTCAApp.swift */; };
 		B5A5CFB9289C257B00AC3E5E /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = B5A5CFB8289C257B00AC3E5E /* Assets.xcassets */; };
 		B5A5CFBC289C257B00AC3E5E /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = B5A5CFBB289C257B00AC3E5E /* Preview Assets.xcassets */; };
@@ -20,6 +23,9 @@
 		B525334628AD3F6000B29A17 /* ProductDomain.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProductDomain.swift; sourceTree = "<group>"; };
 		B525334B28ADCBCE00B29A17 /* Product.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Product.swift; sourceTree = "<group>"; };
 		B525334D28ADD6DE00B29A17 /* ProductListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProductListView.swift; sourceTree = "<group>"; };
+		B525335028AE87C700B29A17 /* CartDomain.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CartDomain.swift; sourceTree = "<group>"; };
+		B525335228AE883B00B29A17 /* CartItem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CartItem.swift; sourceTree = "<group>"; };
+		B525335428AE8C5600B29A17 /* CartView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CartView.swift; sourceTree = "<group>"; };
 		B5A5CFB1289C257900AC3E5E /* OnlineStoreTCA.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = OnlineStoreTCA.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		B5A5CFB4289C257900AC3E5E /* OnlineStoreTCAApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnlineStoreTCAApp.swift; sourceTree = "<group>"; };
 		B5A5CFB8289C257B00AC3E5E /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
@@ -63,6 +69,16 @@
 			path = Root;
 			sourceTree = "<group>";
 		};
+		B525334F28AE87B500B29A17 /* Cart */ = {
+			isa = PBXGroup;
+			children = (
+				B525335028AE87C700B29A17 /* CartDomain.swift */,
+				B525335228AE883B00B29A17 /* CartItem.swift */,
+				B525335428AE8C5600B29A17 /* CartView.swift */,
+			);
+			path = Cart;
+			sourceTree = "<group>";
+		};
 		B5A5CFA8289C257900AC3E5E = {
 			isa = PBXGroup;
 			children = (
@@ -82,6 +98,7 @@
 		B5A5CFB3289C257900AC3E5E /* OnlineStoreTCA */ = {
 			isa = PBXGroup;
 			children = (
+				B525334F28AE87B500B29A17 /* Cart */,
 				B525334528AD3DDF00B29A17 /* Root */,
 				B525334428AD3DD500B29A17 /* Profile */,
 				B525334328AD3DCE00B29A17 /* Products */,
@@ -175,9 +192,12 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				B525335128AE87C700B29A17 /* CartDomain.swift in Sources */,
+				B525335528AE8C5600B29A17 /* CartView.swift in Sources */,
 				B525334E28ADD6DE00B29A17 /* ProductListView.swift in Sources */,
 				B5A5CFB5289C257900AC3E5E /* OnlineStoreTCAApp.swift in Sources */,
 				B525334728AD3F6000B29A17 /* ProductDomain.swift in Sources */,
+				B525335328AE883B00B29A17 /* CartItem.swift in Sources */,
 				B525334C28ADCBCE00B29A17 /* Product.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

@@ -11,11 +11,13 @@ import ComposableArchitecture
 struct ProductDomain {
     struct State: Equatable {
         var products: [Product] = []
+        var shouldOpenCart = false
     }
     
     enum Action: Equatable {
         case fetchProducts
         case fetchProductsResponse(TaskResult<[Product]>)
+        case didPressCartButton
     }
     
     struct Environment {
@@ -37,6 +39,9 @@ struct ProductDomain {
             return .none
         case .fetchProductsResponse(.failure):
             print("Error getting products, try again later.")
+            return .none
+        case .didPressCartButton:
+            state.shouldOpenCart = true
             return .none
         }
     }
