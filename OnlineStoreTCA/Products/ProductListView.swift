@@ -32,9 +32,7 @@ struct ProductListView_Previews: PreviewProvider {
                 initialState: ProductDomain.State(),
                 reducer: ProductDomain.reducer,
                 environment: ProductDomain.Environment(
-                    fetchProducts: {
-                        Product.sample
-                    }
+                    fetchProducts: { Product.sample }
                 )
             )
         )
