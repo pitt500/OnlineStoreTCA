@@ -15,7 +15,8 @@ struct ProductListView: View {
         WithViewStore(self.store) { viewStore in
             NavigationView {
                 List(viewStore.products) { product in
-                    Text(product.title)
+                    ProductCell(product: product)
+                        .listRowSeparator(.hidden)
                 }.onAppear {
                     viewStore.send(.fetchProducts)
                 }
