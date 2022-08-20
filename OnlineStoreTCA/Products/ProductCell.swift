@@ -17,10 +17,25 @@ struct ProductCell: View {
                 .aspectRatio(contentMode: .fit)
             VStack(alignment: .leading) {
                 Text(product.title)
-                Text("$\(product.price.description)")
-                    .fontWeight(.bold)
+                HStack {
+                    Text("$\(product.price.description)")
+                        .font(.custom("AmericanTypewriter", size: 25))
+                        .fontWeight(.bold)
+                    Spacer()
+                    Button {
+                        print("Hello!")
+                    } label: {
+                        Text("Add to Cart")
+                            .padding(10)
+                            .background(.blue)
+                            .foregroundColor(.white)
+                            .cornerRadius(10)
+                    }
+                    .buttonStyle(PlainButtonStyle())
+                }
             }
             .font(.custom("AmericanTypewriter", size: 20))
+            
             
         }
         .padding(20)
