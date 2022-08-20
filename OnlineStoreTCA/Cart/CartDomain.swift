@@ -9,12 +9,12 @@ import Foundation
 import ComposableArchitecture
 
 struct CartDomain {
-    struct State:Equatable {
+    struct State: Equatable {
         var cartItems: [CartItem] = []
         var isCartViewOpen = false
     }
     
-    enum Action {
+    enum Action: Equatable {
         case fetchCartItems([CartItem])
         case didPressPurchaseButton
         case didPressCloseButton

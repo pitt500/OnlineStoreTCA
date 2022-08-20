@@ -6,12 +6,22 @@
 //
 
 import SwiftUI
+import ComposableArchitecture
 
 @main
 struct OnlineStoreTCAApp: App {
     var body: some Scene {
         WindowGroup {
-            Text("Hello")
+            ProductListView(
+                store: Store(
+                    initialState: ProductDomain.State(),
+                    reducer: ProductDomain.reducer,
+                    environment: ProductDomain.Environment(
+                        fetchProducts: { Product.sample },
+                        sendOrder: { _ in "OK" }
+                    )
+                )
+            )
         }
     }
 }

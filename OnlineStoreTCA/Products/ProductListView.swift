@@ -20,6 +20,31 @@ struct ProductListView: View {
                     viewStore.send(.fetchProducts)
                 }
                 .navigationTitle("Products")
+                .toolbar {
+                    ToolbarItem(placement: .navigationBarTrailing) {
+                        Button {
+                            viewStore.send(.setCartView(isPresented: true))
+                        } label: {
+                            Text("Go to Cart")
+                        }
+                    }
+                }
+                .sheet(
+                    isPresented: viewStore.binding(
+                        get: \.shouldOpenCart,
+                        send: ProductDomain.Action.setCartView(isPresented:)
+                    )
+                ) {
+                    IfLetStore(
+                        self.store.scope(
+                            state: \.cartState,
+                            action: ProductDomain.Action.cart
+                        )
+                    ) {
+                        CartView(store: $0)
+                    }
+                }
+                
             }
         }
     }
@@ -32,7 +57,8 @@ struct ProductListView_Previews: PreviewProvider {
                 initialState: ProductDomain.State(),
                 reducer: ProductDomain.reducer,
                 environment: ProductDomain.Environment(
-                    fetchProducts: { Product.sample }
+                    fetchProducts: { Product.sample },
+                    sendOrder: { _ in "OK" }
                 )
             )
         )
