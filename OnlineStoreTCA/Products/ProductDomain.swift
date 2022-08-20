@@ -58,7 +58,6 @@ struct ProductDomain {
             case .cart:
                 return .none
             case .setCartView(let isPresented):
-                print("setCartView: \(isPresented)")
                 state.shouldOpenCart = isPresented
                 state.cartState = isPresented
                 ? CartDomain.State(cartItems: CartItem.sample)

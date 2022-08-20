@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		B50F8EFF28B18F020034B039 /* ProductCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = B50F8EFE28B18F020034B039 /* ProductCell.swift */; };
 		B525334728AD3F6000B29A17 /* ProductDomain.swift in Sources */ = {isa = PBXBuildFile; fileRef = B525334628AD3F6000B29A17 /* ProductDomain.swift */; };
 		B525334C28ADCBCE00B29A17 /* Product.swift in Sources */ = {isa = PBXBuildFile; fileRef = B525334B28ADCBCE00B29A17 /* Product.swift */; };
 		B525334E28ADD6DE00B29A17 /* ProductListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B525334D28ADD6DE00B29A17 /* ProductListView.swift */; };
@@ -20,6 +21,7 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		B50F8EFE28B18F020034B039 /* ProductCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProductCell.swift; sourceTree = "<group>"; };
 		B525334628AD3F6000B29A17 /* ProductDomain.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProductDomain.swift; sourceTree = "<group>"; };
 		B525334B28ADCBCE00B29A17 /* Product.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Product.swift; sourceTree = "<group>"; };
 		B525334D28ADD6DE00B29A17 /* ProductListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProductListView.swift; sourceTree = "<group>"; };
@@ -50,6 +52,7 @@
 				B525334628AD3F6000B29A17 /* ProductDomain.swift */,
 				B525334B28ADCBCE00B29A17 /* Product.swift */,
 				B525334D28ADD6DE00B29A17 /* ProductListView.swift */,
+				B50F8EFE28B18F020034B039 /* ProductCell.swift */,
 			);
 			path = Products;
 			sourceTree = "<group>";
@@ -197,6 +200,7 @@
 				B525334E28ADD6DE00B29A17 /* ProductListView.swift in Sources */,
 				B5A5CFB5289C257900AC3E5E /* OnlineStoreTCAApp.swift in Sources */,
 				B525334728AD3F6000B29A17 /* ProductDomain.swift in Sources */,
+				B50F8EFF28B18F020034B039 /* ProductCell.swift in Sources */,
 				B525335328AE883B00B29A17 /* CartItem.swift in Sources */,
 				B525334C28ADCBCE00B29A17 /* Product.swift in Sources */,
 			);
