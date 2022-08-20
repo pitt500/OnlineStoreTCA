@@ -11,6 +11,7 @@ import ComposableArchitecture
 struct ProductDomain {
     struct State: Equatable {
         var products: [Product] = []
+        var selectedProducts: [Product.ID: UInt] = [:]
         var shouldOpenCart = false
         var cartState: CartDomain.State?
     }

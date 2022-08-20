@@ -22,16 +22,9 @@ struct ProductCell: View {
                         .font(.custom("AmericanTypewriter", size: 25))
                         .fontWeight(.bold)
                     Spacer()
-                    Button {
-                        print("Hello!")
-                    } label: {
-                        Text("Add to Cart")
-                            .padding(10)
-                            .background(.blue)
-                            .foregroundColor(.white)
-                            .cornerRadius(10)
+                    AddToCartButton {
+                        print("Hello")
                     }
-                    .buttonStyle(PlainButtonStyle())
                 }
             }
             .font(.custom("AmericanTypewriter", size: 20))
