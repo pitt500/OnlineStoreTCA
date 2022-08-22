@@ -14,9 +14,9 @@ struct OnlineStoreTCAApp: App {
         WindowGroup {
             ProductListView(
                 store: Store(
-                    initialState: ProductDomain.State(),
-                    reducer: ProductDomain.reducer,
-                    environment: ProductDomain.Environment(
+                    initialState: ProductListDomain.State(),
+                    reducer: ProductListDomain.reducer,
+                    environment: ProductListDomain.Environment(
                         fetchProducts: { Product.sample },
                         sendOrder: { _ in "OK" }
                     )

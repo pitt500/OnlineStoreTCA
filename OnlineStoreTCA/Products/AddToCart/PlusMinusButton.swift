@@ -9,7 +9,7 @@ import SwiftUI
 import ComposableArchitecture
 
 struct PlusMinusButton: View {
-    let store: Store<PlusMinusDomain.State, PlusMinusDomain.Action>
+    let store: Store<AddToCartDomain.State, AddToCartDomain.Action>
     
     var body: some View {
         WithViewStore(self.store) { viewStore in
@@ -47,9 +47,9 @@ struct PlusMinusButton_Previews: PreviewProvider {
     static var previews: some View {
         PlusMinusButton(
             store: Store(
-                initialState: PlusMinusDomain.State(),
-                reducer: PlusMinusDomain.reducer,
-                environment: PlusMinusDomain.Environment()
+                initialState: AddToCartDomain.State(),
+                reducer: AddToCartDomain.reducer,
+                environment: AddToCartDomain.Environment()
             )
         )
     }

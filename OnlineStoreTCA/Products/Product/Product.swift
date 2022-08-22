@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import ComposableArchitecture
 
 struct Product: Equatable, Identifiable {
     let id: Int

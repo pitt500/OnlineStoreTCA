@@ -9,15 +9,23 @@ import SwiftUI
 import ComposableArchitecture
 
 struct ProductListView: View {
-    let store: Store<ProductDomain.State,ProductDomain.Action>
+    let store: Store<ProductListDomain.State,ProductListDomain.Action>
     
     var body: some View {
         WithViewStore(self.store) { viewStore in
             NavigationView {
-                List(viewStore.products) { product in
-                    ProductCell(product: product)
-                        .listRowSeparator(.hidden)
-                }.onAppear {
+                List {
+                    ForEachStore(
+                        self.store.scope(
+                            state: \.productListState,
+                            action: ProductListDomain.Action
+                                .product(id: action:)
+                        )
+                    ) {
+                        ProductCell(store: $0)
+                    }
+                }
+                .task {
                     viewStore.send(.fetchProducts)
                 }
                 .navigationTitle("Products")
@@ -33,13 +41,13 @@ struct ProductListView: View {
                 .sheet(
                     isPresented: viewStore.binding(
                         get: \.shouldOpenCart,
-                        send: ProductDomain.Action.setCartView(isPresented:)
+                        send: ProductListDomain.Action.setCartView(isPresented:)
                     )
                 ) {
                     IfLetStore(
                         self.store.scope(
                             state: \.cartState,
-                            action: ProductDomain.Action.cart
+                            action: ProductListDomain.Action.cart
                         )
                     ) {
                         CartView(store: $0)
@@ -55,9 +63,9 @@ struct ProductListView_Previews: PreviewProvider {
     static var previews: some View {
         ProductListView(
             store: Store(
-                initialState: ProductDomain.State(),
-                reducer: ProductDomain.reducer,
-                environment: ProductDomain.Environment(
+                initialState: ProductListDomain.State(),
+                reducer: ProductListDomain.reducer,
+                environment: ProductListDomain.Environment(
                     fetchProducts: { Product.sample },
                     sendOrder: { _ in "OK" }
                 )

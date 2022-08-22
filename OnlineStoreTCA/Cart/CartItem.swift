@@ -6,11 +6,12 @@
 //
 
 import Foundation
+import ComposableArchitecture
 
 struct CartItem: Equatable, Identifiable {
     let id: UUID
     let product: Product
-    let quantity: UInt
+    let quantity: Int
 }
 
 extension CartItem {

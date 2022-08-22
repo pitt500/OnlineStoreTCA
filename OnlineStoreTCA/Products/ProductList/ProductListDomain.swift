@@ -1,5 +1,5 @@
 //
-//  ProductDomain.swift
+//  ProductListDomain.swift
 //  OnlineStoreTCA
 //
 //  Created by Pedro Rojas on 17/08/22.
@@ -8,12 +8,11 @@
 import Foundation
 import ComposableArchitecture
 
-struct ProductDomain {
+struct ProductListDomain {
     struct State: Equatable {
-        var products: [Product] = []
-        var selectedProducts: [Product.ID: UInt] = [:]
         var shouldOpenCart = false
         var cartState: CartDomain.State?
+        var productListState: IdentifiedArrayOf<ProductDomain.State> = []
     }
     
     enum Action: Equatable {
@@ -21,6 +20,7 @@ struct ProductDomain {
         case fetchProductsResponse(TaskResult<[Product]>)
         case setCartView(isPresented: Bool)
         case cart(CartDomain.Action)
+        case product(id: ProductDomain.State.ID, action: ProductDomain.Action)
     }
     
     struct Environment {
@@ -31,11 +31,16 @@ struct ProductDomain {
     static let reducer = Reducer<
         State, Action, Environment
     >.combine(
+        ProductDomain.reducer.forEach(
+            state: \.productListState,
+            action: /ProductListDomain.Action.product(id:action:),
+            environment: { _ in ProductDomain.Environment() }
+        ),
         CartDomain.reducer
             .optional()
             .pullback(
                 state: \.cartState,
-                action: /ProductDomain.Action.cart,
+                action: /ProductListDomain.Action.cart,
                 environment: {
                     CartDomain.Environment(
                         sendOrder: $0.sendOrder
@@ -51,7 +56,14 @@ struct ProductDomain {
                     )
                 }
             case .fetchProductsResponse(.success(let products)):
-                state.products = products
+                state.productListState = IdentifiedArrayOf(
+                    uniqueElements: products.map {
+                        ProductDomain.State(
+                            id: UUID(),
+                            product: $0
+                        )
+                    }
+                )
                 return .none
             case .fetchProductsResponse(.failure):
                 print("Error getting products, try again later.")
@@ -61,8 +73,20 @@ struct ProductDomain {
             case .setCartView(let isPresented):
                 state.shouldOpenCart = isPresented
                 state.cartState = isPresented
-                ? CartDomain.State(cartItems: CartItem.sample)
+                ? CartDomain.State(
+                    cartItems: state.productListState.compactMap { state in
+                        state.count > 0
+                        ? CartItem(
+                            id: UUID(),
+                            product: state.product,
+                            quantity: state.count
+                        )
+                        : nil
+                    }
+                )
                 : nil
+                return .none
+            case .product(let id, let action):
                 return .none
             }
         }
