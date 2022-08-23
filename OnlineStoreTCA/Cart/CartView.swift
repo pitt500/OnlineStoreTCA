@@ -15,7 +15,7 @@ struct CartView: View {
         WithViewStore(self.store) { viewStore in
             NavigationView {
                 List(viewStore.cartItems) { item in
-                    Text("\(item.product.title), \(item.quantity)")
+                    CartCell(cartItem: item)
                 }
                 .navigationTitle("Cart")
             }
