@@ -9,7 +9,7 @@ import SwiftUI
 import ComposableArchitecture
 
 struct CartView: View {
-    let store: Store<CartDomain.State, CartDomain.Action>
+    let store: Store<CartListDomain.State, CartListDomain.Action>
     
     var body: some View {
         WithViewStore(self.store) { viewStore in
@@ -63,11 +63,11 @@ struct CartView_Previews: PreviewProvider {
     static var previews: some View {
         CartView(
             store: Store(
-                initialState: CartDomain.State(
+                initialState: CartListDomain.State(
                     cartItems: CartItem.sample
                 ),
-                reducer: CartDomain.reducer,
-                environment: CartDomain.Environment(
+                reducer: CartListDomain.reducer,
+                environment: CartListDomain.Environment(
                     sendOrder: { _ in "OK" }
                 )
             )

@@ -11,7 +11,7 @@ import ComposableArchitecture
 struct ProductListDomain {
     struct State: Equatable {
         var shouldOpenCart = false
-        var cartState: CartDomain.State?
+        var cartState: CartListDomain.State?
         var productListState: IdentifiedArrayOf<ProductDomain.State> = []
     }
     
@@ -19,7 +19,7 @@ struct ProductListDomain {
         case fetchProducts
         case fetchProductsResponse(TaskResult<[Product]>)
         case setCartView(isPresented: Bool)
-        case cart(CartDomain.Action)
+        case cart(CartListDomain.Action)
         case product(id: ProductDomain.State.ID, action: ProductDomain.Action)
     }
     
@@ -36,13 +36,13 @@ struct ProductListDomain {
             action: /ProductListDomain.Action.product(id:action:),
             environment: { _ in ProductDomain.Environment() }
         ),
-        CartDomain.reducer
+        CartListDomain.reducer
             .optional()
             .pullback(
                 state: \.cartState,
                 action: /ProductListDomain.Action.cart,
                 environment: {
-                    CartDomain.Environment(
+                    CartListDomain.Environment(
                         sendOrder: $0.sendOrder
                     )
                 }
@@ -80,7 +80,7 @@ struct ProductListDomain {
             case .setCartView(let isPresented):
                 state.shouldOpenCart = isPresented
                 state.cartState = isPresented
-                ? CartDomain.State(
+                ? CartListDomain.State(
                     cartItems: state.productListState.compactMap { state in
                         state.count > 0
                         ? CartItem(

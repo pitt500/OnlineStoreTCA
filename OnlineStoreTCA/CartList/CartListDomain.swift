@@ -1,5 +1,5 @@
 //
-//  CartDomain.swift
+//  CartListDomain.swift
 //  OnlineStoreTCA
 //
 //  Created by Pedro Rojas on 18/08/22.
@@ -8,11 +8,11 @@
 import Foundation
 import ComposableArchitecture
 
-struct CartDomain {
+struct CartListDomain {
     struct State: Equatable {
         var cartItems: [CartItem] = []
         var totalPrice: Double = 0.0
-        var alert: AlertState<CartDomain.Action>?
+        var alert: AlertState<CartListDomain.Action>?
         
         var totalPriceString: String {
             let roundedValue = round(totalPrice * 100) / 100.0
