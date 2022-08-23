@@ -1,5 +1,5 @@
 //
-//  CartView.swift
+//  CartListView.swift
 //  OnlineStoreTCA
 //
 //  Created by Pedro Rojas on 18/08/22.
@@ -8,7 +8,7 @@
 import SwiftUI
 import ComposableArchitecture
 
-struct CartView: View {
+struct CartListView: View {
     let store: Store<CartListDomain.State, CartListDomain.Action>
     
     var body: some View {
@@ -61,7 +61,7 @@ struct CartView: View {
 
 struct CartView_Previews: PreviewProvider {
     static var previews: some View {
-        CartView(
+        CartListView(
             store: Store(
                 initialState: CartListDomain.State(
                     cartItems: CartItem.sample

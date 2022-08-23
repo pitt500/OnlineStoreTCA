@@ -50,7 +50,7 @@ struct ProductListView: View {
                             action: ProductListDomain.Action.cart
                         )
                     ) {
-                        CartView(store: $0)
+                        CartListView(store: $0)
                     }
                 }
                 
