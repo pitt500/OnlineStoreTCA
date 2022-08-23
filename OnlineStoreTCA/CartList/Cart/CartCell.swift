@@ -42,7 +42,11 @@ struct CartCell: View {
                     HStack {
                         Spacer()
                         Button {
-                            viewStore.send(.deleteCartItem)
+                            viewStore.send(
+                                .deleteCartItem(
+                                product: viewStore.cartItem.product
+                                )
+                            )
                         } label: {
                             Image(systemName: "trash.fill")
                                 .foregroundColor(.red)

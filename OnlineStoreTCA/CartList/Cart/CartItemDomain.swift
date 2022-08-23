@@ -15,7 +15,7 @@ struct CartItemDomain {
     }
     
     enum Action: Equatable {
-        case deleteCartItem
+        case deleteCartItem(product: Product)
     }
     
     struct Environment {}

@@ -74,6 +74,12 @@ struct ProductListDomain {
                     state.shouldOpenCart = false
                     state.cartState = nil
                     return .none
+                case .cartItem(_, let action):
+                    switch action {
+                    case .deleteCartItem(let product):
+                        //state.productListState
+                        return .none
+                    }
                 default:
                     return .none
                 }

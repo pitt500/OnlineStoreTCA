@@ -43,6 +43,7 @@ struct CartListView: View {
                     .background(.blue)
                     .cornerRadius(10)
                     .padding()
+                    .opacity(viewStore.isPayButtonHidden ? 0 : 1)
                 }
                 .onAppear {
                     viewStore.send(.getTotalPrice)
