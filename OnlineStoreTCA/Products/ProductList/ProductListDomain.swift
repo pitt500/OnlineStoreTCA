@@ -86,12 +86,15 @@ struct ProductListDomain {
                     return .none
                 }
             case .resetProduct(let product):
-                // TODO: Fix Product's count and addToCartState's count sync
+                
                 guard let index = state.productListState.firstIndex(
                     where: { $0.product.id == product.id }
                 )
                 else { return .none }
                 let productStateId = state.productListState[index].id
+                
+                // TODO: Is there a better way to implement this?
+                state.productListState[id: productStateId]?.count = 0
                 state.productListState[id: productStateId]?.addToCartState.count = 0
                 return .none
                 
