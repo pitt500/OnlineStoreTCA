@@ -23,9 +23,8 @@ struct CartDomain {
     
     enum Action: Equatable {
         case fetchCartItems([CartItem])
-        case didPressPurchaseButton
         case didPressCloseButton
-        case fetchPurchaseResponse(TaskResult<String>)
+        case didReceivePurchaseResponse(TaskResult<String>)
         case getTotalPrice
         case didPressPayButton
         case didCancelConfirmation
@@ -44,20 +43,13 @@ struct CartDomain {
         case .fetchCartItems(let items):
             state.cartItems = items
             return .none
-        case .didPressPurchaseButton:
-            let items = state.cartItems
-            return .task {
-                await .fetchPurchaseResponse(
-                    TaskResult { try await environment.sendOrder(items) }
-                )
-            }
         case .didPressCloseButton:
             state.isCartViewOpen = false
             return .none
-        case .fetchPurchaseResponse(.success(let message)):
+        case .didReceivePurchaseResponse(.success(let message)):
             print("Success: \(message)")
             return .none
-        case .fetchPurchaseResponse(.failure):
+        case .didReceivePurchaseResponse(.failure):
             print("Unable to send order")
             return .none
         case .getTotalPrice:
@@ -76,15 +68,17 @@ struct CartDomain {
                     .cancel(TextState("Cancel"), action: .send(.didCancelConfirmation))
                 ]
             )
-            
-            
             return .none
         case .didCancelConfirmation:
             state.alert = nil
             return .none
         case .didConfirmPurchase:
-            print("Thanks")
-            return .none
+            let items = state.cartItems
+            return .task {
+                await .didReceivePurchaseResponse(
+                    TaskResult { try await environment.sendOrder(items) }
+                )
+            }
         }
     }
 }
