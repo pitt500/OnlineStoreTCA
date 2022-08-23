@@ -27,6 +27,11 @@ extension CartItem {
                 product: Product.sample[1],
                 quantity: 1
             ),
+            .init(
+                id: UUID(),
+                product: Product.sample[2],
+                quantity: 1
+            ),
         ]
     }
 }
