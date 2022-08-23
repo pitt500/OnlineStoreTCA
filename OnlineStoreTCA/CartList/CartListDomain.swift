@@ -10,7 +10,7 @@ import ComposableArchitecture
 
 struct CartListDomain {
     struct State: Equatable {
-        var cartItems: [CartItem] = []
+        var cartItems: IdentifiedArrayOf<CartItemDomain.State> = []
         var totalPrice: Double = 0.0
         var alert: AlertState<CartListDomain.Action>?
         
@@ -28,6 +28,7 @@ struct CartListDomain {
         case didPressPayButton
         case didCancelConfirmation
         case didConfirmPurchase
+        case cartItem(id: CartItemDomain.State.ID, action: CartItemDomain.Action)
     }
     
     struct Environment {
@@ -36,47 +37,66 @@ struct CartListDomain {
     
     static let reducer = Reducer<
         State, Action, Environment
-    >
-    { state, action, environment in
-        switch action {
-        case .fetchCartItems(let items):
-            state.cartItems = items
-            return .none
-        case .didPressCloseButton:
-            return .none
-        case .didReceivePurchaseResponse(.success(let message)):
-            print("Success: \(message)")
-            return .none
-        case .didReceivePurchaseResponse(.failure):
-            print("Unable to send order")
-            return .none
-        case .getTotalPrice:
-            state.totalPrice = state.cartItems.reduce(0.0, {
-                $0 + ($1.product.price * Double($1.quantity))
-            })
-            return .none
-        case .didPressPayButton:
-            state.alert = AlertState(
-                title: TextState("Confirm your purchase"),
-                message: TextState("Do you want to proceed with your purchase of \(state.totalPriceString)?"),
-                buttons: [
-                    .default(
-                        TextState("Pay \(state.totalPriceString)"),
-                        action: .send(.didConfirmPurchase)),
-                    .cancel(TextState("Cancel"), action: .send(.didCancelConfirmation))
-                ]
-            )
-            return .none
-        case .didCancelConfirmation:
-            state.alert = nil
-            return .none
-        case .didConfirmPurchase:
-            let items = state.cartItems
-            return .task {
-                await .didReceivePurchaseResponse(
-                    TaskResult { try await environment.sendOrder(items) }
+    >.combine(
+        CartItemDomain.reducer.forEach(
+            state: \.cartItems,
+            action: /CartListDomain.Action.cartItem(id:action:),
+            environment: { _ in CartItemDomain.Environment() }
+        ),
+        .init { state, action, environment in
+            switch action {
+            case .fetchCartItems(let items):
+                state.cartItems = IdentifiedArrayOf(
+                    uniqueElements: items.map {
+                        CartItemDomain.State(
+                            id: UUID(),
+                            cartItem: $0
+                        )
+                    }
                 )
+                return .none
+            case .didPressCloseButton:
+                return .none
+            case .didReceivePurchaseResponse(.success(let message)):
+                print("Success: \(message)")
+                return .none
+            case .didReceivePurchaseResponse(.failure):
+                print("Unable to send order")
+                return .none
+            case .getTotalPrice:
+                let items = state.cartItems.map { $0.cartItem }
+                state.totalPrice = items.reduce(0.0, {
+                    $0 + ($1.product.price * Double($1.quantity))
+                })
+                return .none
+            case .didPressPayButton:
+                state.alert = AlertState(
+                    title: TextState("Confirm your purchase"),
+                    message: TextState("Do you want to proceed with your purchase of \(state.totalPriceString)?"),
+                    buttons: [
+                        .default(
+                            TextState("Pay \(state.totalPriceString)"),
+                            action: .send(.didConfirmPurchase)),
+                        .cancel(TextState("Cancel"), action: .send(.didCancelConfirmation))
+                    ]
+                )
+                return .none
+            case .didCancelConfirmation:
+                state.alert = nil
+                return .none
+            case .didConfirmPurchase:
+                let items = state.cartItems.map { $0.cartItem }
+                return .task {
+                    await .didReceivePurchaseResponse(
+                        TaskResult { try await environment.sendOrder(items) }
+                    )
+                }
+            case .cartItem(let id,let action):
+                switch action {
+                case .deleteCartItem:
+                    return .none
+                }
             }
         }
-    }
+    )
 }

@@ -14,8 +14,16 @@ struct CartListView: View {
     var body: some View {
         WithViewStore(self.store) { viewStore in
             NavigationView {
-                List(viewStore.cartItems) { item in
-                    CartCell(cartItem: item)
+                List {
+                    ForEachStore(
+                        self.store.scope(
+                            state: \.cartItems,
+                            action: CartListDomain.Action
+                                .cartItem(id:action:)
+                        )
+                    ) {
+                        CartCell(store: $0)
+                    }
                 }
                 .safeAreaInset(edge: .bottom) {
                     Button {
@@ -64,7 +72,15 @@ struct CartView_Previews: PreviewProvider {
         CartListView(
             store: Store(
                 initialState: CartListDomain.State(
-                    cartItems: CartItem.sample
+                    cartItems: IdentifiedArrayOf(
+                        uniqueElements: CartItem.sample
+                            .compactMap {
+                                CartItemDomain.State(
+                                    id: UUID(),
+                                    cartItem: $0
+                                )
+                            }
+                    )
                 ),
                 reducer: CartListDomain.reducer,
                 environment: CartListDomain.Environment(

@@ -81,15 +81,22 @@ struct ProductListDomain {
                 state.shouldOpenCart = isPresented
                 state.cartState = isPresented
                 ? CartListDomain.State(
-                    cartItems: state.productListState.compactMap { state in
-                        state.count > 0
-                        ? CartItem(
-                            id: UUID(),
-                            product: state.product,
-                            quantity: state.count
-                        )
-                        : nil
-                    }
+                    cartItems: IdentifiedArrayOf(
+                        uniqueElements: state
+                            .productListState
+                            .compactMap { state in
+                                state.count > 0
+                                ? CartItemDomain.State(
+                                    id: UUID(),
+                                    cartItem: CartItem(
+                                        id: UUID(),
+                                        product: state.product,
+                                        quantity: state.count
+                                    )
+                                )
+                                : nil
+                            }
+                    )
                 )
                 : nil
                 return .none
