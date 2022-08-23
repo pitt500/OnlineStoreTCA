@@ -30,16 +30,29 @@ struct CartCell: View {
                 }
                 
             }
-            Group {
-                Text("Quantity: ")
-                +
-                Text("\(cartItem.quantity)")
-                    .fontWeight(.bold)
+            ZStack {
+                Group {
+                    Text("Quantity: ")
+                    +
+                    Text("\(cartItem.quantity)")
+                        .fontWeight(.bold)
+                }
+                .font(.custom("AmericanTypewriter", size: 25))
+                HStack {
+                    Spacer()
+                    Button {
+                        
+                    } label: {
+                        Image(systemName: "trash.fill")
+                            .foregroundColor(.red)
+                            .padding()
+                    }
+
+                }
             }
-            .font(.custom("AmericanTypewriter", size: 25))
         }
         .font(.custom("AmericanTypewriter", size: 20))
-        .padding([.bottom, .top], 20)
+        .padding([.bottom, .top], 10)
     }
 }
 
