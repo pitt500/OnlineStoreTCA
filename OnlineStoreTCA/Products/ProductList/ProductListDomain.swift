@@ -21,6 +21,7 @@ struct ProductListDomain {
         case setCartView(isPresented: Bool)
         case cart(CartListDomain.Action)
         case product(id: ProductDomain.State.ID, action: ProductDomain.Action)
+        case resetProduct(product: Product)
     }
     
     struct Environment {
@@ -77,12 +78,23 @@ struct ProductListDomain {
                 case .cartItem(_, let action):
                     switch action {
                     case .deleteCartItem(let product):
-                        //state.productListState
-                        return .none
+                        return .task {
+                            .resetProduct(product: product)
+                        }
                     }
                 default:
                     return .none
                 }
+            case .resetProduct(let product):
+                // TODO: Fix Product's count and addToCartState's count sync
+                guard let index = state.productListState.firstIndex(
+                    where: { $0.product.id == product.id }
+                )
+                else { return .none }
+                let productStateId = state.productListState[index].id
+                state.productListState[id: productStateId]?.addToCartState.count = 0
+                return .none
+                
             case .setCartView(let isPresented):
                 state.shouldOpenCart = isPresented
                 state.cartState = isPresented
