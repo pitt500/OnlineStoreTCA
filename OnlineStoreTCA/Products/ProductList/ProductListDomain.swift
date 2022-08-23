@@ -68,8 +68,15 @@ struct ProductListDomain {
             case .fetchProductsResponse(.failure):
                 print("Error getting products, try again later.")
                 return .none
-            case .cart:
-                return .none
+            case .cart(let action):
+                switch action {
+                case .didPressCloseButton:
+                    state.shouldOpenCart = false
+                    state.cartState = nil
+                    return .none
+                default:
+                    return .none
+                }
             case .setCartView(let isPresented):
                 state.shouldOpenCart = isPresented
                 state.cartState = isPresented

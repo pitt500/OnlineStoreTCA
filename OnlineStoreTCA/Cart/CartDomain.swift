@@ -11,7 +11,6 @@ import ComposableArchitecture
 struct CartDomain {
     struct State: Equatable {
         var cartItems: [CartItem] = []
-        var isCartViewOpen = false
         var totalPrice: Double = 0.0
         var alert: AlertState<CartDomain.Action>?
         
@@ -44,7 +43,6 @@ struct CartDomain {
             state.cartItems = items
             return .none
         case .didPressCloseButton:
-            state.isCartViewOpen = false
             return .none
         case .didReceivePurchaseResponse(.success(let message)):
             print("Success: \(message)")

@@ -44,6 +44,15 @@ struct CartView: View {
                     self.store.scope(state: \.alert),
                     dismiss: .didCancelConfirmation
                 )
+                .toolbar {
+                    ToolbarItem(placement: .navigationBarLeading) {
+                        Button {
+                            viewStore.send(.didPressCloseButton)
+                        } label: {
+                            Text("Close")
+                        }
+                    }
+                }
                 
             }
         }
@@ -55,8 +64,7 @@ struct CartView_Previews: PreviewProvider {
         CartView(
             store: Store(
                 initialState: CartDomain.State(
-                    cartItems: CartItem.sample,
-                    isCartViewOpen: true
+                    cartItems: CartItem.sample
                 ),
                 reducer: CartDomain.reducer,
                 environment: CartDomain.Environment(
