@@ -25,7 +25,7 @@ struct AddToCartButton: View {
                         .foregroundColor(.white)
                         .cornerRadius(10)
                 }
-                .buttonStyle(PlainButtonStyle())
+                .buttonStyle(.plain)
             }
         }
     }

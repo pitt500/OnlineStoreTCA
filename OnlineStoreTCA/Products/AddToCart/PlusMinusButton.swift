@@ -23,7 +23,7 @@ struct PlusMinusButton: View {
                         .foregroundColor(.white)
                         .cornerRadius(10)
                 }
-                .buttonStyle(PlainButtonStyle())
+                .buttonStyle(.plain)
                 
                 Text(viewStore.count.description)
                     .padding(5)
@@ -37,7 +37,7 @@ struct PlusMinusButton: View {
                         .foregroundColor(.white)
                         .cornerRadius(10)
                 }
-                .buttonStyle(PlainButtonStyle())
+                .buttonStyle(.plain)
             }
         }
     }
