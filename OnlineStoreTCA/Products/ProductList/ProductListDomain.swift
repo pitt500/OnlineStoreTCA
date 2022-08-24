@@ -93,7 +93,6 @@ struct ProductListDomain {
                 else { return .none }
                 let productStateId = state.productListState[index].id
                 
-                // TODO: Is there a better way to implement this?
                 state.productListState[id: productStateId]?.count = 0
                 state.productListState[id: productStateId]?.addToCartState.count = 0
                 return .none
