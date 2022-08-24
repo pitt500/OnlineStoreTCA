@@ -15,10 +15,19 @@ struct CartCell: View {
         WithViewStore(self.store) { viewStore in
             VStack {
                 HStack {
-                    Image(viewStore.cartItem.product.imageString)
+                    AsyncImage(
+                        url: URL(
+                            string: viewStore.cartItem.product.imageString
+                        )
+                    ) {
+                        $0
                         .resizable()
                         .aspectRatio(contentMode: .fit)
-                        .frame(height: 100)
+                        .frame(width: 100, height: 100)
+                    } placeholder: {
+                        ProgressView()
+                            .frame(width: 100, height: 100)
+                    }
                     VStack(alignment: .leading) {
                         Text(viewStore.cartItem.product.title)
                             .lineLimit(3)
