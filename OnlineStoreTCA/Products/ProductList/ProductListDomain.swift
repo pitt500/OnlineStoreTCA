@@ -10,9 +10,17 @@ import ComposableArchitecture
 
 struct ProductListDomain {
     struct State: Equatable {
+        fileprivate var dataState = DataState.notStarted
         var shouldOpenCart = false
         var cartState: CartListDomain.State?
         var productListState: IdentifiedArrayOf<ProductDomain.State> = []
+    }
+    
+    fileprivate enum DataState {
+        case notStarted
+        case loading
+        case success
+        case error
     }
     
     enum Action: Equatable {
@@ -56,12 +64,18 @@ struct ProductListDomain {
         .init { state, action, environment in
             switch action {
             case .fetchProducts:
+                if state.dataState == .success || state.dataState == .loading {
+                    return .none
+                }
+                
+                state.dataState = .loading
                 return .task {
                     await .fetchProductsResponse(
                         TaskResult { try await environment.fetchProducts() }
                     )
                 }
             case .fetchProductsResponse(.success(let products)):
+                state.dataState = .success
                 state.productListState = IdentifiedArrayOf(
                     uniqueElements: products.map {
                         ProductDomain.State(
@@ -72,6 +86,7 @@ struct ProductListDomain {
                 )
                 return .none
             case .fetchProductsResponse(.failure(let error)):
+                state.dataState = .error
                 print(error)
                 print("Error getting products, try again later.")
                 return .none
