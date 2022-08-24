@@ -27,7 +27,6 @@ struct CartListDomain {
         case didReceivePurchaseResponse(TaskResult<String>)
         case getTotalPrice
         case didPressPayButton
-        case verifyPayButtonVisibility
         case didCancelConfirmation
         case didConfirmPurchase
         case deleteCartItemOnMainThread(id: CartItemDomain.State.ID)
@@ -71,7 +70,7 @@ struct CartListDomain {
                 state.totalPrice = items.reduce(0.0, {
                     $0 + ($1.product.price * Double($1.quantity))
                 })
-                return Effect(value: .verifyPayButtonVisibility)
+                return verifyPayButtonVisibility(state: &state)
             case .didPressPayButton:
                 state.alert = AlertState(
                     title: TextState("Confirm your purchase"),
@@ -104,11 +103,14 @@ struct CartListDomain {
             case .deleteCartItemOnMainThread(let id):
                 state.cartItems.remove(id: id)
                 return Effect(value: .getTotalPrice)
-                
-            case .verifyPayButtonVisibility:
-                state.isPayButtonHidden = state.totalPrice == 0.0
-                return .none
             }
         }
     )
+    
+    private static func verifyPayButtonVisibility(
+        state: inout State
+    ) -> Effect<Action, Never> {
+        state.isPayButtonHidden = state.totalPrice == 0.0
+        return .none
+    }
 }
