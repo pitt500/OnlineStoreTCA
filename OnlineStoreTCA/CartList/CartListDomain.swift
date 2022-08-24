@@ -28,7 +28,7 @@ struct CartListDomain {
         case didPressPayButton
         case didCancelConfirmation
         case didConfirmPurchase
-        case deleteCartItemOnMainThread(id: CartItemDomain.State.ID)
+        case deleteCartItem(id: CartItemDomain.State.ID)
         case cartItem(id: CartItemDomain.State.ID, action: CartItemDomain.Action)
     }
     
@@ -86,10 +86,10 @@ struct CartListDomain {
                 switch action {
                 case .deleteCartItem:
                     return .task {
-                        .deleteCartItemOnMainThread(id: id)
+                        .deleteCartItem(id: id)
                     }
                 }
-            case .deleteCartItemOnMainThread(let id):
+            case .deleteCartItem(let id):
                 state.cartItems.remove(id: id)
                 return Effect(value: .getTotalPrice)
             }
