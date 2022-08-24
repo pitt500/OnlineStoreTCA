@@ -35,11 +35,6 @@ struct ProductListDomain {
     struct Environment {
         var fetchProducts: () async throws -> [Product]
         var sendOrder: ([CartItem]) async throws -> String
-        
-        static let live = Self(
-            fetchProducts: APIClient.live.fetchProducts,
-            sendOrder: APIClient.live.sendOrder
-        )
     }
     
     static let reducer = Reducer<

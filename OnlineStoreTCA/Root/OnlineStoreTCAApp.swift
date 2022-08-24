@@ -12,10 +12,10 @@ import ComposableArchitecture
 struct OnlineStoreTCAApp: App {
     var body: some Scene {
         WindowGroup {
-            ProductListView(
+            RootView(
                 store: Store(
-                    initialState: ProductListDomain.State(),
-                    reducer: ProductListDomain.reducer,
+                    initialState: RootDomain.State(),
+                    reducer: RootDomain.reducer,
                     environment: .live
                 )
             )
