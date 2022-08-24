@@ -14,15 +14,22 @@ struct ProductListView: View {
     var body: some View {
         WithViewStore(self.store) { viewStore in
             NavigationView {
-                List {
-                    ForEachStore(
-                        self.store.scope(
-                            state: \.productListState,
-                            action: ProductListDomain.Action
-                                .product(id: action:)
-                        )
-                    ) {
-                        ProductCell(store: $0)
+                Group {
+                    if viewStore.productListState.isEmpty {
+                        ProgressView()
+                            .frame(width: 100, height: 100)
+                    } else {
+                        List {
+                            ForEachStore(
+                                self.store.scope(
+                                    state: \.productListState,
+                                    action: ProductListDomain.Action
+                                        .product(id: action:)
+                                )
+                            ) {
+                                ProductCell(store: $0)
+                            }
+                        }
                     }
                 }
                 .task {
