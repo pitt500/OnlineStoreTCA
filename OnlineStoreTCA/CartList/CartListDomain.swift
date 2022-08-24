@@ -22,7 +22,6 @@ struct CartListDomain {
     }
     
     enum Action: Equatable {
-        case fetchCartItems([CartItem])
         case didPressCloseButton
         case didReceivePurchaseResponse(TaskResult<String>)
         case getTotalPrice
@@ -47,16 +46,6 @@ struct CartListDomain {
         ),
         .init { state, action, environment in
             switch action {
-            case .fetchCartItems(let items):
-                state.cartItems = IdentifiedArrayOf(
-                    uniqueElements: items.map {
-                        CartItemDomain.State(
-                            id: UUID(),
-                            cartItem: $0
-                        )
-                    }
-                )
-                return .none
             case .didPressCloseButton:
                 return .none
             case .didReceivePurchaseResponse(.success(let message)):
