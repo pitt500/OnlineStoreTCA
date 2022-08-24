@@ -20,10 +20,11 @@
 		B525335128AE87C700B29A17 /* CartListDomain.swift in Sources */ = {isa = PBXBuildFile; fileRef = B525335028AE87C700B29A17 /* CartListDomain.swift */; };
 		B525335328AE883B00B29A17 /* CartItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = B525335228AE883B00B29A17 /* CartItem.swift */; };
 		B525335528AE8C5600B29A17 /* CartListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B525335428AE8C5600B29A17 /* CartListView.swift */; };
+		B556E16428B5C44000CB51F4 /* APIClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = B556E16328B5C44000CB51F4 /* APIClient.swift */; };
+		B556E16B28B5CEA900CB51F4 /* ComposableArchitecture in Frameworks */ = {isa = PBXBuildFile; productRef = B556E16A28B5CEA900CB51F4 /* ComposableArchitecture */; };
 		B5A5CFB5289C257900AC3E5E /* OnlineStoreTCAApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5A5CFB4289C257900AC3E5E /* OnlineStoreTCAApp.swift */; };
 		B5A5CFB9289C257B00AC3E5E /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = B5A5CFB8289C257B00AC3E5E /* Assets.xcassets */; };
 		B5A5CFBC289C257B00AC3E5E /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = B5A5CFBB289C257B00AC3E5E /* Preview Assets.xcassets */; };
-		B5B41FA028AD3B8A008B12B7 /* ComposableArchitecture in Frameworks */ = {isa = PBXBuildFile; productRef = B5B41F9F28AD3B8A008B12B7 /* ComposableArchitecture */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -40,6 +41,7 @@
 		B525335028AE87C700B29A17 /* CartListDomain.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CartListDomain.swift; sourceTree = "<group>"; };
 		B525335228AE883B00B29A17 /* CartItem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CartItem.swift; sourceTree = "<group>"; };
 		B525335428AE8C5600B29A17 /* CartListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CartListView.swift; sourceTree = "<group>"; };
+		B556E16328B5C44000CB51F4 /* APIClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = APIClient.swift; sourceTree = "<group>"; };
 		B5A5CFB1289C257900AC3E5E /* OnlineStoreTCA.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = OnlineStoreTCA.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		B5A5CFB4289C257900AC3E5E /* OnlineStoreTCAApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnlineStoreTCAApp.swift; sourceTree = "<group>"; };
 		B5A5CFB8289C257B00AC3E5E /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
@@ -51,7 +53,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				B5B41FA028AD3B8A008B12B7 /* ComposableArchitecture in Frameworks */,
+				B556E16B28B5CEA900CB51F4 /* ComposableArchitecture in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -132,6 +134,14 @@
 			path = CartList;
 			sourceTree = "<group>";
 		};
+		B556E16228B5BD6000CB51F4 /* Network */ = {
+			isa = PBXGroup;
+			children = (
+				B556E16328B5C44000CB51F4 /* APIClient.swift */,
+			);
+			path = Network;
+			sourceTree = "<group>";
+		};
 		B5A5CFA8289C257900AC3E5E = {
 			isa = PBXGroup;
 			children = (
@@ -151,6 +161,7 @@
 		B5A5CFB3289C257900AC3E5E /* OnlineStoreTCA */ = {
 			isa = PBXGroup;
 			children = (
+				B556E16228B5BD6000CB51F4 /* Network */,
 				B525334F28AE87B500B29A17 /* CartList */,
 				B525334528AD3DDF00B29A17 /* Root */,
 				B525334428AD3DD500B29A17 /* Profile */,
@@ -186,7 +197,7 @@
 			);
 			name = OnlineStoreTCA;
 			packageProductDependencies = (
-				B5B41F9F28AD3B8A008B12B7 /* ComposableArchitecture */,
+				B556E16A28B5CEA900CB51F4 /* ComposableArchitecture */,
 			);
 			productName = OnlineStoreTCA;
 			productReference = B5A5CFB1289C257900AC3E5E /* OnlineStoreTCA.app */;
@@ -217,7 +228,7 @@
 			);
 			mainGroup = B5A5CFA8289C257900AC3E5E;
 			packageReferences = (
-				B5B41F9E28AD3B8A008B12B7 /* XCRemoteSwiftPackageReference "swift-composable-architecture" */,
+				B556E16928B5CEA900CB51F4 /* XCRemoteSwiftPackageReference "swift-composable-architecture" */,
 			);
 			productRefGroup = B5A5CFB2289C257900AC3E5E /* Products */;
 			projectDirPath = "";
@@ -253,6 +264,7 @@
 				B525334E28ADD6DE00B29A17 /* ProductListView.swift in Sources */,
 				B5A5CFB5289C257900AC3E5E /* OnlineStoreTCAApp.swift in Sources */,
 				B50F8F1028B3D7FB0034B039 /* CartCell.swift in Sources */,
+				B556E16428B5C44000CB51F4 /* APIClient.swift in Sources */,
 				B525334728AD3F6000B29A17 /* ProductListDomain.swift in Sources */,
 				B50F8F0C28B2C1A70034B039 /* ProductDomain.swift in Sources */,
 				B50F8EFF28B18F020034B039 /* ProductCell.swift in Sources */,
@@ -461,7 +473,7 @@
 /* End XCConfigurationList section */
 
 /* Begin XCRemoteSwiftPackageReference section */
-		B5B41F9E28AD3B8A008B12B7 /* XCRemoteSwiftPackageReference "swift-composable-architecture" */ = {
+		B556E16928B5CEA900CB51F4 /* XCRemoteSwiftPackageReference "swift-composable-architecture" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/pointfreeco/swift-composable-architecture.git";
 			requirement = {
@@ -472,9 +484,9 @@
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
-		B5B41F9F28AD3B8A008B12B7 /* ComposableArchitecture */ = {
+		B556E16A28B5CEA900CB51F4 /* ComposableArchitecture */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = B5B41F9E28AD3B8A008B12B7 /* XCRemoteSwiftPackageReference "swift-composable-architecture" */;
+			package = B556E16928B5CEA900CB51F4 /* XCRemoteSwiftPackageReference "swift-composable-architecture" */;
 			productName = ComposableArchitecture;
 		};
 /* End XCSwiftPackageProductDependency section */

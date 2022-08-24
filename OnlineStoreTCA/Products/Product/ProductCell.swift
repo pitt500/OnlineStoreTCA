@@ -14,9 +14,18 @@ struct ProductCell: View {
     var body: some View {
         WithViewStore(self.store) { viewStore in
             VStack {
-                Image(viewStore.product.imageString)
-                    .resizable()
-                    .aspectRatio(contentMode: .fit)
+                AsyncImage(
+                    url: URL(string: viewStore.product.imageString)
+                ) { image in
+                    image
+                        .resizable()
+                        .aspectRatio(contentMode: .fit)
+                        .frame(height: 300)
+                } placeholder: {
+                    ProgressView()
+                        .frame(height: 300)
+                }
+                
                 VStack(alignment: .leading) {
                     Text(viewStore.product.title)
                     HStack {

@@ -16,10 +16,7 @@ struct OnlineStoreTCAApp: App {
                 store: Store(
                     initialState: ProductListDomain.State(),
                     reducer: ProductListDomain.reducer,
-                    environment: ProductListDomain.Environment(
-                        fetchProducts: { Product.sample },
-                        sendOrder: { _ in "OK" }
-                    )
+                    environment: .live
                 )
             )
         }

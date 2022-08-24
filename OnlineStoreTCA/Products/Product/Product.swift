@@ -19,6 +19,27 @@ struct Product: Equatable, Identifiable {
     // Add rating later...
 }
 
+extension Product: Decodable {
+    private enum ProductKeys: String, CodingKey {
+        case id
+        case title
+        case price
+        case description
+        case category
+        case image
+    }
+    
+    init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: ProductKeys.self)
+        self.id = try container.decode(Int.self, forKey: .id)
+        self.title = try container.decode(String.self, forKey: .title)
+        self.price = try container.decode(Double.self, forKey: .price)
+        self.description = try container.decode(String.self, forKey: .description)
+        self.category = try container.decode(String.self, forKey: .category)
+        self.imageString = try container.decode(String.self, forKey: .image)
+    }
+}
+
 extension Product {
     static var sample: [Product] {
         [
