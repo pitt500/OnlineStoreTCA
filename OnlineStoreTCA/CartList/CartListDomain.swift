@@ -15,6 +15,7 @@ struct CartListDomain {
         var confirmationAlert: AlertState<CartListDomain.Action>?
         var successAlert: AlertState<CartListDomain.Action>?
         var isPayButtonHidden = false
+        var isRequestInProcess = false
         
         var totalPriceString: String {
             let roundedValue = round(totalPrice * 100) / 100.0
@@ -51,6 +52,7 @@ struct CartListDomain {
             case .didPressCloseButton:
                 return .none
             case .didReceivePurchaseResponse(.success(let message)):
+                state.isRequestInProcess = false
                 state.successAlert = AlertState(
                     title: TextState("Thank you!"),
                     message: TextState("Your order is in process."),
@@ -61,6 +63,7 @@ struct CartListDomain {
                 print("Success: \(message)")
                 return .none
             case .didReceivePurchaseResponse(.failure):
+                state.isRequestInProcess = false
                 print("Unable to send order")
                 return .none
             case .getTotalPrice:
@@ -88,6 +91,7 @@ struct CartListDomain {
                 state.successAlert = nil
                 return .none
             case .didConfirmPurchase:
+                state.isRequestInProcess = true
                 let items = state.cartItems.map { $0.cartItem }
                 return .task {
                     await .didReceivePurchaseResponse(
