@@ -12,7 +12,8 @@ struct CartListDomain {
     struct State: Equatable {
         var cartItems: IdentifiedArrayOf<CartItemDomain.State> = []
         var totalPrice: Double = 0.0
-        var alert: AlertState<CartListDomain.Action>?
+        var confirmationAlert: AlertState<CartListDomain.Action>?
+        var successAlert: AlertState<CartListDomain.Action>?
         var isPayButtonHidden = false
         
         var totalPriceString: String {
@@ -28,6 +29,7 @@ struct CartListDomain {
         case didPressPayButton
         case didCancelConfirmation
         case didConfirmPurchase
+        case dismissSuccessAlert
         case deleteCartItem(id: CartItemDomain.State.ID)
         case cartItem(id: CartItemDomain.State.ID, action: CartItemDomain.Action)
     }
@@ -49,6 +51,13 @@ struct CartListDomain {
             case .didPressCloseButton:
                 return .none
             case .didReceivePurchaseResponse(.success(let message)):
+                state.successAlert = AlertState(
+                    title: TextState("Thank you!"),
+                    message: TextState("Your order is in process."),
+                    buttons: [
+                        .default(TextState("Done"), action: .send(.dismissSuccessAlert))
+                    ]
+                )
                 print("Success: \(message)")
                 return .none
             case .didReceivePurchaseResponse(.failure):
@@ -61,7 +70,7 @@ struct CartListDomain {
                 })
                 return verifyPayButtonVisibility(state: &state)
             case .didPressPayButton:
-                state.alert = AlertState(
+                state.confirmationAlert = AlertState(
                     title: TextState("Confirm your purchase"),
                     message: TextState("Do you want to proceed with your purchase of \(state.totalPriceString)?"),
                     buttons: [
@@ -73,7 +82,10 @@ struct CartListDomain {
                 )
                 return .none
             case .didCancelConfirmation:
-                state.alert = nil
+                state.confirmationAlert = nil
+                return .none
+            case .dismissSuccessAlert:
+                state.successAlert = nil
                 return .none
             case .didConfirmPurchase:
                 let items = state.cartItems.map { $0.cartItem }

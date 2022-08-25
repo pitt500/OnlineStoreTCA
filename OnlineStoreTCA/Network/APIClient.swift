@@ -27,7 +27,18 @@ extension APIClient {
         return products
     },
     sendOrder: { cartItems in
-        "OK"
+        let payload = try JSONEncoder().encode(cartItems)
+        var urlRequest = URLRequest(url: URL(string: "https://fakestoreapi.com/carts")!)
+        urlRequest.addValue("application/json", forHTTPHeaderField: "Content-Type")
+        urlRequest.httpMethod = "POST"
+        
+        let (data, response) = try await URLSession.shared.upload(for: urlRequest, from: payload)
+        
+        guard let httpResponse = (response as? HTTPURLResponse) else {
+            throw Failure()
+        }
+        
+        return "Status: \(httpResponse.statusCode)"//String(data: data, encoding: .utf8) ?? "default value"
     }
   )
 }

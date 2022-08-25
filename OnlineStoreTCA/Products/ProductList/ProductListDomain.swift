@@ -11,6 +11,7 @@ import ComposableArchitecture
 struct ProductListDomain {
     struct State: Equatable {
         fileprivate var dataState = DataState.notStarted
+        fileprivate var initialState: IdentifiedArrayOf<ProductDomain.State> = []
         var shouldOpenCart = false
         var cartState: CartListDomain.State?
         var productListState: IdentifiedArrayOf<ProductDomain.State> = []
@@ -30,6 +31,7 @@ struct ProductListDomain {
         case cart(CartListDomain.Action)
         case product(id: ProductDomain.State.ID, action: ProductDomain.Action)
         case resetProduct(product: Product)
+        case closeCart
     }
     
     struct Environment {
@@ -79,6 +81,7 @@ struct ProductListDomain {
                         )
                     }
                 )
+                state.initialState = state.productListState
                 return .none
             case .fetchProductsResponse(.failure(let error)):
                 state.dataState = .error
@@ -88,9 +91,12 @@ struct ProductListDomain {
             case .cart(let action):
                 switch action {
                 case .didPressCloseButton:
-                    state.shouldOpenCart = false
-                    state.cartState = nil
-                    return .none
+                    return closeCart(state: &state)
+                case .dismissSuccessAlert:
+                    state.productListState = state.initialState
+                    return .task {
+                        .closeCart
+                    }
                 case .cartItem(_, let action):
                     switch action {
                     case .deleteCartItem(let product):
@@ -101,6 +107,8 @@ struct ProductListDomain {
                 default:
                     return .none
                 }
+            case .closeCart:
+                return closeCart(state: &state)
             case .resetProduct(let product):
                 
                 guard let index = state.productListState.firstIndex(
@@ -112,7 +120,6 @@ struct ProductListDomain {
                 state.productListState[id: productStateId]?.count = 0
                 state.productListState[id: productStateId]?.addToCartState.count = 0
                 return .none
-                
             case .setCartView(let isPresented):
                 state.shouldOpenCart = isPresented
                 state.cartState = isPresented
@@ -141,4 +148,13 @@ struct ProductListDomain {
             }
         }
     )
+    
+    private static func closeCart(
+        state: inout State
+    ) -> Effect<Action, Never> {
+        state.shouldOpenCart = false
+        state.cartState = nil
+        
+        return .none
+    }
 }

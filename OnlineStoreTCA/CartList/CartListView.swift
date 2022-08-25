@@ -57,8 +57,12 @@ struct CartListView: View {
                 }
                 .navigationTitle("Cart")
                 .alert(
-                    self.store.scope(state: \.alert),
+                    self.store.scope(state: \.confirmationAlert),
                     dismiss: .didCancelConfirmation
+                )
+                .alert(
+                    self.store.scope(state: \.successAlert),
+                    dismiss: .dismissSuccessAlert
                 )
                 .toolbar {
                     ToolbarItem(placement: .navigationBarLeading) {
