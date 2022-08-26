@@ -15,6 +15,14 @@ struct ProductListDomain {
         var shouldOpenCart = false
         var cartState: CartListDomain.State?
         var productListState: IdentifiedArrayOf<ProductDomain.State> = []
+        
+        var shouldShowError: Bool {
+            dataState == .error
+        }
+        
+        var isLoading: Bool {
+            dataState == .loading
+        }
     }
     
     fileprivate enum DataState {

@@ -15,9 +15,15 @@ struct ProductListView: View {
         WithViewStore(self.store) { viewStore in
             NavigationView {
                 Group {
-                    if viewStore.productListState.isEmpty {
+                    if viewStore.isLoading {
                         ProgressView()
                             .frame(width: 100, height: 100)
+                    } else if viewStore.shouldShowError {
+                        ErrorView(
+                            message: "Oops, we couldn't fetch product list",
+                            retryAction: { viewStore.send(.fetchProducts) }
+                        )
+                        
                     } else {
                         List {
                             ForEachStore(
