@@ -65,6 +65,10 @@ struct CartListView: View {
                         self.store.scope(state: \.successAlert),
                         dismiss: .dismissSuccessAlert
                     )
+                    .alert(
+                        self.store.scope(state: \.errorAlert),
+                        dismiss: .dismissErrorAlert
+                    )
                     .toolbar {
                         ToolbarItem(placement: .navigationBarLeading) {
                             Button {

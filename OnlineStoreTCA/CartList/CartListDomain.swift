@@ -10,17 +10,33 @@ import ComposableArchitecture
 
 struct CartListDomain {
     struct State: Equatable {
+        fileprivate var dataState = DataState.notStarted
         var cartItems: IdentifiedArrayOf<CartItemDomain.State> = []
         var totalPrice: Double = 0.0
         var confirmationAlert: AlertState<CartListDomain.Action>?
+        var errorAlert: AlertState<CartListDomain.Action>?
         var successAlert: AlertState<CartListDomain.Action>?
         var isPayButtonHidden = false
-        var isRequestInProcess = false
         
         var totalPriceString: String {
             let roundedValue = round(totalPrice * 100) / 100.0
             return "$\(roundedValue)"
         }
+        
+        init(cartItems: IdentifiedArrayOf<CartItemDomain.State>) {
+            self.cartItems = cartItems
+        }
+        
+        var isRequestInProcess: Bool {
+            dataState == .loading
+        }
+    }
+    
+    fileprivate enum DataState {
+        case notStarted
+        case loading
+        case success
+        case error
     }
     
     enum Action: Equatable {
@@ -31,6 +47,7 @@ struct CartListDomain {
         case didCancelConfirmation
         case didConfirmPurchase
         case dismissSuccessAlert
+        case dismissErrorAlert
         case deleteCartItem(id: CartItemDomain.State.ID)
         case cartItem(id: CartItemDomain.State.ID, action: CartItemDomain.Action)
     }
@@ -52,7 +69,7 @@ struct CartListDomain {
             case .didPressCloseButton:
                 return .none
             case .didReceivePurchaseResponse(.success(let message)):
-                state.isRequestInProcess = false
+                state.dataState = .success
                 state.successAlert = AlertState(
                     title: TextState("Thank you!"),
                     message: TextState("Your order is in process."),
@@ -63,8 +80,15 @@ struct CartListDomain {
                 print("Success: \(message)")
                 return .none
             case .didReceivePurchaseResponse(.failure):
-                state.isRequestInProcess = false
+                state.dataState = .error
                 print("Unable to send order")
+                state.errorAlert = AlertState(
+                    title: TextState("Oops!"),
+                    message: TextState("Unable to send order, try again later."),
+                    buttons: [
+                        .default(TextState("Done"), action: .send(.dismissErrorAlert))
+                    ]
+                )
                 return .none
             case .getTotalPrice:
                 let items = state.cartItems.map { $0.cartItem }
@@ -90,8 +114,11 @@ struct CartListDomain {
             case .dismissSuccessAlert:
                 state.successAlert = nil
                 return .none
+            case .dismissErrorAlert:
+                state.errorAlert = nil
+                return .none
             case .didConfirmPurchase:
-                state.isRequestInProcess = true
+                state.dataState = .loading
                 let items = state.cartItems.map { $0.cartItem }
                 return .task {
                     await .didReceivePurchaseResponse(
