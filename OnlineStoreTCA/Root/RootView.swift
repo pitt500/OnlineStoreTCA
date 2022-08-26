@@ -26,17 +26,22 @@ struct RootView: View {
                             .productList
                     )
                 )
-                    .tabItem {
-                        Image(systemName: "list.bullet")
-                        Text("Products")
-                    }
-                    .tag(RootDomain.Tab.products)
-                Text("Hello")
-                    .tabItem {
-                        Image(systemName: "person.fill")
-                        Text("Profile")
-                    }
-                    .tag(RootDomain.Tab.profile)
+                .tabItem {
+                    Image(systemName: "list.bullet")
+                    Text("Products")
+                }
+                .tag(RootDomain.Tab.products)
+                ProfileView(
+                    store: self.store.scope(
+                        state: \.profileState,
+                        action: RootDomain.Action.profile
+                    )
+                )
+                .tabItem {
+                    Image(systemName: "person.fill")
+                    Text("Profile")
+                }
+                .tag(RootDomain.Tab.profile)
             }
         }
     }
@@ -50,7 +55,8 @@ struct RootView_Previews: PreviewProvider {
                 reducer: RootDomain.reducer,
                 environment: RootDomain.Environment(
                     fetchProducts: { Product.sample },
-                    sendOrder: { _ in "OK" }
+                    sendOrder: { _ in "OK" },
+                    fetchUserProfile: { UserProfile.sample }
                 )
             )
         )

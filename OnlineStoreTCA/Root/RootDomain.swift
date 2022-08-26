@@ -12,6 +12,7 @@ struct RootDomain {
     struct State: Equatable {
         var selectedTab = Tab.products
         var productListState = ProductListDomain.State()
+        var profileState = ProfileDomain.State()
     }
     
     enum Tab {
@@ -22,15 +23,18 @@ struct RootDomain {
     enum Action: Equatable {
         case tabSelected(Tab)
         case productList(ProductListDomain.Action)
+        case profile(ProfileDomain.Action)
     }
     
     struct Environment {
         var fetchProducts: () async throws -> [Product]
         var sendOrder: ([CartItem]) async throws -> String
+        var fetchUserProfile: () async throws -> UserProfile
         
         static let live = Self(
             fetchProducts: APIClient.live.fetchProducts,
-            sendOrder: APIClient.live.sendOrder
+            sendOrder: APIClient.live.sendOrder,
+            fetchUserProfile: APIClient.live.fetchUserProfile
         )
     }
     
@@ -48,12 +52,24 @@ struct RootDomain {
                     )
                 }
             ),
+        ProfileDomain.reducer
+            .pullback(
+                state: \.profileState,
+                action: /RootDomain.Action.profile,
+                environment: {
+                    ProfileDomain.Environment(
+                        fetchUserProfile:  $0.fetchUserProfile
+                    )
+                }
+            ),
         .init { state, action, environment in
             switch action {
             case .productList:
                 return .none
             case .tabSelected(let tab):
                 state.selectedTab = tab
+                return .none
+            case .profile:
                 return .none
             }
         }

@@ -11,8 +11,9 @@ import ComposableArchitecture
 struct APIClient {
     var fetchProducts: () async throws -> [Product]
     var sendOrder: ([CartItem]) async throws -> String
-
-  struct Failure: Error, Equatable {}
+    var fetchUserProfile: () async throws -> UserProfile
+    
+    struct Failure: Error, Equatable {}
 }
 
 // This is the "live" fact dependency that reaches into the outside world to fetch the data from network.
@@ -39,6 +40,12 @@ extension APIClient {
         }
         
         return "Status: \(httpResponse.statusCode)"//String(data: data, encoding: .utf8) ?? "default value"
+    },
+    fetchUserProfile: {
+        let (data, _) = try await URLSession.shared
+            .data(from: URL(string: "https://fakestoreapi.com/users/1")!)
+        let profile = try JSONDecoder().decode(UserProfile.self, from: data)
+        return profile
     }
   )
 }
