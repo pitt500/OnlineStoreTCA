@@ -97,10 +97,10 @@
 		B50F8F0228B19CBD0034B039 /* AddToCart */ = {
 			isa = PBXGroup;
 			children = (
+				B5BE68D728BA6E63008FC353 /* Test */,
 				B50F8F0028B19B880034B039 /* AddToCartButton.swift */,
 				B50F8F0328B19CD30034B039 /* PlusMinusButton.swift */,
 				B50F8F0528B19E660034B039 /* AddToCartDomain.swift */,
-				B556E18428B919FB00CB51F4 /* AddToCartDomainTest.swift */,
 			);
 			path = AddToCart;
 			sourceTree = "<group>";
@@ -229,6 +229,14 @@
 				B5A5CFBB289C257B00AC3E5E /* Preview Assets.xcassets */,
 			);
 			path = "Preview Content";
+			sourceTree = "<group>";
+		};
+		B5BE68D728BA6E63008FC353 /* Test */ = {
+			isa = PBXGroup;
+			children = (
+				B556E18428B919FB00CB51F4 /* AddToCartDomainTest.swift */,
+			);
+			path = Test;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
