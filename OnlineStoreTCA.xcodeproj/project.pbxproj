@@ -20,6 +20,8 @@
 		B525335128AE87C700B29A17 /* CartListDomain.swift in Sources */ = {isa = PBXBuildFile; fileRef = B525335028AE87C700B29A17 /* CartListDomain.swift */; };
 		B525335328AE883B00B29A17 /* CartItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = B525335228AE883B00B29A17 /* CartItem.swift */; };
 		B525335528AE8C5600B29A17 /* CartListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B525335428AE8C5600B29A17 /* CartListView.swift */; };
+		B5389D1528B9AAA4002BF611 /* OnlineStoreTCATests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5389D1428B9AAA4002BF611 /* OnlineStoreTCATests.swift */; };
+		B5389D1B28B9AAC6002BF611 /* AddToCartDomainTest.swift in Sources */ = {isa = PBXBuildFile; fileRef = B556E18428B919FB00CB51F4 /* AddToCartDomainTest.swift */; };
 		B556E16428B5C44000CB51F4 /* APIClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = B556E16328B5C44000CB51F4 /* APIClient.swift */; };
 		B556E16B28B5CEA900CB51F4 /* ComposableArchitecture in Frameworks */ = {isa = PBXBuildFile; productRef = B556E16A28B5CEA900CB51F4 /* ComposableArchitecture */; };
 		B556E17928B671AC00CB51F4 /* RootView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B556E17828B671AC00CB51F4 /* RootView.swift */; };
@@ -32,6 +34,16 @@
 		B5A5CFB9289C257B00AC3E5E /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = B5A5CFB8289C257B00AC3E5E /* Assets.xcassets */; };
 		B5A5CFBC289C257B00AC3E5E /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = B5A5CFBB289C257B00AC3E5E /* Preview Assets.xcassets */; };
 /* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		B5389D1628B9AAA4002BF611 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = B5A5CFA9289C257900AC3E5E /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = B5A5CFB0289C257900AC3E5E;
+			remoteInfo = OnlineStoreTCA;
+		};
+/* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
 		B50F8EFE28B18F020034B039 /* ProductCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProductCell.swift; sourceTree = "<group>"; };
@@ -47,6 +59,8 @@
 		B525335028AE87C700B29A17 /* CartListDomain.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CartListDomain.swift; sourceTree = "<group>"; };
 		B525335228AE883B00B29A17 /* CartItem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CartItem.swift; sourceTree = "<group>"; };
 		B525335428AE8C5600B29A17 /* CartListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CartListView.swift; sourceTree = "<group>"; };
+		B5389D1228B9AAA3002BF611 /* OnlineStoreTCATests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = OnlineStoreTCATests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		B5389D1428B9AAA4002BF611 /* OnlineStoreTCATests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnlineStoreTCATests.swift; sourceTree = "<group>"; };
 		B556E16328B5C44000CB51F4 /* APIClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = APIClient.swift; sourceTree = "<group>"; };
 		B556E17828B671AC00CB51F4 /* RootView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RootView.swift; sourceTree = "<group>"; };
 		B556E17A28B6740A00CB51F4 /* RootDomain.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RootDomain.swift; sourceTree = "<group>"; };
@@ -54,6 +68,7 @@
 		B556E17E28B7BE2D00CB51F4 /* ProfileDomain.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileDomain.swift; sourceTree = "<group>"; };
 		B556E18028B7BEC200CB51F4 /* UserProfile.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserProfile.swift; sourceTree = "<group>"; };
 		B556E18228B84F1500CB51F4 /* ErrorView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ErrorView.swift; sourceTree = "<group>"; };
+		B556E18428B919FB00CB51F4 /* AddToCartDomainTest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddToCartDomainTest.swift; sourceTree = "<group>"; };
 		B5A5CFB1289C257900AC3E5E /* OnlineStoreTCA.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = OnlineStoreTCA.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		B5A5CFB4289C257900AC3E5E /* OnlineStoreTCAApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnlineStoreTCAApp.swift; sourceTree = "<group>"; };
 		B5A5CFB8289C257B00AC3E5E /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
@@ -61,6 +76,13 @@
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
+		B5389D0F28B9AAA3002BF611 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		B5A5CFAE289C257900AC3E5E /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
@@ -78,6 +100,7 @@
 				B50F8F0028B19B880034B039 /* AddToCartButton.swift */,
 				B50F8F0328B19CD30034B039 /* PlusMinusButton.swift */,
 				B50F8F0528B19E660034B039 /* AddToCartDomain.swift */,
+				B556E18428B919FB00CB51F4 /* AddToCartDomainTest.swift */,
 			);
 			path = AddToCart;
 			sourceTree = "<group>";
@@ -152,6 +175,14 @@
 			path = CartList;
 			sourceTree = "<group>";
 		};
+		B5389D1328B9AAA4002BF611 /* OnlineStoreTCATests */ = {
+			isa = PBXGroup;
+			children = (
+				B5389D1428B9AAA4002BF611 /* OnlineStoreTCATests.swift */,
+			);
+			path = OnlineStoreTCATests;
+			sourceTree = "<group>";
+		};
 		B556E16228B5BD6000CB51F4 /* Network */ = {
 			isa = PBXGroup;
 			children = (
@@ -164,6 +195,7 @@
 			isa = PBXGroup;
 			children = (
 				B5A5CFB3289C257900AC3E5E /* OnlineStoreTCA */,
+				B5389D1328B9AAA4002BF611 /* OnlineStoreTCATests */,
 				B5A5CFB2289C257900AC3E5E /* Products */,
 			);
 			sourceTree = "<group>";
@@ -172,6 +204,7 @@
 			isa = PBXGroup;
 			children = (
 				B5A5CFB1289C257900AC3E5E /* OnlineStoreTCA.app */,
+				B5389D1228B9AAA3002BF611 /* OnlineStoreTCATests.xctest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -201,6 +234,24 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
+		B5389D1128B9AAA3002BF611 /* OnlineStoreTCATests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = B5389D1A28B9AAA4002BF611 /* Build configuration list for PBXNativeTarget "OnlineStoreTCATests" */;
+			buildPhases = (
+				B5389D0E28B9AAA3002BF611 /* Sources */,
+				B5389D0F28B9AAA3002BF611 /* Frameworks */,
+				B5389D1028B9AAA3002BF611 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				B5389D1728B9AAA4002BF611 /* PBXTargetDependency */,
+			);
+			name = OnlineStoreTCATests;
+			productName = OnlineStoreTCATests;
+			productReference = B5389D1228B9AAA3002BF611 /* OnlineStoreTCATests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
 		B5A5CFB0289C257900AC3E5E /* OnlineStoreTCA */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = B5A5CFBF289C257B00AC3E5E /* Build configuration list for PBXNativeTarget "OnlineStoreTCA" */;
@@ -228,9 +279,13 @@
 			isa = PBXProject;
 			attributes = {
 				BuildIndependentTargetsInParallel = 1;
-				LastSwiftUpdateCheck = 1330;
+				LastSwiftUpdateCheck = 1400;
 				LastUpgradeCheck = 1330;
 				TargetAttributes = {
+					B5389D1128B9AAA3002BF611 = {
+						CreatedOnToolsVersion = 14.0;
+						TestTargetID = B5A5CFB0289C257900AC3E5E;
+					};
 					B5A5CFB0289C257900AC3E5E = {
 						CreatedOnToolsVersion = 13.3;
 					};
@@ -253,11 +308,19 @@
 			projectRoot = "";
 			targets = (
 				B5A5CFB0289C257900AC3E5E /* OnlineStoreTCA */,
+				B5389D1128B9AAA3002BF611 /* OnlineStoreTCATests */,
 			);
 		};
 /* End PBXProject section */
 
 /* Begin PBXResourcesBuildPhase section */
+		B5389D1028B9AAA3002BF611 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		B5A5CFAF289C257900AC3E5E /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -270,6 +333,15 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
+		B5389D0E28B9AAA3002BF611 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				B5389D1B28B9AAC6002BF611 /* AddToCartDomainTest.swift in Sources */,
+				B5389D1528B9AAA4002BF611 /* OnlineStoreTCATests.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		B5A5CFAD289C257900AC3E5E /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -300,7 +372,55 @@
 		};
 /* End PBXSourcesBuildPhase section */
 
+/* Begin PBXTargetDependency section */
+		B5389D1728B9AAA4002BF611 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = B5A5CFB0289C257900AC3E5E /* OnlineStoreTCA */;
+			targetProxy = B5389D1628B9AAA4002BF611 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
 /* Begin XCBuildConfiguration section */
+		B5389D1828B9AAA4002BF611 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = LHJA6J73E9;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 15.4;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.swiftandtips.OnlineStoreTCATests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/OnlineStoreTCA.app/OnlineStoreTCA";
+			};
+			name = Debug;
+		};
+		B5389D1928B9AAA4002BF611 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = LHJA6J73E9;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 15.4;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.swiftandtips.OnlineStoreTCATests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/OnlineStoreTCA.app/OnlineStoreTCA";
+			};
+			name = Release;
+		};
 		B5A5CFBD289C257B00AC3E5E /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -476,6 +596,15 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
+		B5389D1A28B9AAA4002BF611 /* Build configuration list for PBXNativeTarget "OnlineStoreTCATests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				B5389D1828B9AAA4002BF611 /* Debug */,
+				B5389D1928B9AAA4002BF611 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
 		B5A5CFAC289C257900AC3E5E /* Build configuration list for PBXProject "OnlineStoreTCA" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
