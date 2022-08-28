@@ -12,17 +12,23 @@ import XCTest
 
 @MainActor
 class ProductListDomainTest: XCTestCase {
-    //Elements are inserted in reverse order
-    private var uuidArray = [
-        UUID(uuidString: "00000000-0000-0000-0000-000000000001")!,
-        UUID(uuidString: "00000000-0000-0000-0000-000000000000")!
-    ]
+    private var uuidArray: [UUID] = []
     
     private func getUUID() -> UUID {
-        return uuidArray.popLast()!
+        return uuidArray.removeLast()
     }
     
-    func testFetchProducts() async {
+    override func setUp() {
+        super.setUp()
+        
+        //Elements are inserted in reverse order
+        self.uuidArray = [
+            UUID(uuidString: "00000000-0000-0000-0000-000000000001")!,
+            UUID(uuidString: "00000000-0000-0000-0000-000000000000")!
+        ]
+    }
+    
+    func testFetchProductsSuccess() async {
         let products: [Product] = [
             .init(
                 id: 1,
@@ -74,6 +80,30 @@ class ProductListDomainTest: XCTestCase {
         await store.receive(.fetchProductsResponse(.success(products))) {
             $0.productListState = identifiedArray
             $0.dataLoadingStatus = .success
+        }
+    }
+    
+    func testFetchProductsFailure() async {
+        let error = APIClient.Failure()
+        let store = TestStore(
+            initialState: ProductListDomain.State(),
+            reducer: ProductListDomain.reducer,
+            environment: ProductListDomain.Environment(
+                fetchProducts: {
+                    throw error
+                },
+                sendOrder: { _ in "OK" },
+                uuid: { self.getUUID() }
+            )
+        )
+        
+        await store.send(.fetchProducts) {
+            $0.dataLoadingStatus = .loading
+        }
+        
+        await store.receive(.fetchProductsResponse(.failure(error))) {
+            $0.productListState = []
+            $0.dataLoadingStatus = .error
         }
     }
 }
