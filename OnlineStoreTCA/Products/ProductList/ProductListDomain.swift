@@ -10,26 +10,18 @@ import ComposableArchitecture
 
 struct ProductListDomain {
     struct State: Equatable {
-        fileprivate var dataState = DataState.notStarted
-        fileprivate var initialState: IdentifiedArrayOf<ProductDomain.State> = []
+        var dataLoadingStatus = DataLoadingStatus.notStarted
         var shouldOpenCart = false
         var cartState: CartListDomain.State?
         var productListState: IdentifiedArrayOf<ProductDomain.State> = []
         
         var shouldShowError: Bool {
-            dataState == .error
+            dataLoadingStatus == .error
         }
         
         var isLoading: Bool {
-            dataState == .loading
+            dataLoadingStatus == .loading
         }
-    }
-    
-    fileprivate enum DataState {
-        case notStarted
-        case loading
-        case success
-        case error
     }
     
     enum Action: Equatable {
@@ -45,6 +37,7 @@ struct ProductListDomain {
     struct Environment {
         var fetchProducts: () async throws -> [Product]
         var sendOrder: ([CartItem]) async throws -> String
+        var uuid: () -> UUID
     }
     
     static let reducer = Reducer<
@@ -69,30 +62,29 @@ struct ProductListDomain {
         .init { state, action, environment in
             switch action {
             case .fetchProducts:
-                if state.dataState == .success || state.dataState == .loading {
+                if state.dataLoadingStatus == .success || state.dataLoadingStatus == .loading {
                     return .none
                 }
                 
-                state.dataState = .loading
+                state.dataLoadingStatus = .loading
                 return .task {
                     await .fetchProductsResponse(
                         TaskResult { try await environment.fetchProducts() }
                     )
                 }
             case .fetchProductsResponse(.success(let products)):
-                state.dataState = .success
+                state.dataLoadingStatus = .success
                 state.productListState = IdentifiedArrayOf(
                     uniqueElements: products.map {
                         ProductDomain.State(
-                            id: UUID(),
+                            id: environment.uuid(),
                             product: $0
                         )
                     }
                 )
-                state.initialState = state.productListState
                 return .none
             case .fetchProductsResponse(.failure(let error)):
-                state.dataState = .error
+                state.dataLoadingStatus = .error
                 print(error)
                 print("Error getting products, try again later.")
                 return .none
@@ -101,7 +93,8 @@ struct ProductListDomain {
                 case .didPressCloseButton:
                     return closeCart(state: &state)
                 case .dismissSuccessAlert:
-                    state.productListState = state.initialState
+                    resetProductsToZero(state: &state)
+                    
                     return .task {
                         .closeCart
                     }
@@ -164,5 +157,14 @@ struct ProductListDomain {
         state.cartState = nil
         
         return .none
+    }
+    
+    private static func resetProductsToZero(
+        state: inout State
+    ) {
+        for id in state.productListState.map(\.id)
+        where state.productListState[id: id]?.count != 0  {
+            state.productListState[id: id]?.count = 0
+        }
     }
 }

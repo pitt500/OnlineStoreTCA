@@ -80,7 +80,8 @@ struct ProductListView_Previews: PreviewProvider {
                 reducer: ProductListDomain.reducer,
                 environment: ProductListDomain.Environment(
                     fetchProducts: { Product.sample },
-                    sendOrder: { _ in "OK" }
+                    sendOrder: { _ in "OK" },
+                    uuid: UUID.init
                 )
             )
         )

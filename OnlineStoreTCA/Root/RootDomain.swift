@@ -48,7 +48,8 @@ struct RootDomain {
                 environment: {
                     ProductListDomain.Environment(
                         fetchProducts: $0.fetchProducts,
-                        sendOrder: $0.sendOrder
+                        sendOrder: $0.sendOrder,
+                        uuid: UUID.init
                     )
                 }
             ),

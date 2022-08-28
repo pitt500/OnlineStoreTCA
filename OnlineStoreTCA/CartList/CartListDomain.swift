@@ -10,7 +10,7 @@ import ComposableArchitecture
 
 struct CartListDomain {
     struct State: Equatable {
-        fileprivate var dataState = DataState.notStarted
+        var dataLoadingStatus = DataLoadingStatus.notStarted
         var cartItems: IdentifiedArrayOf<CartItemDomain.State> = []
         var totalPrice: Double = 0.0
         var confirmationAlert: AlertState<CartListDomain.Action>?
@@ -28,15 +28,8 @@ struct CartListDomain {
         }
         
         var isRequestInProcess: Bool {
-            dataState == .loading
+            dataLoadingStatus == .loading
         }
-    }
-    
-    fileprivate enum DataState {
-        case notStarted
-        case loading
-        case success
-        case error
     }
     
     enum Action: Equatable {
@@ -69,7 +62,7 @@ struct CartListDomain {
             case .didPressCloseButton:
                 return .none
             case .didReceivePurchaseResponse(.success(let message)):
-                state.dataState = .success
+                state.dataLoadingStatus = .success
                 state.successAlert = AlertState(
                     title: TextState("Thank you!"),
                     message: TextState("Your order is in process."),
@@ -80,7 +73,7 @@ struct CartListDomain {
                 print("Success: \(message)")
                 return .none
             case .didReceivePurchaseResponse(.failure):
-                state.dataState = .error
+                state.dataLoadingStatus = .error
                 print("Unable to send order")
                 state.errorAlert = AlertState(
                     title: TextState("Oops!"),
@@ -118,7 +111,7 @@ struct CartListDomain {
                 state.errorAlert = nil
                 return .none
             case .didConfirmPurchase:
-                state.dataState = .loading
+                state.dataLoadingStatus = .loading
                 let items = state.cartItems.map { $0.cartItem }
                 return .task {
                     await .didReceivePurchaseResponse(

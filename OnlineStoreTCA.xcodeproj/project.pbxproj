@@ -34,6 +34,8 @@
 		B5A5CFB9289C257B00AC3E5E /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = B5A5CFB8289C257B00AC3E5E /* Assets.xcassets */; };
 		B5A5CFBC289C257B00AC3E5E /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = B5A5CFBB289C257B00AC3E5E /* Preview Assets.xcassets */; };
 		B5BE68DB28BA6EA8008FC353 /* ProductDomainTest.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5BE68D928BA6EA4008FC353 /* ProductDomainTest.swift */; };
+		B5BE68DF28BB23B1008FC353 /* ProductListDomainTest.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5BE68DD28BB23AC008FC353 /* ProductListDomainTest.swift */; };
+		B5BE68E128BBAE93008FC353 /* DataLoadingStatus.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5BE68E028BBAE93008FC353 /* DataLoadingStatus.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -75,6 +77,8 @@
 		B5A5CFB8289C257B00AC3E5E /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		B5A5CFBB289C257B00AC3E5E /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
 		B5BE68D928BA6EA4008FC353 /* ProductDomainTest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProductDomainTest.swift; sourceTree = "<group>"; };
+		B5BE68DD28BB23AC008FC353 /* ProductListDomainTest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProductListDomainTest.swift; sourceTree = "<group>"; };
+		B5BE68E028BBAE93008FC353 /* DataLoadingStatus.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataLoadingStatus.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -110,6 +114,7 @@
 		B50F8F0D28B2C1C90034B039 /* ProductList */ = {
 			isa = PBXGroup;
 			children = (
+				B5BE68DC28BB2399008FC353 /* Test */,
 				B525334628AD3F6000B29A17 /* ProductListDomain.swift */,
 				B525334D28ADD6DE00B29A17 /* ProductListView.swift */,
 				B556E18228B84F1500CB51F4 /* ErrorView.swift */,
@@ -190,6 +195,7 @@
 			isa = PBXGroup;
 			children = (
 				B556E16328B5C44000CB51F4 /* APIClient.swift */,
+				B5BE68E028BBAE93008FC353 /* DataLoadingStatus.swift */,
 			);
 			path = Network;
 			sourceTree = "<group>";
@@ -246,6 +252,14 @@
 			isa = PBXGroup;
 			children = (
 				B5BE68D928BA6EA4008FC353 /* ProductDomainTest.swift */,
+			);
+			path = Test;
+			sourceTree = "<group>";
+		};
+		B5BE68DC28BB2399008FC353 /* Test */ = {
+			isa = PBXGroup;
+			children = (
+				B5BE68DD28BB23AC008FC353 /* ProductListDomainTest.swift */,
 			);
 			path = Test;
 			sourceTree = "<group>";
@@ -359,6 +373,7 @@
 				B5389D1B28B9AAC6002BF611 /* AddToCartDomainTest.swift in Sources */,
 				B5389D1528B9AAA4002BF611 /* OnlineStoreTCATests.swift in Sources */,
 				B5BE68DB28BA6EA8008FC353 /* ProductDomainTest.swift in Sources */,
+				B5BE68DF28BB23B1008FC353 /* ProductListDomainTest.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -372,6 +387,7 @@
 				B525335528AE8C5600B29A17 /* CartListView.swift in Sources */,
 				B556E18328B84F1500CB51F4 /* ErrorView.swift in Sources */,
 				B50F8F0628B19E660034B039 /* AddToCartDomain.swift in Sources */,
+				B5BE68E128BBAE93008FC353 /* DataLoadingStatus.swift in Sources */,
 				B556E17B28B6740A00CB51F4 /* RootDomain.swift in Sources */,
 				B525334E28ADD6DE00B29A17 /* ProductListView.swift in Sources */,
 				B5A5CFB5289C257900AC3E5E /* OnlineStoreTCAApp.swift in Sources */,
