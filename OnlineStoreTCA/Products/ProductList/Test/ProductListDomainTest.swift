@@ -73,7 +73,6 @@ class ProductListDomainTest: XCTestCase {
         
         await store.receive(.fetchProductsResponse(.success(products))) {
             $0.productListState = identifiedArray
-            $0.initialState = identifiedArray
             $0.dataLoadingStatus = .success
         }
     }
