@@ -35,8 +35,8 @@ struct ProductListDomain {
     }
     
     struct Environment {
-        var fetchProducts: () async throws -> [Product]
-        var sendOrder: ([CartItem]) async throws -> String
+        var fetchProducts:  @Sendable () async throws -> [Product]
+        var sendOrder:  @Sendable ([CartItem]) async throws -> String
         var uuid: () -> UUID
     }
     

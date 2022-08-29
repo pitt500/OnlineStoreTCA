@@ -9,9 +9,9 @@ import Foundation
 import ComposableArchitecture
 
 struct APIClient {
-    var fetchProducts: () async throws -> [Product]
-    var sendOrder: ([CartItem]) async throws -> String
-    var fetchUserProfile: () async throws -> UserProfile
+    var fetchProducts:  @Sendable () async throws -> [Product]
+    var sendOrder:  @Sendable ([CartItem]) async throws -> String
+    var fetchUserProfile:  @Sendable () async throws -> UserProfile
     
     struct Failure: Error, Equatable {}
 }
