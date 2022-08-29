@@ -106,4 +106,107 @@ class ProductListDomainTest: XCTestCase {
             $0.dataLoadingStatus = .error
         }
     }
+    
+    func testResetProductsToZeroAcferPayingOrder() async {
+        let products: [Product] = [
+            .init(
+                id: 1,
+                title: "ProductDemo",
+                price: 10.5,
+                description: "Hi mom!",
+                category: "Category1",
+                imageString: "image"
+            ),
+            .init(
+                id: 2,
+                title: "AnotherProduct",
+                price: 99.99,
+                description: "Hi Dad!",
+                category: "Category2",
+                imageString: "image2"
+            ),
+        ]
+        
+        let id1 = UUID(uuidString: "00000000-0000-0000-0000-000000000000")!
+        let id2 = UUID(uuidString: "00000000-0000-0000-0000-000000000001")!
+        
+        let identifiedProducts = IdentifiedArrayOf(
+            uniqueElements: [
+                ProductDomain.State(
+                    id: id1,
+                    product: products[0],
+                    count: 0
+                ),
+                ProductDomain.State(
+                    id: id2,
+                    product: products[1],
+                    count: 0
+                ),
+            ]
+        )
+        
+        let store = TestStore(
+            initialState: ProductListDomain.State(
+                productListState: identifiedProducts
+            ),
+            reducer: ProductListDomain.reducer,
+            environment: ProductListDomain.Environment(
+                fetchProducts: {
+                    products
+                },
+                sendOrder: { _ in "OK" },
+                uuid: { self.getUUID() }
+            )
+        )
+        
+        await store.send(
+            .product(
+                id: id1,
+                action: .addToCart(.didTapPlusButton)
+            )
+        ) {
+            $0.productListState[id: id1]?.count = 1
+            $0.productListState[id: id1]?.addToCartState.count = 1
+        }
+        
+        await store.send(
+            .product(
+                id: id1,
+                action: .addToCart(.didTapPlusButton)
+            )
+        ) {
+            $0.productListState[id: id1]?.count = 2
+            $0.productListState[id: id1]?.addToCartState.count = 2
+        }
+        
+        let expectedCartState = CartListDomain.State(
+            cartItems: IdentifiedArrayOf(
+                uniqueElements: [
+                    CartItemDomain.State(
+                        id: id1,
+                        cartItem: CartItem(
+                            id: id2,
+                            product: products.first!,
+                            quantity: 2
+                        )
+                    )
+                ]
+            )
+        )
+        
+        await store.send(.setCartView(isPresented: true)) {
+            $0.shouldOpenCart = true
+            $0.cartState = expectedCartState
+        }
+        
+        await store.send(.cart(.dismissSuccessAlert)) {
+            $0.productListState[id: id1]?.count = 0
+            $0.productListState[id: id1]?.addToCartState.count = 0
+        }
+
+        await store.receive(.closeCart) {
+            $0.shouldOpenCart = false
+            $0.cartState = nil
+        }
+    }
 }

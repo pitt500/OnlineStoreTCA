@@ -131,9 +131,9 @@ struct ProductListDomain {
                             .compactMap { state in
                                 state.count > 0
                                 ? CartItemDomain.State(
-                                    id: UUID(),
+                                    id: environment.uuid(),
                                     cartItem: CartItem(
-                                        id: UUID(),
+                                        id: environment.uuid(),
                                         product: state.product,
                                         quantity: state.count
                                     )
@@ -165,6 +165,7 @@ struct ProductListDomain {
         for id in state.productListState.map(\.id)
         where state.productListState[id: id]?.count != 0  {
             state.productListState[id: id]?.count = 0
+            state.productListState[id: id]?.addToCartState.count = 0
         }
     }
 }
