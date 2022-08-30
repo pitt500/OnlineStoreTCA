@@ -12,6 +12,11 @@ import XCTest
 
 @MainActor
 class ProductListDomainTest: XCTestCase {
+    
+    override func setUp() async throws {
+        UUID.uuIdTestCounter = 0
+    }
+    
     func testFetchProductsSuccess() async {
         let products: [Product] = [
             .init(
@@ -40,7 +45,7 @@ class ProductListDomainTest: XCTestCase {
                     products
                 },
                 sendOrder: { _ in fatalError("unimplemented") },
-                uuid: UUID.incrementing
+                uuid: { UUID.newUUIDForTest }
             )
         )
         
@@ -80,7 +85,7 @@ class ProductListDomainTest: XCTestCase {
                     throw error
                 },
                 sendOrder: { _ in fatalError("unimplemented") },
-                uuid: UUID.incrementing
+                uuid: { UUID.newUUIDForTest }
             )
         )
         
@@ -142,7 +147,7 @@ class ProductListDomainTest: XCTestCase {
                     fatalError("unimplemented")
                 },
                 sendOrder: { _ in fatalError("unimplemented") },
-                uuid: UUID.incrementing
+                uuid: { UUID.newUUIDForTest }
             )
         )
         
@@ -190,7 +195,7 @@ class ProductListDomainTest: XCTestCase {
             $0.productListState[id: id1]?.count = 0
             $0.productListState[id: id1]?.addToCartState.count = 0
         }
-
+        
         await store.receive(.closeCart) {
             $0.shouldOpenCart = false
             $0.cartState = nil
@@ -247,7 +252,7 @@ class ProductListDomainTest: XCTestCase {
                     fatalError("unimplemented")
                 },
                 sendOrder: { _ in fatalError("unimplemented") },
-                uuid: UUID.incrementing
+                uuid: { UUID.newUUIDForTest }
             )
         )
         
@@ -295,12 +300,13 @@ class ProductListDomainTest: XCTestCase {
 
 
 extension UUID {
-  // A deterministic, auto-incrementing "UUID" generator for testing.
-  static var incrementing: () -> UUID {
-    var uuid = 0
-    return {
-      defer { uuid += 1 }
-      return UUID(uuidString: "00000000-0000-0000-0000-\(String(format: "%012x", uuid))")!
+    // uuIdTestCounter needs to be set to 0 on setUp() method
+    static var uuIdTestCounter: UInt = 0
+    
+    static var newUUIDForTest: UUID {
+        defer {
+            uuIdTestCounter += 1
+        }
+        return UUID(uuidString: "00000000-0000-0000-0000-\(String(format: "%012x", uuIdTestCounter))")!
     }
-  }
 }

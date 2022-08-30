@@ -30,11 +30,13 @@ struct RootDomain {
         var fetchProducts: @Sendable () async throws -> [Product]
         var sendOrder:  @Sendable ([CartItem]) async throws -> String
         var fetchUserProfile:  @Sendable () async throws -> UserProfile
+        var uuid: @Sendable () -> UUID
         
         static let live = Self(
             fetchProducts: APIClient.live.fetchProducts,
             sendOrder: APIClient.live.sendOrder,
-            fetchUserProfile: APIClient.live.fetchUserProfile
+            fetchUserProfile: APIClient.live.fetchUserProfile,
+            uuid: { UUID() }
         )
     }
     
@@ -49,7 +51,7 @@ struct RootDomain {
                     ProductListDomain.Environment(
                         fetchProducts: $0.fetchProducts,
                         sendOrder: $0.sendOrder,
-                        uuid: UUID.init
+                        uuid: $0.uuid
                     )
                 }
             ),

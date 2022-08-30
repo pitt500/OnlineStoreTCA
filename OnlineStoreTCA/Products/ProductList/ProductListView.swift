@@ -81,7 +81,7 @@ struct ProductListView_Previews: PreviewProvider {
                 environment: ProductListDomain.Environment(
                     fetchProducts: { Product.sample },
                     sendOrder: { _ in "OK" },
-                    uuid: UUID.init
+                    uuid: { UUID() }
                 )
             )
         )

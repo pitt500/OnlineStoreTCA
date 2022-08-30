@@ -56,7 +56,8 @@ struct RootView_Previews: PreviewProvider {
                 environment: RootDomain.Environment(
                     fetchProducts: { Product.sample },
                     sendOrder: { _ in "OK" },
-                    fetchUserProfile: { UserProfile.sample }
+                    fetchUserProfile: { UserProfile.sample },
+                    uuid: { UUID() }
                 )
             )
         )
