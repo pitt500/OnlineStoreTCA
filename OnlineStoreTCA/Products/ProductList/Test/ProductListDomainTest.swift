@@ -12,22 +12,6 @@ import XCTest
 
 @MainActor
 class ProductListDomainTest: XCTestCase {
-    private var uuidArray: [UUID] = []
-    
-    private func getUUID() -> UUID {
-        return uuidArray.removeLast()
-    }
-    
-    @MainActor override func setUp() {
-        super.setUp()
-        
-        //Elements are inserted in reverse order
-        self.uuidArray = [
-            UUID(uuidString: "00000000-0000-0000-0000-000000000001")!,
-            UUID(uuidString: "00000000-0000-0000-0000-000000000000")!
-        ]
-    }
-    
     func testFetchProductsSuccess() async {
         let products: [Product] = [
             .init(
@@ -56,18 +40,21 @@ class ProductListDomainTest: XCTestCase {
                     products
                 },
                 sendOrder: { _ in fatalError("unimplemented") },
-                uuid: { self.getUUID() }
+                uuid: UUID.incrementing
             )
         )
+        
+        let productId1 = UUID(uuidString: "00000000-0000-0000-0000-000000000000")!
+        let productId2 = UUID(uuidString: "00000000-0000-0000-0000-000000000001")!
         
         let identifiedArray = IdentifiedArrayOf(
             uniqueElements: [
                 ProductDomain.State(
-                    id: UUID(uuidString: "00000000-0000-0000-0000-000000000000")!,
+                    id: productId1,
                     product: products[0]
                 ),
                 ProductDomain.State(
-                    id: UUID(uuidString: "00000000-0000-0000-0000-000000000001")!,
+                    id: productId2,
                     product: products[1]
                 ),
             ]
@@ -93,7 +80,7 @@ class ProductListDomainTest: XCTestCase {
                     throw error
                 },
                 sendOrder: { _ in fatalError("unimplemented") },
-                uuid: { self.getUUID() }
+                uuid: UUID.incrementing
             )
         )
         
@@ -155,7 +142,7 @@ class ProductListDomainTest: XCTestCase {
                     fatalError("unimplemented")
                 },
                 sendOrder: { _ in fatalError("unimplemented") },
-                uuid: { self.getUUID() }
+                uuid: UUID.incrementing
             )
         )
         
@@ -260,7 +247,7 @@ class ProductListDomainTest: XCTestCase {
                     fatalError("unimplemented")
                 },
                 sendOrder: { _ in fatalError("unimplemented") },
-                uuid: { self.getUUID() }
+                uuid: UUID.incrementing
             )
         )
         
@@ -283,7 +270,6 @@ class ProductListDomainTest: XCTestCase {
             $0.shouldOpenCart = true
             $0.cartState = expectedCartState
         }
-        
         await store.send(
             .cart(
                 .cartItem(
@@ -295,7 +281,6 @@ class ProductListDomainTest: XCTestCase {
         await store.receive(.cart(.deleteCartItem(id: id1))) {
             $0.cartState?.cartItems = []
         }
-
         await store.receive(.cart(.getTotalPrice)) {
             $0.cartState?.totalPrice = 0
             $0.cartState?.isPayButtonHidden = true
@@ -306,4 +291,16 @@ class ProductListDomainTest: XCTestCase {
             $0.productListState[id: id1]?.addToCartState.count = 0
         }
     }
+}
+
+
+extension UUID {
+  // A deterministic, auto-incrementing "UUID" generator for testing.
+  static var incrementing: () -> UUID {
+    var uuid = 0
+    return {
+      defer { uuid += 1 }
+      return UUID(uuidString: "00000000-0000-0000-0000-\(String(format: "%012x", uuid))")!
+    }
+  }
 }
