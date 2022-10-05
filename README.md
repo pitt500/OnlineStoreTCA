@@ -28,6 +28,7 @@ Note: Feel free to recommend any change that may be great to teach a concept in 
 ## The basics
 ### Archiecture Diagram
 <img src="./Images/TCA_Architecture.png">
+
 ### Context
 Let's say that you have a simple app with two buttons, one will increase a counter in the screen and the other will decrease it. This is what will happen if this app was implemented on TCA:
 
