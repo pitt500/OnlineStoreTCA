@@ -27,6 +27,9 @@ Note: Feel free to recommend any change that may be great to teach a concept in 
 
 ## The basics
 ### Archiecture Diagram
-<img src="./Images/TCA_Architecture.png"  width="25%" height="25%">
+<img src="./Images/TCA_Architecture.png">
+Context:
+
+1. ...
 
 ### More coming ...
