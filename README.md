@@ -25,4 +25,8 @@ Note: Feel free to recommend any change that may be great to teach a concept in 
 ### Cart
 <img src="./Images/demo3.png"  width="25%" height="25%">|<img src="./Images/demo4.png"  width="25%" height="25%">|<img src="./Images/demo5.png"  width="25%" height="25%">
 
+## The basics
+### Archiecture Diagram
+<img src="./Images/TCA_Architecture.png"  width="25%" height="25%">
+
 ### More coming ...
