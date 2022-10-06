@@ -29,11 +29,109 @@ Note: Feel free to recommend any change that may be great to teach a concept in 
 ### Archiecture Diagram
 <img src="./Images/TCA_Architecture.png">
 
-### Context
+### Example
 Let's say that you have a simple app with two buttons, one will increase a counter in the screen and the other will decrease it. This is what will happen if this app was implemented on TCA:
 
-1. The view is presented in the screen.
+1. The view is presented in the screen. It shows the current state of the app.
 <img src="./Images/viewDemo1.png" width="30%" height="30%">
-2. ...
+
+```swift
+struct State: Equatable {
+    var counter = 0
+}
+```
+
+2. The user press a button, that internally send an action to the store.
+<img src="./Images/actionDemo1.png" width="30%" height="30%">
+
+```swift
+enum Action: Equatable {
+    case increaseCounter
+    case decreaseCounter
+}
+```
+
+3. The store & reducer require an environment object, that in TCA is just the object holding your dependencies. If you don't have any dependencies yet, just add an empty Environment.
+```swift
+struct Environment {
+    // Future Dependencies...
+}
+```
+
+
+4. The action is received by the reducer and proceed to mutate the state. Reducer MUST also return an effect, that represent logic from the "outside world" (network calls, notifications, database, etc). If no effect is needed, just return `Effect.none` .
+
+```swift
+let reducer = Reducer<
+    State, Action, Environment
+> { state, action, environment in
+    switch action {
+    case .increaseCounter:
+        state.counter += 1
+        return Effect.none
+    case .decreaseCounter:
+        state.counter -= 1
+        return Effect.none
+    }
+}
+```
+
+5. Once the mutation is done and the reducer returned the effect, the view will render the update in the screen. To observe object in TCA, we need an object called viewStore, that in this example is wrapped within WithViewStore view.
+6. We can send another action using `viewStore.send()` and an `Action` value.
+
+```swift
+struct ContentView: View {
+    let store: Store<State, Action>
+
+    var body: some View {
+        WithViewStore(self.store) { viewStore in
+            HStack {
+                Button {
+                    viewStore.send(.decreaseCounter)
+                } label: {
+                    Text("-")
+                        .padding(10)
+                        .background(.blue)
+                        .foregroundColor(.white)
+                        .cornerRadius(10)
+                }
+                .buttonStyle(.plain)
+
+                Text(viewStore.counter.description)
+                    .padding(5)
+
+                Button {
+                    viewStore.send(.increaseCounter)
+                } label: {
+                    Text("+")
+                        .padding(10)
+                        .background(.blue)
+                        .foregroundColor(.white)
+                        .cornerRadius(10)
+                }
+                .buttonStyle(.plain)
+            }
+        }
+    }
+}
+```
+
+7. View is initialized by a `Store` object.
+
+```swift
+ContentView(
+    store: Store(
+        initialState: State(),
+        reducer: reducer,
+        environment: Environment()
+    )
+)
+```
+
+If you want to learn more about the basics, check out the following [video](https://youtu.be/SfFDj6qT-xg)
+
+## Composition
+
+TBD
 
 ### More coming ...
