@@ -41,7 +41,7 @@ struct State: Equatable {
 }
 ```
 
-2. The user press a button, that internally send an action to the store.
+2. The user press a button (let's say increase button), that internally send an action to the store.
 <img src="./Images/actionDemo1.png" width="30%" height="30%">
 
 ```swift
