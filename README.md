@@ -33,6 +33,7 @@ Note: Feel free to recommend any change that may be great to teach a concept in 
 Let's say that you have a simple app with two buttons, one will increase a counter in the screen and the other will decrease it. This is what will happen if this app was implemented on TCA:
 
 1. The view is presented in the screen.
+<img src="./Images/viewDemo1.png" width="30%" height="30%">
 2. ...
 
 ### More coming ...
