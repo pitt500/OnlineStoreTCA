@@ -137,4 +137,16 @@ If you want to learn more about the basics, check out the following [video](http
 
 TBD
 
+## Environment
+
+TBD
+
+## Side Effects
+
+TBD
+
+## Testing
+
+TBD
+
 ### More coming ...
