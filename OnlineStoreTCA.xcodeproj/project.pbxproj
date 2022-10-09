@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		4CC3676428F35BFF0075EAD3 /* ProductDetailsViewDomain.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4CC3676328F35BFF0075EAD3 /* ProductDetailsViewDomain.swift */; };
 		B50F8EFF28B18F020034B039 /* ProductCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = B50F8EFE28B18F020034B039 /* ProductCell.swift */; };
 		B50F8F0128B19B880034B039 /* AddToCartButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = B50F8F0028B19B880034B039 /* AddToCartButton.swift */; };
 		B50F8F0428B19CD30034B039 /* PlusMinusButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = B50F8F0328B19CD30034B039 /* PlusMinusButton.swift */; };
@@ -50,6 +51,7 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		4CC3676328F35BFF0075EAD3 /* ProductDetailsViewDomain.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProductDetailsViewDomain.swift; sourceTree = "<group>"; };
 		B50F8EFE28B18F020034B039 /* ProductCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProductCell.swift; sourceTree = "<group>"; };
 		B50F8F0028B19B880034B039 /* AddToCartButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddToCartButton.swift; sourceTree = "<group>"; };
 		B50F8F0328B19CD30034B039 /* PlusMinusButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlusMinusButton.swift; sourceTree = "<group>"; };
@@ -102,6 +104,14 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		4CC3676228F35BE80075EAD3 /* ProductDetails */ = {
+			isa = PBXGroup;
+			children = (
+				4CC3676328F35BFF0075EAD3 /* ProductDetailsViewDomain.swift */,
+			);
+			path = ProductDetails;
+			sourceTree = "<group>";
+		};
 		B50F8F0228B19CBD0034B039 /* AddToCart */ = {
 			isa = PBXGroup;
 			children = (
@@ -156,6 +166,7 @@
 		B525334328AD3DCE00B29A17 /* Products */ = {
 			isa = PBXGroup;
 			children = (
+				4CC3676228F35BE80075EAD3 /* ProductDetails */,
 				B50F8F0E28B2C1D40034B039 /* Product */,
 				B50F8F0D28B2C1C90034B039 /* ProductList */,
 				B50F8F0228B19CBD0034B039 /* AddToCart */,
@@ -393,6 +404,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				4CC3676428F35BFF0075EAD3 /* ProductDetailsViewDomain.swift in Sources */,
 				B525335128AE87C700B29A17 /* CartListDomain.swift in Sources */,
 				B50F8F0128B19B880034B039 /* AddToCartButton.swift in Sources */,
 				B50F8F1328B482E80034B039 /* CartItemDomain.swift in Sources */,
