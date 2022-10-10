@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		4CC3676428F35BFF0075EAD3 /* ProductDetailsViewDomain.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4CC3676328F35BFF0075EAD3 /* ProductDetailsViewDomain.swift */; };
+		4CD36E1828F363230083A538 /* ProductDetailsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4CD36E1728F363230083A538 /* ProductDetailsView.swift */; };
 		B50F8EFF28B18F020034B039 /* ProductCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = B50F8EFE28B18F020034B039 /* ProductCell.swift */; };
 		B50F8F0128B19B880034B039 /* AddToCartButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = B50F8F0028B19B880034B039 /* AddToCartButton.swift */; };
 		B50F8F0428B19CD30034B039 /* PlusMinusButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = B50F8F0328B19CD30034B039 /* PlusMinusButton.swift */; };
@@ -52,6 +53,7 @@
 
 /* Begin PBXFileReference section */
 		4CC3676328F35BFF0075EAD3 /* ProductDetailsViewDomain.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProductDetailsViewDomain.swift; sourceTree = "<group>"; };
+		4CD36E1728F363230083A538 /* ProductDetailsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProductDetailsView.swift; sourceTree = "<group>"; };
 		B50F8EFE28B18F020034B039 /* ProductCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProductCell.swift; sourceTree = "<group>"; };
 		B50F8F0028B19B880034B039 /* AddToCartButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddToCartButton.swift; sourceTree = "<group>"; };
 		B50F8F0328B19CD30034B039 /* PlusMinusButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlusMinusButton.swift; sourceTree = "<group>"; };
@@ -108,6 +110,7 @@
 			isa = PBXGroup;
 			children = (
 				4CC3676328F35BFF0075EAD3 /* ProductDetailsViewDomain.swift */,
+				4CD36E1728F363230083A538 /* ProductDetailsView.swift */,
 			);
 			path = ProductDetails;
 			sourceTree = "<group>";
@@ -409,6 +412,7 @@
 				B50F8F0128B19B880034B039 /* AddToCartButton.swift in Sources */,
 				B50F8F1328B482E80034B039 /* CartItemDomain.swift in Sources */,
 				B525335528AE8C5600B29A17 /* CartListView.swift in Sources */,
+				4CD36E1828F363230083A538 /* ProductDetailsView.swift in Sources */,
 				B556E18328B84F1500CB51F4 /* ErrorView.swift in Sources */,
 				B50F8F0628B19E660034B039 /* AddToCartDomain.swift in Sources */,
 				B5BE68E128BBAE93008FC353 /* DataLoadingStatus.swift in Sources */,

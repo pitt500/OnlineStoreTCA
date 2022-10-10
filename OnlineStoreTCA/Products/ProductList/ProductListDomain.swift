@@ -13,6 +13,7 @@ struct ProductListDomain {
         var dataLoadingStatus = DataLoadingStatus.notStarted
         var shouldOpenCart = false
         var cartState: CartListDomain.State?
+        var detailsState: ProductDetailsDomain.State?
         var productListState: IdentifiedArrayOf<ProductDomain.State> = []
         
         var shouldShowError: Bool {
@@ -145,6 +146,7 @@ struct ProductListDomain {
                 : nil
                 return .none
             case .product(let id, let action):
+                
                 return .none
             }
         }

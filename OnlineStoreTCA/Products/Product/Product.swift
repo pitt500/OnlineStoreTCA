@@ -41,16 +41,18 @@ extension Product: Decodable {
 }
 
 extension Product {
+    static var `default`: Self = .init(
+        id: 1,
+        title: "Mens Casual Premium Slim Fit T-Shirts",
+        price: 22.3,
+        description: "Slim-fitting style, contrast raglan long sleeve, three-button henley placket, light weight & soft fabric for breathable and comfortable wearing. And Solid stitched shirts with round neck made for durability and a great fit for casual fashion wear and diehard baseball fans. The Henley style round neckline includes a three-button placket.",
+        category: "men's clothing",
+        imageString: "https://fakestoreapi.com/img/81fPKd-2AYL._AC_SL1500_.jpg"
+    )
+    
     static var sample: [Product] {
         [
-            .init(
-                id: 1,
-                title: "Mens Casual Premium Slim Fit T-Shirts",
-                price: 22.3,
-                description: "Slim-fitting style, contrast raglan long sleeve, three-button henley placket, light weight & soft fabric for breathable and comfortable wearing. And Solid stitched shirts with round neck made for durability and a great fit for casual fashion wear and diehard baseball fans. The Henley style round neckline includes a three-button placket.",
-                category: "men's clothing",
-                imageString: "tshirt"
-            ),
+            `default`,
             .init(
                 id: 2,
                 title: "Fjallraven - Foldsack No. 1 Backpack, Fits 15 Laptops",

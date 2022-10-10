@@ -32,9 +32,13 @@ struct ProductListView: View {
                                     action: ProductListDomain.Action
                                         .product(id: action:)
                                 )
-                            ) {
-                                ProductCell(store: $0)
-                            }
+                            ) { cellStore in
+                                NavigationLink {
+                                    ProductDetailsView(store: cellStore)
+                                } label: {
+                                    ProductCell(store: $0)
+                                }
+                            } 
                         }
                     }
                 }
