@@ -31,7 +31,6 @@ class ProductDomainTest: XCTestCase {
         )
         
         await store.send(.addToCart(.didTapPlusButton)) {
-            $0.count = 1
             $0.addToCartState = AddToCartDomain.State(count: 1)
         }
     }
@@ -55,17 +54,14 @@ class ProductDomainTest: XCTestCase {
         )
         
         await store.send(.addToCart(.didTapPlusButton)) {
-            $0.count = 1
             $0.addToCartState = AddToCartDomain.State(count: 1)
         }
         
         await store.send(.addToCart(.didTapPlusButton)) {
-            $0.count = 2
             $0.addToCartState = AddToCartDomain.State(count: 2)
         }
         
         await store.send(.addToCart(.didTapPlusButton)) {
-            $0.count = 3
             $0.addToCartState = AddToCartDomain.State(count: 3)
         }
     }
@@ -89,10 +85,7 @@ class ProductDomainTest: XCTestCase {
             environment: ProductDomain.Environment()
         )
         
-        await store.send(.addToCart(.didTapMinusButton)) {
-            $0.count = 0
-            $0.addToCartState = AddToCartDomain.State(count: -1)
-        }
+        await store.send(.addToCart(.didTapMinusButton))
     }
     
     func testIncreaseProductCounterTappingMinusButtonThreeTimes() async {
@@ -113,18 +106,10 @@ class ProductDomainTest: XCTestCase {
             environment: ProductDomain.Environment()
         )
         
-        await store.send(.addToCart(.didTapMinusButton)) {
-            $0.count = 0
-            $0.addToCartState = AddToCartDomain.State(count: -1)
-        }
-        await store.send(.addToCart(.didTapMinusButton)) {
-            $0.count = 0
-            $0.addToCartState = AddToCartDomain.State(count: -2)
-        }
-        await store.send(.addToCart(.didTapMinusButton)) {
-            $0.count = 0
-            $0.addToCartState = AddToCartDomain.State(count: -3)
-        }
+        // No changes expected!
+        await store.send(.addToCart(.didTapMinusButton))
+        await store.send(.addToCart(.didTapMinusButton))
+        await store.send(.addToCart(.didTapMinusButton))
     }
     
     func testIncreaseProductCounterTappingMinusTwoTimesAndPlusOnce() async {
@@ -145,17 +130,13 @@ class ProductDomainTest: XCTestCase {
             environment: ProductDomain.Environment()
         )
         
-        await store.send(.addToCart(.didTapMinusButton)) {
-            $0.count = 0
-            $0.addToCartState = AddToCartDomain.State(count: -1)
-        }
-        await store.send(.addToCart(.didTapMinusButton)) {
-            $0.count = 0
-            $0.addToCartState = AddToCartDomain.State(count: -2)
-        }
+        // No changes expected!
+        await store.send(.addToCart(.didTapMinusButton))
+        await store.send(.addToCart(.didTapMinusButton))
+        
+        // Change expected!
         await store.send(.addToCart(.didTapPlusButton)) {
-            $0.count = 1
-            $0.addToCartState = AddToCartDomain.State(count: -1)
+            $0.addToCartState = AddToCartDomain.State(count: 1)
         }
     }
     

@@ -126,13 +126,11 @@ class ProductListDomainTest: XCTestCase {
             uniqueElements: [
                 ProductDomain.State(
                     id: id1,
-                    product: products[0],
-                    count: 0
+                    product: products[0]
                 ),
                 ProductDomain.State(
                     id: id2,
-                    product: products[1],
-                    count: 0
+                    product: products[1]
                 ),
             ]
         )
@@ -157,7 +155,6 @@ class ProductListDomainTest: XCTestCase {
                 action: .addToCart(.didTapPlusButton)
             )
         ) {
-            $0.productListState[id: id1]?.count = 1
             $0.productListState[id: id1]?.addToCartState.count = 1
         }
         
@@ -167,7 +164,6 @@ class ProductListDomainTest: XCTestCase {
                 action: .addToCart(.didTapPlusButton)
             )
         ) {
-            $0.productListState[id: id1]?.count = 2
             $0.productListState[id: id1]?.addToCartState.count = 2
         }
         
@@ -192,7 +188,6 @@ class ProductListDomainTest: XCTestCase {
         }
         
         await store.send(.cart(.dismissSuccessAlert)) {
-            $0.productListState[id: id1]?.count = 0
             $0.productListState[id: id1]?.addToCartState.count = 0
         }
         
@@ -231,13 +226,11 @@ class ProductListDomainTest: XCTestCase {
                 ProductDomain.State(
                     id: id1,
                     product: products[0],
-                    count: numberOfItems,
                     addToCartState: AddToCartDomain.State(count: numberOfItems)
                 ),
                 ProductDomain.State(
                     id: id2,
-                    product: products[1],
-                    count: 0
+                    product: products[1]
                 ),
             ]
         )
@@ -292,7 +285,6 @@ class ProductListDomainTest: XCTestCase {
         }
         await store.receive(.resetProduct(product: products.first!)) {
             $0.productListState = identifiedProducts
-            $0.productListState[id: id1]?.count = 0
             $0.productListState[id: id1]?.addToCartState.count = 0
         }
     }

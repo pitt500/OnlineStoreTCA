@@ -118,7 +118,6 @@ struct ProductListDomain {
                 else { return .none }
                 let productStateId = state.productListState[index].id
                 
-                state.productListState[id: productStateId]?.count = 0
                 state.productListState[id: productStateId]?.addToCartState.count = 0
                 return .none
             case .setCartView(let isPresented):
@@ -164,7 +163,6 @@ struct ProductListDomain {
     ) {
         for id in state.productListState.map(\.id)
         where state.productListState[id: id]?.count != 0  {
-            state.productListState[id: id]?.count = 0
             state.productListState[id: id]?.addToCartState.count = 0
         }
     }

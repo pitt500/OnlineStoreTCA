@@ -12,8 +12,11 @@ struct ProductDomain {
     struct State: Equatable, Identifiable {
         let id: UUID
         let product: Product
-        var count: Int = 0
         var addToCartState = AddToCartDomain.State()
+        
+        var count: Int {
+            addToCartState.count
+        }
     }
     
     enum Action: Equatable {
@@ -36,10 +39,9 @@ struct ProductDomain {
         .init { state, action, environment in
             switch action {
             case .addToCart(.didTapPlusButton):
-                state.count += 1
                 return .none
             case .addToCart(.didTapMinusButton):
-                state.count = max(0, state.count - 1)
+                state.addToCartState.count = max(0, state.addToCartState.count)
                 return .none
             }
         }

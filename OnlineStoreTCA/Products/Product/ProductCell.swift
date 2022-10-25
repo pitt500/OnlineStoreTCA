@@ -56,8 +56,7 @@ struct ProductCell_Previews: PreviewProvider {
             store: Store(
                 initialState: ProductDomain.State(
                     id: UUID(),
-                    product: Product.sample[0],
-                    count: 0
+                    product: Product.sample[0]
                 ),
                 reducer: ProductDomain.reducer,
                 environment: ProductDomain.Environment()
