@@ -31,6 +31,7 @@ struct ProductListDomain {
         case setCartView(isPresented: Bool)
         case cart(CartListDomain.Action)
         case product(id: ProductDomain.State.ID, action: ProductDomain.Action)
+        case detail(action: ProductDetailsDomain.Action)
         case resetProduct(product: Product)
         case closeCart
     }
@@ -44,6 +45,17 @@ struct ProductListDomain {
     static let reducer = Reducer<
         State, Action, Environment
     >.combine(
+        ProductDetailsDomain.reducer
+            .optional()
+            .pullback(
+                state: \.detailsState,
+                action: /ProductListDomain.Action.detail(action:),
+                environment: { _ in
+                    ProductDetailsDomain.Environment(
+                        fetchProduct: { Product.sample.first! }
+                    )
+                }
+            ),
         ProductDomain.reducer.forEach(
             state: \.productListState,
             action: /ProductListDomain.Action.product(id:action:),
@@ -146,7 +158,10 @@ struct ProductListDomain {
                 : nil
                 return .none
             case .product(let id, let action):
+
+                return .none
                 
+            case .detail:
                 return .none
             }
         }

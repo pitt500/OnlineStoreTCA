@@ -13,39 +13,34 @@ struct ProductDetailsView: View {
     
     var body: some View {
         WithViewStore(self.store) { viewStore in
-            NavigationView {
-                VStack {
-                    AsyncImage(
-                        url: URL(string: viewStore.product.imageString)
-                    ) { image in
-                        image
-                            .resizable()
-                            .aspectRatio(contentMode: .fit)
-                            .frame(height: 300)
-                    } placeholder: {
-                        ProgressView()
-                            .frame(height: 300)
-                    }
-                    
-                    VStack(alignment: .leading) {
-                        Text(viewStore.product.title)
-                        HStack {
-                            Text("$\(viewStore.product.price.description)")
-                                .font(.custom("AmericanTypewriter", size: 25))
-                                .fontWeight(.bold)
-                            Spacer()
-                        }
-                    }
-                    .font(.custom("AmericanTypewriter", size: 20))
-                    
-                    
+            VStack {
+                AsyncImage(
+                    url: URL(string: viewStore.product.imageString)
+                ) { image in
+                    image
+                        .resizable()
+                        .aspectRatio(contentMode: .fit)
+                        .frame(height: 300)
+                } placeholder: {
+                    ProgressView()
+                        .frame(height: 300)
                 }
-                .padding(20)
+                
+                VStack(alignment: .leading) {
+                    Text(viewStore.product.title)
+                    HStack {
+                        Text("$\(viewStore.product.price.description)")
+                            .font(.custom("AmericanTypewriter", size: 25))
+                            .fontWeight(.bold)
+                        Spacer()
+                    }
+                }
+                .font(.custom("AmericanTypewriter", size: 20))
             }
+            .padding(20)
             .task {
                 viewStore.send(.fetchProduct)
             }
-            .navigationTitle("Profile")
         }
     }
 }

@@ -32,13 +32,23 @@ struct ProductListView: View {
                                     action: ProductListDomain.Action
                                         .product(id: action:)
                                 )
-                            ) { cellStore in
+                            ) { store in
                                 NavigationLink {
-                                    ProductDetailsView(store: cellStore)
+                                    IfLetStore(
+                                        self.store.scope(
+                                            state: \.detailsState,
+                                            action: ProductListDomain.Action.detail(action:)
+                                        )
+                                    ){
+                                        ProductDetailsView(
+                                            store: $0
+                                        )
+                                    }
+                                    
                                 } label: {
-                                    ProductCell(store: $0)
+                                    ProductCell(store: store)
                                 }
-                            } 
+                            }
                         }
                     }
                 }
