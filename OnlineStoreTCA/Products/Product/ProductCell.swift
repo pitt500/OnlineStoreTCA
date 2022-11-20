@@ -56,10 +56,9 @@ struct ProductCell_Previews: PreviewProvider {
             store: Store(
                 initialState: ProductDomain.State(
                     id: UUID(),
-                    product: Product.sample[0]
+                    product: .sample[0]
                 ),
-                reducer: ProductDomain.reducer,
-                environment: ProductDomain.Environment()
+                reducer: ProductDomain()
             )
         )
         .previewLayout(.fixed(width: 300, height: 300))

@@ -52,11 +52,10 @@ struct RootView_Previews: PreviewProvider {
         RootView(
             store: Store(
                 initialState: RootDomain.State(),
-                reducer: RootDomain.reducer,
-                environment: RootDomain.Environment(
+                reducer: RootDomain(
                     fetchProducts: { Product.sample },
                     sendOrder: { _ in "OK" },
-                    fetchUserProfile: { UserProfile.sample },
+                    fetchUserProfile: { .sample },
                     uuid: { UUID() }
                 )
             )

@@ -48,8 +48,7 @@ struct PlusMinusButton_Previews: PreviewProvider {
         PlusMinusButton(
             store: Store(
                 initialState: AddToCartDomain.State(),
-                reducer: AddToCartDomain.reducer,
-                environment: AddToCartDomain.Environment()
+                reducer: AddToCartDomain()
             )
         )
     }

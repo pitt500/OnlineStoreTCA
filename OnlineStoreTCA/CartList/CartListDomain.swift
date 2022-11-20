@@ -8,7 +8,7 @@
 import Foundation
 import ComposableArchitecture
 
-struct CartListDomain {
+struct CartListDomain: ReducerProtocol {
     struct State: Equatable {
         var dataLoadingStatus = DataLoadingStatus.notStarted
         var cartItems: IdentifiedArrayOf<CartItemDomain.State> = []
@@ -45,19 +45,10 @@ struct CartListDomain {
         case cartItem(id: CartItemDomain.State.ID, action: CartItemDomain.Action)
     }
     
-    struct Environment {
-        var sendOrder: ([CartItem]) async throws -> String
-    }
-    
-    static let reducer = Reducer<
-        State, Action, Environment
-    >.combine(
-        CartItemDomain.reducer.forEach(
-            state: \.cartItems,
-            action: /CartListDomain.Action.cartItem(id:action:),
-            environment: { _ in CartItemDomain.Environment() }
-        ),
-        .init { state, action, environment in
+    var sendOrder: ([CartItem]) async throws -> String
+
+    var body: some ReducerProtocol<State, Action> {
+        Reduce<State, Action> { state, action in
             switch action {
             case .didPressCloseButton:
                 return .none
@@ -115,7 +106,7 @@ struct CartListDomain {
                 let items = state.cartItems.map { $0.cartItem }
                 return .task {
                     await .didReceivePurchaseResponse(
-                        TaskResult { try await environment.sendOrder(items) }
+                        TaskResult { try await sendOrder(items) }
                     )
                 }
             case .cartItem(let id,let action):
@@ -130,9 +121,10 @@ struct CartListDomain {
                 return Effect(value: .getTotalPrice)
             }
         }
-    )
+        .forEach(\.cartItems, action: /Action.cartItem) {}
+    }
     
-    private static func verifyPayButtonVisibility(
+    private func verifyPayButtonVisibility(
         state: inout State
     ) -> Effect<Action, Never> {
         state.isPayButtonHidden = state.totalPrice == 0.0

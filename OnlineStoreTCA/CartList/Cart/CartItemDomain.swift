@@ -8,7 +8,7 @@
 import Foundation
 import ComposableArchitecture
 
-struct CartItemDomain {
+struct CartItemDomain: ReducerProtocol {
     struct State: Equatable, Identifiable {
         let id: UUID
         let cartItem: CartItem
@@ -18,11 +18,7 @@ struct CartItemDomain {
         case deleteCartItem(product: Product)
     }
     
-    struct Environment {}
-    
-    static let reducer = Reducer<
-        State, Action, Environment
-    > { state, action, environment in
+    func reduce(into state: inout State, action: Action) -> EffectTask<Action> {
         switch action {
         case .deleteCartItem:
             return .none

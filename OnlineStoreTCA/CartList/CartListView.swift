@@ -24,8 +24,7 @@ struct CartListView: View {
                                 ForEachStore(
                                     self.store.scope(
                                         state: \.cartItems,
-                                        action: CartListDomain.Action
-                                            .cartItem(id:action:)
+                                        action: CartListDomain.Action.cartItem
                                     )
                                 ) {
                                     CartCell(store: $0)
@@ -104,8 +103,7 @@ struct CartView_Previews: PreviewProvider {
                             }
                     )
                 ),
-                reducer: CartListDomain.reducer,
-                environment: CartListDomain.Environment(
+                reducer: CartListDomain(
                     sendOrder: { _ in "OK" }
                 )
             )

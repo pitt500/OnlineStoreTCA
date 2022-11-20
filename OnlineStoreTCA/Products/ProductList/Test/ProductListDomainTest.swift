@@ -39,8 +39,7 @@ class ProductListDomainTest: XCTestCase {
         
         let store = TestStore(
             initialState: ProductListDomain.State(),
-            reducer: ProductListDomain.reducer,
-            environment: ProductListDomain.Environment(
+            reducer: ProductListDomain(
                 fetchProducts: {
                     products
                 },
@@ -79,8 +78,7 @@ class ProductListDomainTest: XCTestCase {
         let error = APIClient.Failure()
         let store = TestStore(
             initialState: ProductListDomain.State(),
-            reducer: ProductListDomain.reducer,
-            environment: ProductListDomain.Environment(
+            reducer: ProductListDomain(
                 fetchProducts: {
                     throw error
                 },
@@ -139,8 +137,7 @@ class ProductListDomainTest: XCTestCase {
             initialState: ProductListDomain.State(
                 productListState: identifiedProducts
             ),
-            reducer: ProductListDomain.reducer,
-            environment: ProductListDomain.Environment(
+            reducer: ProductListDomain(
                 fetchProducts: {
                     fatalError("unimplemented")
                 },
@@ -239,8 +236,7 @@ class ProductListDomainTest: XCTestCase {
             initialState: ProductListDomain.State(
                 productListState: identifiedProducts
             ),
-            reducer: ProductListDomain.reducer,
-            environment: ProductListDomain.Environment(
+            reducer: ProductListDomain(
                 fetchProducts: {
                     fatalError("unimplemented")
                 },

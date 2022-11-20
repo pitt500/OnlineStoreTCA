@@ -29,8 +29,7 @@ struct ProductListView: View {
                             ForEachStore(
                                 self.store.scope(
                                     state: \.productListState,
-                                    action: ProductListDomain.Action
-                                        .product(id: action:)
+                                    action: ProductListDomain.Action.product
                                 )
                             ) {
                                 ProductCell(store: $0)
@@ -42,6 +41,7 @@ struct ProductListView: View {
                     viewStore.send(.fetchProducts)
                 }
                 .navigationTitle("Products")
+                .navigationViewStyle(.stack)
                 .toolbar {
                     ToolbarItem(placement: .navigationBarTrailing) {
                         Button {
@@ -77,8 +77,7 @@ struct ProductListView_Previews: PreviewProvider {
         ProductListView(
             store: Store(
                 initialState: ProductListDomain.State(),
-                reducer: ProductListDomain.reducer,
-                environment: ProductListDomain.Environment(
+                reducer: ProductListDomain(
                     fetchProducts: { Product.sample },
                     sendOrder: { _ in "OK" },
                     uuid: { UUID() }

@@ -49,8 +49,7 @@ struct ProfileView_Previews: PreviewProvider {
         ProfileView(
             store: Store(
                 initialState: ProfileDomain.State(),
-                reducer: ProfileDomain.reducer,
-                environment: ProfileDomain.Environment(
+                reducer: ProfileDomain(
                     fetchUserProfile: { .sample }
                 )
             )
