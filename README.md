@@ -1,3 +1,6 @@
+# NOTICE ⚠️
+ReducerProtocol Migration will come pretty soon as part of the TCA series. Thanks for your patience!
+
 # Online Store made with Composable Architecture (TCA)
 The purpose of this demo is to explore the main concepts of TCA. If this is your first time reading about it, I **strongly** recommend you to read first the README from the [main repo](https://github.com/pointfreeco/swift-composable-architecture) and watch the [Tour of TCA](https://www.pointfree.co/collections/composable-architecture/a-tour-of-the-composable-architecture).
 
