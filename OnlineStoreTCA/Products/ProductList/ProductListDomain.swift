@@ -132,7 +132,6 @@ struct ProductListDomain {
                                 ? CartItemDomain.State(
                                     id: environment.uuid(),
                                     cartItem: CartItem(
-                                        id: environment.uuid(),
                                         product: state.product,
                                         quantity: state.count
                                     )
