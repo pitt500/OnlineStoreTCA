@@ -14,7 +14,7 @@ struct CartListView: View {
     var body: some View {
         WithViewStore(self.store) { viewStore in
             ZStack {
-                NavigationView {
+                NavigationStack {
                     Group {
                         if viewStore.cartItems.isEmpty {
                             Text("Oops, your cart is empty! \n")
