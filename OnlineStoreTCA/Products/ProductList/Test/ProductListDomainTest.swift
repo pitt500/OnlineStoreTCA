@@ -173,7 +173,6 @@ class ProductListDomainTest: XCTestCase {
                     CartItemDomain.State(
                         id: id1,
                         cartItem: CartItem(
-                            id: id2,
                             product: products.first!,
                             quantity: 2
                         )
@@ -255,7 +254,6 @@ class ProductListDomainTest: XCTestCase {
                     CartItemDomain.State(
                         id: id1,
                         cartItem: CartItem(
-                            id: id2,
                             product: products.first!,
                             quantity: numberOfItems
                         )

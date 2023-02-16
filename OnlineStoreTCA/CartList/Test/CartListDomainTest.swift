@@ -21,7 +21,6 @@ class CartListDomainTest: XCTestCase {
             .init(
                 id: cartItemId1,
                 cartItem: CartItem.init(
-                    id: cartItemId1,
                     product: Product.sample[0],
                     quantity: itemQuantity
                 )
@@ -29,7 +28,6 @@ class CartListDomainTest: XCTestCase {
             .init(
                 id: cartItemId2,
                 cartItem: CartItem.init(
-                    id: cartItemId2,
                     product: Product.sample[1],
                     quantity: itemQuantity
                 )
@@ -49,7 +47,6 @@ class CartListDomainTest: XCTestCase {
                 .init(
                     id: cartItemId2,
                     cartItem: CartItem.init(
-                        id: cartItemId2,
                         product: Product.sample[1],
                         quantity: itemQuantity
                     )
@@ -72,7 +69,6 @@ class CartListDomainTest: XCTestCase {
             .init(
                 id: cartItemId1,
                 cartItem: CartItem.init(
-                    id: cartItemId1,
                     product: Product.sample[0],
                     quantity: itemQuantity
                 )
@@ -80,7 +76,6 @@ class CartListDomainTest: XCTestCase {
             .init(
                 id: cartItemId2,
                 cartItem: CartItem.init(
-                    id: cartItemId2,
                     product: Product.sample[1],
                     quantity: itemQuantity
                 )
@@ -100,7 +95,6 @@ class CartListDomainTest: XCTestCase {
                 .init(
                     id: cartItemId2,
                     cartItem: CartItem.init(
-                        id: cartItemId2,
                         product: Product.sample[1],
                         quantity: itemQuantity
                     )
@@ -133,7 +127,6 @@ class CartListDomainTest: XCTestCase {
             .init(
                 id: cartItemId1,
                 cartItem: CartItem.init(
-                    id: cartItemId1,
                     product: Product.sample[0],
                     quantity: itemQuantity
                 )
@@ -141,7 +134,6 @@ class CartListDomainTest: XCTestCase {
             .init(
                 id: cartItemId2,
                 cartItem: CartItem.init(
-                    id: cartItemId2,
                     product: Product.sample[1],
                     quantity: itemQuantity
                 )
@@ -182,7 +174,6 @@ class CartListDomainTest: XCTestCase {
             .init(
                 id: cartItemId1,
                 cartItem: CartItem.init(
-                    id: cartItemId1,
                     product: Product.sample[0],
                     quantity: itemQuantity
                 )
@@ -190,7 +181,6 @@ class CartListDomainTest: XCTestCase {
             .init(
                 id: cartItemId2,
                 cartItem: CartItem.init(
-                    id: cartItemId2,
                     product: Product.sample[1],
                     quantity: itemQuantity
                 )
