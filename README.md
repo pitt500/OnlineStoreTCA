@@ -138,15 +138,23 @@ If you want to learn more about the basics, check out the following [video](http
 
 ## Composition
 
-TBD
+Composition refers to the process of building complex software systems by combining smaller, reusable software components. 
+
+If you want to learn more about scope, combine and pullback operators, check out this [video](https://youtu.be/Zf2pFEa3uew).
+
+If you want to learn more about ForEachStore, check out this other [video](https://youtu.be/sid-zfggYhQ)
 
 ## Environment
 
-TBD
+The environment is a structure that contains all the dependencies needed by the application to perform its tasks. It was part of the TCA foundation before the introduction of [ReducerProtocol](https://www.pointfree.co/blog/posts/81-announcing-the-reducer-protocol) and [Dependencies Framework](https://github.com/pointfreeco/swift-dependencies).
+
 
 ## Side Effects
 
-TBD
+A side effect is an observable change that occurs as a result of running a function or method. This can include things like modifying state outside of the function, performing I/O operations like reading or writing to a file, or making network requests. 
+TCA helps to encapsulate those side effects through Effects objects.
+
+If you want to learn more about side effects, check out this [video](https://youtu.be/t3HHam3GYkU)
 
 ## Testing
 
