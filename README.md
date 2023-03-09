@@ -140,7 +140,11 @@ If you want to learn more about the basics, check out the following [video](http
 
 Composition refers to the process of building complex software systems by combining smaller, reusable software components. 
 
+### Single state
+
 If you want to learn more about scope, combine and pullback operators, check out this [video](https://youtu.be/Zf2pFEa3uew).
+
+### Collection of states
 
 If you want to learn more about ForEachStore, check out this other [video](https://youtu.be/sid-zfggYhQ)
 
