@@ -140,7 +140,7 @@ If you want to learn more about the basics, check out the following [video](http
 
 Composition refers to the process of building complex software systems by combining smaller, reusable software components. Take a look to this image:
 
-<img src="./Images/composition1.png" width="80%" height="80%">
+<img src="./Images/composition2.png" width="80%" height="80%">
 
 We started with a simple button counter, then we add an extra state to display text, next we put the whole button in a Product cell, and finally, each product cell will be part of a Product list. That is composition!
 
