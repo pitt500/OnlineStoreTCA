@@ -146,9 +146,34 @@ We started with a simple button counter, then we add an extra state to display t
 
 ### Single states
 
-For single states (all, except collections/lists), TCA provides operators to glue the components to make bigger ones.
+For single states (all, except collections/lists), TCA provides operators to glue the components and make bigger ones.
 
-If you want to learn more about scope, combine and pullback operators, check out this [video](https://youtu.be/Zf2pFEa3uew).
+* **Scope**: Scope will expose from parent domain (Product) only the required state and action for the child domain (AddToCart). For example, the ProductDomain below contains two properties as part of its state: product and addToCartState.
+
+```swift
+struct ProductDomain {
+    struct State: Equatable, Identifiable {
+        let product: Product
+        var addToCartState = AddToCartDomain.State()
+    }
+    // ...
+```
+We don't want to pass around the whole ProductDomain state, instead, we want to reduce the scope as much as possible. In order to do that, we use scope on the child component:
+
+```swift
+AddToCartButton(
+    store: self.store.scope(
+        state: \.addToCartState,
+        action: ProductDomain.Action.addToCart
+    )
+)
+```
+In this way, AddToCart Domain will only know about its own state and nothing about product and more.
+
+* **Combine**: TBD.
+* **Pullback**: TBD.
+
+If you want to learn more about these operators, check out this [video](https://youtu.be/Zf2pFEa3uew).
 
 ### Collection of states
 
