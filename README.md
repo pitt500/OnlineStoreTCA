@@ -213,7 +213,60 @@ If you want to learn more about these operators, check out this [video](https://
 
 ### Collection of states
 
-If you want to learn more about ForEachStore, check out this other [video](https://youtu.be/sid-zfggYhQ)
+What about if we have multiple states and we need to manage them? TCA also have great support for that.
+
+First, we need to hold a list of (Product) states using IdentifiedArray:
+```swift
+struct ProductListDomain {
+    struct State: Equatable {
+        var productListState: IdentifiedArrayOf<ProductDomain.State> = []
+        // ...    
+    }
+    // ...
+}
+```
+
+* **forEach**: TBD
+
+```swift
+struct ProductListDomain {
+    // State and Actions ...
+    
+    static let reducer = Reducer<
+        State, Action, Environment
+    >.combine(
+        ProductDomain.reducer.forEach(
+            state: \.productListState,
+            action: /ProductListDomain.Action.product(id:action:),
+            environment: { _ in ProductDomain.Environment() }
+        ),
+        // More Reducers ...
+        .init { state, action, environment in
+            switch action {
+                // ...
+            }
+        }
+    )
+}
+```
+
+Then in the UI, we use ForEachStore to iterate over all the (Product) states and actions:
+```swift
+List {
+    ForEachStore(
+        self.store.scope(
+            state: \.productListState,
+            action: ProductListDomain.Action
+                .product(id: action:)
+        )
+    ) {
+        ProductCell(store: $0)
+    }
+}
+```
+
+
+If you want to learn more about forEach operator and ForEachStore, check out this [video](https://youtu.be/sid-zfggYhQ)
 
 ## Environment
 
