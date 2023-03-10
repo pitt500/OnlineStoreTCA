@@ -271,6 +271,13 @@ If you want to learn more about forEach operator and ForEachStore, check out thi
 
 The environment is a structure that contains all the dependencies needed by the application to perform its tasks. It was part of the TCA foundation before the introduction of [ReducerProtocol](https://www.pointfree.co/blog/posts/81-announcing-the-reducer-protocol) and [Dependencies Framework](https://github.com/pointfreeco/swift-dependencies).
 
+```swift
+struct Environment {
+    var fetchProducts:  () async throws -> [Product]
+    var sendOrder: ([CartItem]) async throws -> String
+    var uuid: () -> UUID
+}
+```
 
 ## Side Effects
 
@@ -279,7 +286,27 @@ TCA helps to encapsulate those side effects through Effects objects.
 
 If you want to learn more about side effects, check out this [video](https://youtu.be/t3HHam3GYkU)
 
+### Network calls
+
+TBD
+
+For information about network requests in TCA, check out this [video](https://youtu.be/sid-zfggYhQ) explaining async requests, and this other [video](https://youtu.be/j2qymM6i9n4) configuring a real web API call.
+
 ## Testing
+
+TBD
+
+## Other topics
+
+### Optional States
+
+TBD
+
+### Private Actions
+
+TBD
+
+### Alert Views
 
 TBD
 
