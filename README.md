@@ -350,15 +350,31 @@ TBD
 
 ## Other topics
 
+### SwiftUI's Binding
+
+TBD
+
+If you want to lean more about Binding with TCA and SwiftUI, take a look to this [video](https://youtu.be/Ilr8AsoggIY).
+
 ### Optional States
 
 TBD
+
+If you want to learn more about optional states, check out this [video](https://youtu.be/AV0laQw2OjM).
 
 ### Private Actions
 
 TBD
 
+For more about private actions, check out this [video](https://youtu.be/7BkZX_7z-jw).
+
 ### Alert Views
+
+TBD
+
+This [video](https://youtu.be/U3EMduy-DhE) explains more about alert Views in TCA.
+
+### Making a Root Domain
 
 TBD
 
