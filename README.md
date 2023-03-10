@@ -290,9 +290,51 @@ If you want to learn more about side effects, check out this [video](https://you
 
 ### Network calls
 
-TBD
+Since network calls are one of the most common tasks in mobile development, of course TCA provides tools for that. And since network calls are part of the outside world (side effects), we use Effect object to wrap the calls, more specifically, into Effect.task.
 
-For information about network requests in TCA, check out this [video](https://youtu.be/sid-zfggYhQ) explaining async requests, and this other [video](https://youtu.be/j2qymM6i9n4) configuring a real web API call.
+However, this task operator will only call the web API, but to get the actual response, we have to implement an additional action that will hold the result in a TaskResult:
+
+```swift
+struct ProductListDomain {
+    // State and more ...
+    
+    enum Action: Equatable {
+        case fetchProducts
+        case fetchProductsResponse(TaskResult<[Product]>)
+   }
+    
+    static let reducer = Reducer<
+        State, Action, Environment
+    >.combine(
+        // Other child reducers...
+        .init { state, action, environment in
+            switch action {
+            case .fetchProducts:
+                return .task {
+                    await .fetchProductsResponse(
+                        TaskResult { try await environment.fetchProducts() }
+                    )
+                }
+            case .fetchProductsResponse(.success(let products)):
+                state.productListState = IdentifiedArrayOf(
+                    uniqueElements: products.map {
+                        ProductDomain.State(
+                            id: environment.uuid(),
+                            product: $0
+                        )
+                    }
+                )
+                return .none
+            case .fetchProductsResponse(.failure(let error)):
+                print("Error getting products, try again later.", error)
+                return .none
+            }
+        }
+    )
+}
+```
+
+For information about network requests in TCA, check out this [video](https://youtu.be/sid-zfggYhQ?list=PLHWvYoDHvsOVo4tklgLW1g7gy4Kmk4kjw&t=144) explaining async requests, and this other [video](https://youtu.be/j2qymM6i9n4) configuring a real web API call.
 
 ## Testing
 
