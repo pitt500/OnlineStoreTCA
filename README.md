@@ -213,9 +213,9 @@ If you want to learn more about these operators, check out this [video](https://
 
 ### Collection of states
 
-What about if we have multiple states and we need to manage them? TCA also have great support for that.
+What about having multiple states to manage?, TCA also have great support for that.
 
-First, we need to hold a list of (Product) states using IdentifiedArray:
+As a first step, we need to hold a list of (Product) states using IdentifiedArray instead of a regular array:
 ```swift
 struct ProductListDomain {
     struct State: Equatable {
@@ -226,7 +226,7 @@ struct ProductListDomain {
 }
 ```
 
-* **forEach**: TBD
+* **forEach**: `forEach` operator it's basically a pullback operator, but it will work for a collection of states, transforming the child reducers into ones compatible with parent reducer:
 
 ```swift
 struct ProductListDomain {
@@ -250,7 +250,7 @@ struct ProductListDomain {
 }
 ```
 
-Then in the UI, we use ForEachStore to iterate over all the (Product) states and actions:
+Then in the UI, we use ForEachStore to iterate over all the (Product) states and actions. This will make possible sending actions to the respective cell and mutate its state.
 ```swift
 List {
     ForEachStore(
@@ -264,7 +264,6 @@ List {
     }
 }
 ```
-
 
 If you want to learn more about forEach operator and ForEachStore, check out this [video](https://youtu.be/sid-zfggYhQ)
 
