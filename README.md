@@ -302,6 +302,11 @@ struct ProductListDomain {
         case fetchProducts
         case fetchProductsResponse(TaskResult<[Product]>)
    }
+   
+   struct Environment {
+        var fetchProducts: () async throws -> [Product]
+        var uuid: () -> UUID
+    }
     
     static let reducer = Reducer<
         State, Action, Environment
@@ -311,11 +316,13 @@ struct ProductListDomain {
             switch action {
             case .fetchProducts:
                 return .task {
+                    // Just making the call 
                     await .fetchProductsResponse(
                         TaskResult { try await environment.fetchProducts() }
                     )
                 }
             case .fetchProductsResponse(.success(let products)):
+                // Getting the success response
                 state.productListState = IdentifiedArrayOf(
                     uniqueElements: products.map {
                         ProductDomain.State(
@@ -326,6 +333,7 @@ struct ProductListDomain {
                 )
                 return .none
             case .fetchProductsResponse(.failure(let error)):
+                // Getting an error from the web API
                 print("Error getting products, try again later.", error)
                 return .none
             }
