@@ -170,8 +170,44 @@ AddToCartButton(
 ```
 In this way, AddToCart Domain will only know about its own state and nothing about product and more.
 
-* **Combine**: TBD.
-* **Pullback**: TBD.
+* **Pullback**: Pullback works like a mapping function. It transforms the child reducer (AddToCart) into one compatible with parent reducer (Product).
+```swift
+AddToCartDomain.reducer
+    .pullback(
+        state: \.addToCartState,
+        action: /ProductDomain.Action.addToCart,
+        environment: { _ in
+            AddToCartDomain.Environment()
+        }
+    )
+```
+This transformation will be really useful when we combine multiple reducers to build a more complex component.
+
+* **Combine**: Combine operator will combine many reducers into a single one by running each one on state in order, and merging all of the effects.
+```swift
+static let reducer = Reducer<
+    State, Action, Environment
+>.combine(
+    AddToCartDomain.reducer
+        .pullback(
+            state: \.addToCartState,
+            action: /ProductDomain.Action.addToCart,
+            environment: { _ in
+                AddToCartDomain.Environment()
+            }
+        ),
+    .init { state, action, environment in
+        switch action {
+        case .addToCart(.didTapPlusButton):
+            return .none
+        case .addToCart(.didTapMinusButton):
+            state.addToCartState.count = max(0, state.addToCartState.count)
+            return .none
+        }
+    }
+)
+```
+With the help of pullback operators, the child reducers can work along with the parent domain to execute each action in order. We have to move the parent reducer at the end to run the child reducers first and then capture any side effect (note: this is not required in ReducerProtocol anymore).
 
 If you want to learn more about these operators, check out this [video](https://youtu.be/Zf2pFEa3uew).
 
