@@ -689,4 +689,7 @@ struct RootView: View {
 ```
 
 Check out the full details of this implementation in this [video](https://youtu.be/a_FwMVIhCHY).
-### More coming ...
+## Contact
+* [Twitter](https://twitter.com/swiftandtips)
+* [LinkedIn](https://www.linkedin.com/in/pedrorojaslo/)
+* [Mastodon](https://iosdev.space/@swiftandtips)
