@@ -45,7 +45,7 @@ Even if this demo is not considered a real-world app, it has enough reducers to 
 
 Additionally, I've created tests to demostrate one of the key features of TCA and how it makes a test to fail if you didn't capture the actual mutation of your state.
 
-Note: Feel free to recommend any change that may be great to teach a concept in a better way or something that you consider should be here too! :) 
+**Note:** Feel free to add any feedback!
 
 ## Screenshots
 ### Tabs
