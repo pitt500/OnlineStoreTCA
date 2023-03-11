@@ -516,11 +516,79 @@ private static func resetProductsToZero(
 
 For more about private actions, check out this [video](https://youtu.be/7BkZX_7z-jw).
 
-### Alert Views
+### Alert Views in SwiftUI
 
-TBD
+TCA library provides support for AlertView too adding its own state and way to build UI to keep consistency without the architecture. Here's how you can create your own alert:
 
-This [video](https://youtu.be/U3EMduy-DhE) explains more about alert Views in TCA.
+1. Create an AlertState with actions of your own domain.
+2. Create the actions that will trigger events for the alert:
+    - Initialize AlertState (`didPressPayButton`)
+    - Dismiss the alert (`didCancelConfirmation`)
+    - Execute the alert's handler (`didConfirmPurchase`)
+
+```swift
+struct CartListDomain {
+    struct State: Equatable {
+        var confirmationAlert: AlertState<CartListDomain.Action>?
+        
+        // More properties ...
+    }
+    
+    enum Action: Equatable {
+        case didPressPayButton
+        case didCancelConfirmation
+        case didConfirmPurchase
+        
+        // More actions ...
+    }
+    
+    static let reducer = Reducer<
+        State, Action, Environment
+    >.combine(
+        CartItemDomain.reducer.forEach(
+            state: \.cartItems,
+            action: /CartListDomain.Action.cartItem(id:action:),
+            environment: { _ in CartItemDomain.Environment() }
+        ),
+        .init { state, action, environment in
+            switch action {
+            case .didCancelConfirmation:
+                state.confirmationAlert = nil
+                return .none
+            case .didConfirmPurchase:
+                // Sent order and Pay ...
+            case .didPressPayButton:
+                state.confirmationAlert = AlertState(
+                    title: TextState("Confirm your purchase"),
+                    message: TextState("Do you want to proceed with your purchase of \(state.totalPriceString)?"),
+                    buttons: [
+                        .default(
+                            TextState("Pay \(state.totalPriceString)"),
+                            action: .send(.didConfirmPurchase)),
+                        .cancel(TextState("Cancel"), action: .send(.didCancelConfirmation))
+                    ]
+                )
+                return .none
+            // More actions ...
+            }
+        }
+    )
+}
+                
+```
+
+3. Invoke the UI
+```swift
+let store: Store<CartListDomain.State, CartListDomain.Action>
+
+Text("Parent View")
+.alert(
+    self.store.scope(state: \.confirmationAlert),
+    dismiss: .didCancelConfirmation
+)
+```
+
+This [video](https://youtu.be/U3EMduy-DhE) explains more about AlertView in SwiftUI and TCA.
 
 ### Making a Root Domain
 
