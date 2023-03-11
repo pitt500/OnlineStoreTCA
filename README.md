@@ -238,7 +238,9 @@ static let reducer = Reducer<
     }
 )
 ```
-With the help of pullback operators, the child reducers can work along with the parent domain to execute each action in order. We have to move the parent reducer at the end to run the child reducers first and then capture any side effect (note: this is not required in ReducerProtocol anymore).
+With the help of pullback operators, the child reducers can work along with the parent domain to execute each action in order. 
+
+Be careful because we have to move the parent reducer at the end to run the child reducers first and then capture any [side effects](#side-effects) (note: this is not required in ReducerProtocol anymore).
 
 If you want to learn more about these operators, check out this [video](https://youtu.be/Zf2pFEa3uew).
 
