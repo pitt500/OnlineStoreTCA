@@ -384,7 +384,7 @@ If you want to lean more about Binding with TCA and SwiftUI, take a look to this
 
 By default, a TCA's state will be kept in memory during the app's lifecycle. However, there are cases where having a state alive is just a waste of resources. For example, a modal view is only displayed a short period of time, it doesn't make sense to keep its state in memory all the time, for that we have optional states.
 
-The way to create an optional state is similar to any optional value in Swift, just declare the property in the parent state, but instead of assigning a default value, let's declare it as optional:
+The way to create an optional state is similar to any optional value in Swift, just declare the property in the parent state, but instead of assigning a default value, let's declare it as optional. In this example, cartState will hold an optional state for a Cart List:
 
 ```swift
 struct ProductListDomain {
@@ -397,7 +397,10 @@ struct ProductListDomain {
     }
 }
 ```
-In this example, cartState will hold an optional state for a Cart List. TBD
+
+Now in the reducer, we have to use pullback operator to transform the child (CartList) reducer into one compatible with parent (ProductList) reducer, however, pullback doesn't accept optional states. In order to make this work, we need to use `optional` operator, which will enable the reducer once the state is non-nil.
+
+To assign a new non-optional state, the parent reducer will have to initialize the property (cartState) once a specific action is called (setCartView).
 
 ```swift
 static let reducer = Reducer<
@@ -429,7 +432,7 @@ static let reducer = Reducer<
     )
 ```
 
-TBD
+Finally, use `IfLetStore` to unwrap a store of optional state in order to show the respective view that will work with that state. 
 
 
 ```swift
