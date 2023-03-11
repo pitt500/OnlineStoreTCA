@@ -327,9 +327,9 @@ If you want to learn more about side effects, check out this [video](https://you
 
 ### Network calls
 
-Network calls are one of the most common tasks in mobile development, and of course, TCA provides tools for that. And since network calls are part of the outside world (side effects), we use Effect object to wrap the calls, more specifically, into Effect.task.
+Network calls are one of the most common tasks in mobile development, and of course, TCA provides tools for that. And since network calls are part of the outside world ([side effects](#side-effects)), we use Effect object to wrap the calls, more specifically, into `Effect.task`.
 
-However, this task operator will only call the web API, but to get the actual response, we have to implement an additional action that will hold the result in a TaskResult:
+However, this task operator will only call the web API, but to get the actual response, we have to implement an additional action that will hold the result in a `TaskResult:
 
 ```swift
 struct ProductListDomain {
