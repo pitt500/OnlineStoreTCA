@@ -593,8 +593,100 @@ Text("Parent View")
 
 This [video](https://youtu.be/U3EMduy-DhE) explains more about AlertView in SwiftUI and TCA.
 
-### Making a Root Domain
+### Making a Root Domain with Tab Views
 
-TBD
+Creating a Root Domain is like creating any other domain in TCA. Each property in this state will represent a complex substate. For Tab logic, we simply add an enum representing each tab item:
 
+```swift
+struct RootDomain {
+    struct State: Equatable {
+        var selectedTab = Tab.products
+        var productListState = ProductListDomain.State()
+        var profileState = ProfileDomain.State()
+    }
+    
+    enum Tab {
+        case products
+        case profile
+    }
+    
+    enum Action: Equatable {
+        case tabSelected(Tab)
+        case productList(ProductListDomain.Action)
+        case profile(ProfileDomain.Action)
+    }
+    
+    struct Environment {
+        // Dependencies
+        
+        static let live = Self(
+            // Dependency Initialization
+        )
+    }
+    
+    static let reducer = Reducer<
+        State, Action, Environment
+    >.combine(
+        ProductListDomain.reducer
+            .pullback(...),
+        ProfileDomain.reducer
+            .pullback(...),
+        .init { state, action, environment in
+            switch action {
+            case .productList:
+                return .none
+            case .tabSelected(let tab):
+                state.selectedTab = tab
+                return .none
+            case .profile:
+                return .none
+            }
+        }
+    )
+}
+```
+
+For the UI, it's almost identical to vanilla SwiftUI, except we are holding the store property to manage the current selected tab:
+```swift
+struct RootView: View {
+    let store: Store<RootDomain.State, RootDomain.Action>
+    
+    var body: some View {
+        WithViewStore(self.store) { viewStore in
+            TabView(
+                selection: viewStore.binding(
+                    get: \.selectedTab,
+                    send: RootDomain.Action.tabSelected
+                )
+            ) {
+                ProductListView(
+                    store: self.store.scope(
+                        state: \.productListState,
+                        action: RootDomain.Action
+                            .productList
+                    )
+                )
+                .tabItem {
+                    Image(systemName: "list.bullet")
+                    Text("Products")
+                }
+                .tag(RootDomain.Tab.products)
+                ProfileView(
+                    store: self.store.scope(
+                        state: \.profileState,
+                        action: RootDomain.Action.profile
+                    )
+                )
+                .tabItem {
+                    Image(systemName: "person.fill")
+                    Text("Profile")
+                }
+                .tag(RootDomain.Tab.profile)
+            }
+        }
+    }
+}
+```
+
+Check out the full details of this implementation in this [video](https://youtu.be/a_FwMVIhCHY).
 ### More coming ...
