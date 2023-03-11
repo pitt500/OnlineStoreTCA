@@ -286,6 +286,8 @@ If you want to learn more about how Environment object works on TCA, take a look
 A side effect is an observable change that occurs as a result of running a function or method. This can include things like modifying state outside of the function, performing I/O operations like reading or writing to a file, or making network requests. 
 TCA helps to encapsulate those side effects through Effects objects.
 
+<img src="./Images/sideEffects1.png" width="80%" height="80%">
+
 If you want to learn more about side effects, check out this [video](https://youtu.be/t3HHam3GYkU)
 
 ### Network calls
