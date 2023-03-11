@@ -39,7 +39,7 @@ extension APIClient {
             throw Failure()
         }
         
-        return "Status: \(httpResponse.statusCode)"//String(data: data, encoding: .utf8) ?? "default value"
+        return "Status: \(httpResponse.statusCode)"
     },
     fetchUserProfile: {
         let (data, _) = try await URLSession.shared

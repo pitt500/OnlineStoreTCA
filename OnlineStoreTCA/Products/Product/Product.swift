@@ -6,7 +6,6 @@
 //
 
 import Foundation
-import ComposableArchitecture
 
 struct Product: Equatable, Identifiable {
     let id: Int
@@ -18,9 +17,8 @@ struct Product: Equatable, Identifiable {
     
     // Add rating later...
 }
-
 extension Product: Decodable {
-    private enum ProductKeys: String, CodingKey {
+    enum ProductKeys: String, CodingKey {
         case id
         case title
         case price

@@ -28,7 +28,7 @@ struct ProductListView: View {
                         List {
                             ForEachStore(
                                 self.store.scope(
-                                    state: \.productListState,
+                                    state: \.productList,
                                     action: ProductListDomain.Action
                                         .product(id: action:)
                                 )

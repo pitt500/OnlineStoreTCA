@@ -13,7 +13,7 @@ struct ProductListDomain {
         var dataLoadingStatus = DataLoadingStatus.notStarted
         var shouldOpenCart = false
         var cartState: CartListDomain.State?
-        var productListState: IdentifiedArrayOf<ProductDomain.State> = []
+        var productList: IdentifiedArrayOf<ProductDomain.State> = []
         
         var shouldShowError: Bool {
             dataLoadingStatus == .error
@@ -44,7 +44,7 @@ struct ProductListDomain {
         State, Action, Environment
     >.combine(
         ProductDomain.reducer.forEach(
-            state: \.productListState,
+            state: \.productList,
             action: /ProductListDomain.Action.product(id:action:),
             environment: { _ in ProductDomain.Environment() }
         ),
@@ -74,7 +74,7 @@ struct ProductListDomain {
                 }
             case .fetchProductsResponse(.success(let products)):
                 state.dataLoadingStatus = .success
-                state.productListState = IdentifiedArrayOf(
+                state.productList = IdentifiedArrayOf(
                     uniqueElements: products.map {
                         ProductDomain.State(
                             id: environment.uuid(),
@@ -112,13 +112,13 @@ struct ProductListDomain {
                 return closeCart(state: &state)
             case .resetProduct(let product):
                 
-                guard let index = state.productListState.firstIndex(
+                guard let index = state.productList.firstIndex(
                     where: { $0.product.id == product.id }
                 )
                 else { return .none }
-                let productStateId = state.productListState[index].id
+                let productStateId = state.productList[index].id
                 
-                state.productListState[id: productStateId]?.addToCartState.count = 0
+                state.productList[id: productStateId]?.addToCartState.count = 0
                 return .none
             case .setCartView(let isPresented):
                 state.shouldOpenCart = isPresented
@@ -126,7 +126,7 @@ struct ProductListDomain {
                 ? CartListDomain.State(
                     cartItems: IdentifiedArrayOf(
                         uniqueElements: state
-                            .productListState
+                            .productList
                             .compactMap { state in
                                 state.count > 0
                                 ? CartItemDomain.State(
@@ -160,9 +160,8 @@ struct ProductListDomain {
     private static func resetProductsToZero(
         state: inout State
     ) {
-        for id in state.productListState.map(\.id)
-        where state.productListState[id: id]?.count != 0  {
-            state.productListState[id: id]?.addToCartState.count = 0
+        for id in state.productList.map(\.id) {
+            state.productList[id: id]?.count = 0
         }
     }
 }

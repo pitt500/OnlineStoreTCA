@@ -70,7 +70,7 @@ class ProductListDomainTest: XCTestCase {
         }
         
         await store.receive(.fetchProductsResponse(.success(products))) {
-            $0.productListState = identifiedArray
+            $0.productList = identifiedArray
             $0.dataLoadingStatus = .success
         }
     }
@@ -94,12 +94,12 @@ class ProductListDomainTest: XCTestCase {
         }
         
         await store.receive(.fetchProductsResponse(.failure(error))) {
-            $0.productListState = []
+            $0.productList = []
             $0.dataLoadingStatus = .error
         }
     }
     
-    func testResetProductsToZeroAcferPayingOrder() async {
+    func testResetProductsToZeroAfterPayingOrder() async {
         let products: [Product] = [
             .init(
                 id: 1,
@@ -137,7 +137,7 @@ class ProductListDomainTest: XCTestCase {
         
         let store = TestStore(
             initialState: ProductListDomain.State(
-                productListState: identifiedProducts
+                productList: identifiedProducts
             ),
             reducer: ProductListDomain.reducer,
             environment: ProductListDomain.Environment(
@@ -155,7 +155,7 @@ class ProductListDomainTest: XCTestCase {
                 action: .addToCart(.didTapPlusButton)
             )
         ) {
-            $0.productListState[id: id1]?.addToCartState.count = 1
+            $0.productList[id: id1]?.addToCartState.count = 1
         }
         
         await store.send(
@@ -164,7 +164,7 @@ class ProductListDomainTest: XCTestCase {
                 action: .addToCart(.didTapPlusButton)
             )
         ) {
-            $0.productListState[id: id1]?.addToCartState.count = 2
+            $0.productList[id: id1]?.addToCartState.count = 2
         }
         
         let expectedCartState = CartListDomain.State(
@@ -187,7 +187,7 @@ class ProductListDomainTest: XCTestCase {
         }
         
         await store.send(.cart(.dismissSuccessAlert)) {
-            $0.productListState[id: id1]?.addToCartState.count = 0
+            $0.productList[id: id1]?.addToCartState.count = 0
         }
         
         await store.receive(.closeCart) {
@@ -227,16 +227,18 @@ class ProductListDomainTest: XCTestCase {
                     product: products[0],
                     addToCartState: AddToCartDomain.State(count: numberOfItems)
                 ),
+                // This item should not be added:
                 ProductDomain.State(
                     id: id2,
-                    product: products[1]
+                    product: products[1],
+                    addToCartState: AddToCartDomain.State(count: 0)
                 ),
             ]
         )
         
         let store = TestStore(
             initialState: ProductListDomain.State(
-                productListState: identifiedProducts
+                productList: identifiedProducts
             ),
             reducer: ProductListDomain.reducer,
             environment: ProductListDomain.Environment(
@@ -270,20 +272,20 @@ class ProductListDomainTest: XCTestCase {
             .cart(
                 .cartItem(
                     id: id1,
-                    action: .deleteCartItem(product: products.first!)
+                    action: .deleteCartItem(product: products[0])
                 )
             )
-        )
-        await store.receive(.cart(.deleteCartItem(id: id1))) {
+        ) {
             $0.cartState?.cartItems = []
         }
+        
         await store.receive(.cart(.getTotalPrice)) {
             $0.cartState?.totalPrice = 0
-            $0.cartState?.isPayButtonHidden = true
+            $0.cartState?.isPayButtonDisable = true
         }
-        await store.receive(.resetProduct(product: products.first!)) {
-            $0.productListState = identifiedProducts
-            $0.productListState[id: id1]?.addToCartState.count = 0
+        await store.receive(.resetProduct(product: products[0])) {
+            $0.productList = identifiedProducts
+            $0.productList[id: id1]?.count = 0
         }
     }
 }

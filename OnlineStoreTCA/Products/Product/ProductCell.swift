@@ -42,8 +42,6 @@ struct ProductCell: View {
                     }
                 }
                 .font(.custom("AmericanTypewriter", size: 20))
-                
-                
             }
             .padding(20)
         }

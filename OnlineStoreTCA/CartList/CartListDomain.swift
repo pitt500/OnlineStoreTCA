@@ -13,18 +13,14 @@ struct CartListDomain {
         var dataLoadingStatus = DataLoadingStatus.notStarted
         var cartItems: IdentifiedArrayOf<CartItemDomain.State> = []
         var totalPrice: Double = 0.0
-        var confirmationAlert: AlertState<CartListDomain.Action>?
-        var errorAlert: AlertState<CartListDomain.Action>?
-        var successAlert: AlertState<CartListDomain.Action>?
-        var isPayButtonHidden = false
+        var isPayButtonDisable = false
+        var confirmationAlert: AlertState<Action>?
+        var errorAlert: AlertState<Action>?
+        var successAlert: AlertState<Action>?
         
         var totalPriceString: String {
             let roundedValue = round(totalPrice * 100) / 100.0
             return "$\(roundedValue)"
-        }
-        
-        init(cartItems: IdentifiedArrayOf<CartItemDomain.State>) {
-            self.cartItems = cartItems
         }
         
         var isRequestInProcess: Bool {
@@ -34,15 +30,14 @@ struct CartListDomain {
     
     enum Action: Equatable {
         case didPressCloseButton
-        case didReceivePurchaseResponse(TaskResult<String>)
+        case cartItem(id: CartItemDomain.State.ID, action: CartItemDomain.Action)
         case getTotalPrice
         case didPressPayButton
-        case didCancelConfirmation
+        case didReceivePurchaseResponse(TaskResult<String>)
         case didConfirmPurchase
+        case didCancelConfirmation
         case dismissSuccessAlert
         case dismissErrorAlert
-        case deleteCartItem(id: CartItemDomain.State.ID)
-        case cartItem(id: CartItemDomain.State.ID, action: CartItemDomain.Action)
     }
     
     struct Environment {
@@ -54,35 +49,19 @@ struct CartListDomain {
     >.combine(
         CartItemDomain.reducer.forEach(
             state: \.cartItems,
-            action: /CartListDomain.Action.cartItem(id:action:),
+            action: /Action.cartItem(id:action:),
             environment: { _ in CartItemDomain.Environment() }
         ),
         .init { state, action, environment in
             switch action {
             case .didPressCloseButton:
                 return .none
-            case .didReceivePurchaseResponse(.success(let message)):
-                state.dataLoadingStatus = .success
-                state.successAlert = AlertState(
-                    title: TextState("Thank you!"),
-                    message: TextState("Your order is in process."),
-                    buttons: [
-                        .default(TextState("Done"), action: .send(.dismissSuccessAlert))
-                    ]
-                )
-                print("Success: \(message)")
-                return .none
-            case .didReceivePurchaseResponse(.failure):
-                state.dataLoadingStatus = .error
-                print("Unable to send order")
-                state.errorAlert = AlertState(
-                    title: TextState("Oops!"),
-                    message: TextState("Unable to send order, try again later."),
-                    buttons: [
-                        .default(TextState("Done"), action: .send(.dismissErrorAlert))
-                    ]
-                )
-                return .none
+            case .cartItem(let id, let action):
+                switch action {
+                case .deleteCartItem:
+                    state.cartItems.remove(id: id)
+                    return Effect(value: .getTotalPrice)
+                }
             case .getTotalPrice:
                 let items = state.cartItems.map { $0.cartItem }
                 state.totalPrice = items.reduce(0.0, {
@@ -96,8 +75,12 @@ struct CartListDomain {
                     buttons: [
                         .default(
                             TextState("Pay \(state.totalPriceString)"),
-                            action: .send(.didConfirmPurchase)),
-                        .cancel(TextState("Cancel"), action: .send(.didCancelConfirmation))
+                            action: .send(.didConfirmPurchase)
+                        ),
+                        .cancel(
+                            TextState("Cancel"),
+                            action: .send(.didCancelConfirmation)
+                        )
                     ]
                 )
                 return .none
@@ -110,32 +93,47 @@ struct CartListDomain {
             case .dismissErrorAlert:
                 state.errorAlert = nil
                 return .none
+            case .didReceivePurchaseResponse(.success(let message)):
+                state.dataLoadingStatus = .success
+                state.successAlert = AlertState(
+                    title: TextState("Thank you!"),
+                    message: TextState("Your order is in process."),
+                    buttons: [
+                        .default(TextState("Done"), action: .send(.dismissSuccessAlert))
+                    ]
+                )
+                print("Success: ", message)
+                return .none
+            case .didReceivePurchaseResponse(.failure(let error)):
+                state.dataLoadingStatus = .error
+                state.errorAlert = AlertState(
+                    title: TextState("Oops!"),
+                    message: TextState("Unable to send order, try again later."),
+                    buttons: [
+                        .default(TextState("Done"), action: .send(.dismissErrorAlert))
+                    ]
+                )
+                print("Error sending your order:", error.localizedDescription)
+                return .none
             case .didConfirmPurchase:
                 state.dataLoadingStatus = .loading
                 let items = state.cartItems.map { $0.cartItem }
                 return .task {
                     await .didReceivePurchaseResponse(
-                        TaskResult { try await environment.sendOrder(items) }
+                        TaskResult{
+                            try await environment.sendOrder(items)
+                        }
                     )
                 }
-            case .cartItem(let id,let action):
-                switch action {
-                case .deleteCartItem:
-                    return .task {
-                        .deleteCartItem(id: id)
-                    }
-                }
-            case .deleteCartItem(let id):
-                state.cartItems.remove(id: id)
-                return Effect(value: .getTotalPrice)
             }
-        }
+       }
     )
     
     private static func verifyPayButtonVisibility(
         state: inout State
     ) -> Effect<Action, Never> {
-        state.isPayButtonHidden = state.totalPrice == 0.0
+        state.isPayButtonDisable = state.totalPrice == 0.0
         return .none
     }
 }
+

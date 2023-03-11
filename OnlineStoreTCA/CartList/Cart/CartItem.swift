@@ -12,6 +12,19 @@ struct CartItem: Equatable {
     let quantity: Int
 }
 
+extension CartItem: Encodable {
+    private enum CartItemsKey: String, CodingKey {
+        case productId
+        case quantity
+    }
+    
+    func encode(to encoder: Encoder) throws {
+        var container = encoder.container(keyedBy: CartItemsKey.self)
+        try container.encode(product.id, forKey: .productId)
+        try container.encode(quantity, forKey: .quantity)
+    }
+}
+
 extension CartItem {
     static var sample: [CartItem] {
         [
@@ -28,18 +41,5 @@ extension CartItem {
                 quantity: 1
             ),
         ]
-    }
-}
-
-extension CartItem: Encodable {
-    private enum CartItemsKey: String, CodingKey {
-        case productId
-        case quantity
-    }
-    
-    func encode(to encoder: Encoder) throws {
-        var container = encoder.container(keyedBy: CartItemsKey.self)
-        try container.encode(product.id, forKey: .productId)
-        try container.encode(quantity, forKey: .quantity)
     }
 }

@@ -15,7 +15,8 @@ struct ProductDomain {
         var addToCartState = AddToCartDomain.State()
         
         var count: Int {
-            addToCartState.count
+            get { addToCartState.count }
+            set { addToCartState.count = newValue }
         }
     }
     

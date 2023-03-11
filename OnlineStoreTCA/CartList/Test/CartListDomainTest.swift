@@ -42,7 +42,12 @@ class CartListDomainTest: XCTestCase {
             )
         )
         
-        await store.send(.deleteCartItem(id: cartItemId1)) {
+        await store.send(
+            .cartItem(
+                id: cartItemId1,
+                action: .deleteCartItem(product: Product.sample[0])
+            )
+        ) {
             $0.cartItems = [
                 .init(
                     id: cartItemId2,
@@ -90,7 +95,12 @@ class CartListDomainTest: XCTestCase {
             )
         )
         
-        await store.send(.deleteCartItem(id: cartItemId1)) {
+        await store.send(
+            .cartItem(
+                id: cartItemId1,
+                action: .deleteCartItem(product: Product.sample[0])
+            )
+        ) {
             $0.cartItems = [
                 .init(
                     id: cartItemId2,
@@ -107,13 +117,18 @@ class CartListDomainTest: XCTestCase {
             $0.totalPrice = expectedPrice
         }
         
-        await store.send(.deleteCartItem(id: cartItemId2)) {
+        await store.send(
+            .cartItem(
+                id: cartItemId2,
+                action: .deleteCartItem(product: Product.sample[1])
+            )
+        ) {
             $0.cartItems = []
         }
-        
+
         await store.receive(.getTotalPrice) {
             $0.totalPrice = 0
-            $0.isPayButtonHidden = true
+            $0.isPayButtonDisable = true
         }
         
     }

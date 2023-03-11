@@ -46,17 +46,30 @@ struct CartListView: View {
                                     
                                 }
                                 .frame(maxWidth: .infinity, minHeight: 60)
-                                .background(.blue)
+                                .background(
+                                    viewStore.isPayButtonDisable
+                                    ? .gray
+                                    : .blue
+                                )
                                 .cornerRadius(10)
                                 .padding()
-                                .opacity(viewStore.isPayButtonHidden ? 0 : 1)
+                                .disabled(viewStore.isPayButtonDisable)
+                            }
+                        }
+                    }
+                    .navigationTitle("Cart")
+                    .toolbar {
+                        ToolbarItem(placement: .navigationBarLeading) {
+                            Button {
+                                viewStore.send(.didPressCloseButton)
+                            } label: {
+                                Text("Close")
                             }
                         }
                     }
                     .onAppear {
                         viewStore.send(.getTotalPrice)
                     }
-                    .navigationTitle("Cart")
                     .alert(
                         self.store.scope(state: \.confirmationAlert),
                         dismiss: .didCancelConfirmation
@@ -69,15 +82,6 @@ struct CartListView: View {
                         self.store.scope(state: \.errorAlert),
                         dismiss: .dismissErrorAlert
                     )
-                    .toolbar {
-                        ToolbarItem(placement: .navigationBarLeading) {
-                            Button {
-                                viewStore.send(.didPressCloseButton)
-                            } label: {
-                                Text("Close")
-                            }
-                        }
-                    }
                 }
                 if viewStore.isRequestInProcess {
                     Color.black.opacity(0.2)
@@ -89,14 +93,14 @@ struct CartListView: View {
     }
 }
 
-struct CartView_Previews: PreviewProvider {
+struct CartListView_Previews: PreviewProvider {
     static var previews: some View {
         CartListView(
             store: Store(
                 initialState: CartListDomain.State(
                     cartItems: IdentifiedArrayOf(
                         uniqueElements: CartItem.sample
-                            .compactMap {
+                            .map {
                                 CartItemDomain.State(
                                     id: UUID(),
                                     cartItem: $0

@@ -61,7 +61,6 @@ struct CartCell: View {
                                 .foregroundColor(.red)
                                 .padding()
                         }
-
                     }
                 }
             }
