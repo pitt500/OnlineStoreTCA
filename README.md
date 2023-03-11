@@ -380,7 +380,25 @@ If you want to lean more about Binding with TCA and SwiftUI, take a look to this
 
 ### Optional States
 
+By default, a TCA's state will be kept in memory during the app's lifecycle. However, there are cases where having a state alive is just a waste of resources. For example, a modal view is only displayed a short period of time, it doesn't make sense to keep its state in memory all the time, for that we have optional states.
+
+The way to create an optional state is similar to any optional value in Swift, just declare the property in the parent state, but instead of assigning a default value, let's declare it as optional:
+
+```swift
+struct ProductListDomain {
+    struct State: Equatable {
+        var productListState: IdentifiedArrayOf<ProductDomain.State> = []
+        var shouldOpenCart = false
+        var cartState: CartListDomain.State?
+        
+        // More properties...
+    }
+}
+```
+In this example, cartState will hold an optional state for a Cart List.
+
 TBD
+
 
 ```swift
 List {
