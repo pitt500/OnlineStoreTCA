@@ -82,7 +82,7 @@ let reducer = Reducer<
 5. Once the mutation is done and the reducer returned the effect, the view will render the update in the screen. 
 <img src="./Images/viewUpdateDemo1.png" width="30%" height="30%">
 
-7. To observe object in TCA, we need an object called viewStore, that in this example is wrapped within WithViewStore view.
+7. To observe object in TCA, we need an object called `viewStore`, that in this example is wrapped within WithViewStore view.
 8. We can send another action using `viewStore.send()` and an `Action` value.
 
 ```swift
