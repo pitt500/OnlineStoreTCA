@@ -4,6 +4,28 @@ ReducerProtocol Migration will come pretty soon as part of the TCA series. Thank
 # Online Store made with Composable Architecture (TCA)
 The purpose of this demo is to explore the main concepts of TCA. If this is your first time reading about it, I **strongly** recommend you to read first the README from the [main repo](https://github.com/pointfreeco/swift-composable-architecture) and watch the [Tour of TCA](https://www.pointfree.co/collections/composable-architecture/a-tour-of-the-composable-architecture).
 
+## Content
+* [Motivation](#motivation)
+* [Screenshots of the app](#screenshots)
+* [The basics](#the-basics)
+    * [Archiecture Diagram](#archiecture-diagram)
+    * [Hello World Example](#hello-world-example)
+* [Composition](#composition)
+    * [Single states](#single-states)
+    * [Collection of states](#collection-of-states)
+* [Environment](#environment)
+* [Side Effects](#side-effects)
+    * [Network Calls](#network-calls)
+* [Testing](#testing)
+* [Other Topics](#other-topics)
+    * [Opening Modal Views](#opening-modal-views)
+    * [Optional States](#optional-states)
+    * [Private Actions](#private-actions)
+    * [Alert Views in SwiftUI](#alert-views-in-swiftui)
+    * [Making a Root Domain with Tab View](#making-a-root-domain-with-tab-view)
+* [Contact](#contact)
+
+
 ## Motivation
 **TL;DR:** Build an app with TCA not too simple nor too complex to study the most important use cases, and provide concise documentation to new learners.
 
@@ -32,7 +54,7 @@ Note: Feel free to recommend any change that may be great to teach a concept in 
 ### Archiecture Diagram
 <img src="./Images/TCA_Architecture.png">
 
-### Example
+### Hello World Example
 Let's say that you have a simple app with two buttons, one will increase a counter in the screen and the other will decrease it. This is what will happen if this app was implemented on TCA:
 
 1. The view is presented in the screen. It shows the current state of the app.
@@ -593,7 +615,7 @@ Text("Parent View")
 
 This [video](https://youtu.be/U3EMduy-DhE) explains more about AlertView in SwiftUI and TCA.
 
-### Making a Root Domain with Tab Views
+### Making a Root Domain with Tab View
 
 Creating a Root Domain is like creating any other domain in TCA. Each property in this state will represent a complex substate. For Tab logic, we simply add an enum representing each tab item:
 
