@@ -397,7 +397,37 @@ struct ProductListDomain {
     }
 }
 ```
-In this example, cartState will hold an optional state for a Cart List.
+In this example, cartState will hold an optional state for a Cart List. TBD
+
+```swift
+static let reducer = Reducer<
+        State, Action, Environment
+    >.combine(
+        // More reducers ...
+        CartListDomain.reducer
+            .optional()
+            .pullback(
+                state: \.cartState,
+                action: /ProductListDomain.Action.cart,
+                environment: {
+                    CartListDomain.Environment(
+                        sendOrder: $0.sendOrder
+                    )
+                }
+            ),
+        .init { state, action, environment in
+            switch action {
+            //  More cases ...
+            case .setCartView(let isPresented):
+                state.shouldOpenCart = isPresented
+                state.cartState = isPresented
+                ? CartListDomain.State(...)
+                : nil
+                return .none
+            }
+        }
+    )
+```
 
 TBD
 
