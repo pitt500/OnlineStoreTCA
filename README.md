@@ -417,7 +417,7 @@ If you want to lean more about Binding with TCA and SwiftUI, take a look to this
 
 ### Optional States
 
-By default, a TCA's state will be kept in memory during the app's lifecycle. However, there are cases where having a state alive is just a waste of resources. For example, a modal view is only displayed a short period of time, it doesn't make sense to keep its state in memory all the time, for that we have optional states.
+By default, a TCA's state will be kept in memory during the app's lifecycle. However, there are cases where having a state alive is just a waste of resources. For example, a modal view is only displayed a short period of time, it doesn't make sense to keep its state in memory all the time. For that, we have optional states.
 
 The way to create an optional state is similar to any optional value in Swift, just declare the property in the parent state, but instead of assigning a default value, let's declare it as optional. In this example, cartState will hold an optional state for a Cart List:
 
@@ -435,7 +435,7 @@ struct ProductListDomain {
 
 Now in the reducer, we have to use pullback operator to transform the child (CartList) reducer into one compatible with parent (ProductList) reducer, however, pullback doesn't accept optional states. In order to make this work, we need to use `optional` operator, which will enable the reducer once the state is non-nil.
 
-To assign a new non-optional state, the parent reducer will have to initialize the property (cartState) once a specific action is called (setCartView).
+To assign a new non-optional state, the parent reducer will have to initialize the property (cartState) once a specific action is called (`setCartView`).
 
 ```swift
 static let reducer = Reducer<
@@ -553,9 +553,9 @@ For more about private actions, check out this [video](https://youtu.be/7BkZX_7z
 
 ### Alert Views in SwiftUI
 
-TCA library provides support for AlertView too adding its own state and way to build UI to keep consistency without the architecture. Here's how you can create your own alert:
+TCA library provides support for `AlertView` too adding its own state and way to build UI to keep consistency without the architecture. Here's how you can create your own alert:
 
-1. Create an AlertState with actions of your own domain.
+1. Create an `AlertState with actions of your own domain.
 2. Create the actions that will trigger events for the alert:
     - Initialize AlertState (`didPressPayButton`)
     - Dismiss the alert (`didCancelConfirmation`)
@@ -728,3 +728,5 @@ Check out the full details of this implementation in this [video](https://youtu.
 * [Twitter](https://twitter.com/swiftandtips)
 * [LinkedIn](https://www.linkedin.com/in/pedrorojaslo/)
 * [Mastodon](https://iosdev.space/@swiftandtips)
+
+Thanks for reading, and have a great day! 😄
