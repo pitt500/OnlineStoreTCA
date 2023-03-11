@@ -290,7 +290,7 @@ If you want to learn more about side effects, check out this [video](https://you
 
 ### Network calls
 
-Since network calls are one of the most common tasks in mobile development, of course TCA provides tools for that. And since network calls are part of the outside world (side effects), we use Effect object to wrap the calls, more specifically, into Effect.task.
+Network calls are one of the most common tasks in mobile development, and of course, TCA provides tools for that. And since network calls are part of the outside world (side effects), we use Effect object to wrap the calls, more specifically, into Effect.task.
 
 However, this task operator will only call the web API, but to get the actual response, we have to implement an additional action that will hold the result in a TaskResult:
 
@@ -350,15 +350,66 @@ TBD
 
 ## Other topics
 
-### SwiftUI's Binding
+### Opening Modal Views
 
-TBD
+If you require to open a view modally in SwiftUI, you will need to use sheet modifier and provide a binding parameter:
+```swift
+func sheet<Content>(
+    isPresented: Binding<Bool>,
+    onDismiss: (() -> Void)? = nil, @ViewBuilder content: @escaping () -> Content
+) -> some View where Content : View
+```
+
+In other to use this (or any modifier with binding parameters) in TCA, we must use `binding` operator from `viewStore`and provide two parameters:
+* The state property that will be mutated.
+* the action that will trigger the mutation.
+
+```swift
+Text("Parent View")
+.sheet(
+    isPresented: viewStore.binding(
+        get: \.shouldOpenModal,
+        send: Action.setModalView(isPresented:)
+    )
+) {
+    Text("I'm a Modal View!")
+}
+```
 
 If you want to lean more about Binding with TCA and SwiftUI, take a look to this [video](https://youtu.be/Ilr8AsoggIY).
 
 ### Optional States
 
 TBD
+
+```swift
+List {
+    ForEachStore(
+        self.store.scope(
+            state: \.productListState,
+            action: ProductListDomain.Action
+                .product(id: action:)
+        )
+    ) {
+        ProductCell(store: $0)
+    }
+}
+.sheet(
+    isPresented: viewStore.binding(
+        get: \.shouldOpenCart,
+        send: ProductListDomain.Action.setCartView(isPresented:)
+    )
+) {
+    IfLetStore(
+        self.store.scope(
+            state: \.cartState,
+            action: ProductListDomain.Action.cart
+        )
+    ) {
+        CartListView(store: $0)
+    }
+}
+```
 
 If you want to learn more about optional states, check out this [video](https://youtu.be/AV0laQw2OjM).
 
