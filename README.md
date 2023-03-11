@@ -12,7 +12,11 @@ The purpose of this demo is to explore the main concepts of TCA. If this is your
     * [Hello World Example](#hello-world-example)
 * [Composition](#composition)
     * [Single states](#single-states)
+      * [Scope](#scope)
+      * [Pullback](#pullback)
+      * [Combine](#combine)
     * [Collection of states](#collection-of-states)
+      * [ForEach](#foreach)
 * [Environment](#environment)
 * [Side Effects](#side-effects)
     * [Network Calls](#network-calls)
@@ -170,7 +174,8 @@ We started with a simple button counter, then we add an extra state to display t
 
 For single states (all, except collections/lists), TCA provides operators to glue the components and make bigger ones.
 
-* **Scope**: Scope will expose from parent domain (Product) only the required state and action for the child domain (AddToCart). For example, the ProductDomain below contains two properties as part of its state: product and addToCartState.
+#### Scope 
+Scope will expose from parent domain (Product) only the required state and action for the child domain (AddToCart). For example, the ProductDomain below contains two properties as part of its state: product and addToCartState.
 
 ```swift
 struct ProductDomain {
@@ -192,7 +197,9 @@ AddToCartButton(
 ```
 In this way, AddToCart Domain will only know about its own state and nothing about product and more.
 
-* **Pullback**: Pullback works like a mapping function. It transforms the child reducer (AddToCart) into one compatible with parent reducer (Product).
+#### Pullback
+
+Pullback works like a mapping function. It transforms the child reducer (AddToCart) into one compatible with parent reducer (Product).
 ```swift
 AddToCartDomain.reducer
     .pullback(
@@ -205,7 +212,9 @@ AddToCartDomain.reducer
 ```
 This transformation will be really useful when we combine multiple reducers to build a more complex component.
 
-* **Combine**: Combine operator will combine many reducers into a single one by running each one on state in order, and merging all of the effects.
+#### Combine
+
+Combine operator will combine many reducers into a single one by running each one on state in order, and merging all of the effects.
 ```swift
 static let reducer = Reducer<
     State, Action, Environment
@@ -248,7 +257,9 @@ struct ProductListDomain {
 }
 ```
 
-* **forEach**: `forEach` operator it's basically a pullback operator, but it will work for a collection of states, transforming the child reducers into ones compatible with parent reducer:
+#### ForEach
+
+`forEach` operator it's basically a pullback operator, but it will work for a collection of states, transforming the child reducers into ones compatible with parent reducer:
 
 ```swift
 struct ProductListDomain {
