@@ -468,7 +468,51 @@ If you want to learn more about optional states, check out this [video](https://
 
 ### Private Actions
 
-TBD
+By default, if you declare an action in a TCA domain, it will be available for other reducers too. There are cases where an action is very specific for a reducer and we don't need to expose it outside of it. For those cases, you can simply declare private functions:
+
+```swift
+static let reducer = Reducer<
+    State, Action, Environment
+>.combine(
+    // More reducers ...
+    .init { state, action, environment in
+        switch action {
+        // More actions ...
+        case .cart(let action):
+            switch action {
+            case .didPressCloseButton:
+                return closeCart(state: &state)
+            case .dismissSuccessAlert:
+                resetProductsToZero(state: &state)
+
+                return .task {
+                    .closeCart
+                }
+            }
+        case .closeCart:
+            return closeCart(state: &state)
+        }
+    }
+)
+
+private static func closeCart(
+        state: inout State
+) -> Effect<Action, Never> {
+    state.shouldOpenCart = false
+    state.cartState = nil
+
+    return .none
+}
+
+private static func resetProductsToZero(
+    state: inout State
+) {
+    for id in state.productListState.map(\.id)
+    where state.productListState[id: id]?.count != 0  {
+        state.productListState[id: id]?.addToCartState.count = 0
+    }
+}
+```
 
 For more about private actions, check out this [video](https://youtu.be/7BkZX_7z-jw).
 
