@@ -578,6 +578,9 @@ struct CartListDomain {
 ```
 
 3. Invoke the UI
+
+<img src="./Images/alertView1.png" width="50%" height="50%">
+
 ```swift
 let store: Store<CartListDomain.State, CartListDomain.Action>
 
