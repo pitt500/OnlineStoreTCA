@@ -60,7 +60,7 @@ struct CartListDomain {
                 switch action {
                 case .deleteCartItem:
                     state.cartItems.remove(id: id)
-                    return Effect(value: .getTotalPrice)
+                    return EffectTask(value: .getTotalPrice)
                 }
             case .getTotalPrice:
                 let items = state.cartItems.map { $0.cartItem }
@@ -131,7 +131,7 @@ struct CartListDomain {
     
     private static func verifyPayButtonVisibility(
         state: inout State
-    ) -> Effect<Action, Never> {
+    ) -> EffectTask<Action> {
         state.isPayButtonDisable = state.totalPrice == 0.0
         return .none
     }

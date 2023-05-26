@@ -150,7 +150,7 @@ struct ProductListDomain {
     
     private static func closeCart(
         state: inout State
-    ) -> Effect<Action, Never> {
+    ) -> EffectTask<Action> {
         state.shouldOpenCart = false
         state.cartState = nil
         
