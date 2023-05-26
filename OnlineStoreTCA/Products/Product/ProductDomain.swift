@@ -26,16 +26,16 @@ struct ProductDomain {
     
     struct Environment {}
     
-    static let reducer = Reducer<
+    static let reducer = AnyReducer<
         State, Action, Environment
     >.combine(
-        AddToCartDomain.reducer
+        AnyReducer { environment in
+            AddToCartDomain()
+        }
             .pullback(
                 state: \.addToCartState,
                 action: /ProductDomain.Action.addToCart,
-                environment: { _ in
-                    AddToCartDomain.Environment()
-                }
+                environment: { $0 }
             ),
         .init { state, action, environment in
             switch action {
