@@ -40,7 +40,7 @@ struct ProductListDomain {
         var uuid: @Sendable () -> UUID
     }
     
-    static let reducer = Reducer<
+    static let reducer = AnyReducer<
         State, Action, Environment
     >.combine(
         ProductDomain.reducer.forEach(

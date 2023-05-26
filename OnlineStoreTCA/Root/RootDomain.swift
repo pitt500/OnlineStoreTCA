@@ -40,7 +40,7 @@ struct RootDomain {
         )
     }
     
-    static let reducer = Reducer<
+    static let reducer = AnyReducer<
         State, Action, Environment
     >.combine(
         ProductListDomain.reducer

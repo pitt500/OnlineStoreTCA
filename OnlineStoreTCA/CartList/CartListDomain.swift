@@ -44,7 +44,7 @@ struct CartListDomain {
         var sendOrder: ([CartItem]) async throws -> String
     }
     
-    static let reducer = Reducer<
+    static let reducer = AnyReducer<
         State, Action, Environment
     >.combine(
         CartItemDomain.reducer.forEach(

@@ -20,7 +20,7 @@ struct CartItemDomain {
     
     struct Environment {}
     
-    static let reducer = Reducer<
+    static let reducer = AnyReducer<
         State, Action, Environment
     > { state, action, environment in
         switch action {
