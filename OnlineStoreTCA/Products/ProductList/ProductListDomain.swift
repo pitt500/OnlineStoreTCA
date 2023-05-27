@@ -43,10 +43,12 @@ struct ProductListDomain {
     static let reducer = AnyReducer<
         State, Action, Environment
     >.combine(
-        ProductDomain.reducer.forEach(
+        AnyReducer { environment in
+            ProductDomain()
+        }.forEach(
             state: \.productList,
             action: /ProductListDomain.Action.product(id:action:),
-            environment: { _ in ProductDomain.Environment() }
+            environment: { $0 }
         ),
         CartListDomain.reducer
             .optional()
