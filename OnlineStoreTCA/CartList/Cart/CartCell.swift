@@ -78,8 +78,7 @@ struct CartCell_Previews: PreviewProvider {
                     id: UUID(),
                     cartItem: CartItem.sample.first!
                 ),
-                reducer: CartItemDomain.reducer,
-                environment: CartItemDomain.Environment()
+                reducer: CartItemDomain()
             )
         )
         .previewLayout(.fixed(width: 300, height: 300))
