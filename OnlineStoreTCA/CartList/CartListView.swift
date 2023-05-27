@@ -108,10 +108,7 @@ struct CartListView_Previews: PreviewProvider {
                             }
                     )
                 ),
-                reducer: CartListDomain.reducer,
-                environment: CartListDomain.Environment(
-                    sendOrder: { _ in "OK" }
-                )
+                reducer: CartListDomain(sendOrder: { _ in "OK" })
             )
         )
     }

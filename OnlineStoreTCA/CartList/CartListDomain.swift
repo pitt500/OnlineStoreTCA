@@ -8,7 +8,7 @@
 import Foundation
 import ComposableArchitecture
 
-struct CartListDomain {
+struct CartListDomain: ReducerProtocol {
     struct State: Equatable {
         var dataLoadingStatus = DataLoadingStatus.notStarted
         var cartItems: IdentifiedArrayOf<CartItemDomain.State> = []
@@ -40,21 +40,17 @@ struct CartListDomain {
         case dismissErrorAlert
     }
     
-    struct Environment {
-        var sendOrder: ([CartItem]) async throws -> String
+    let sendOrder: ([CartItem]) async throws -> String
+    
+    private func verifyPayButtonVisibility(
+        state: inout State
+    ) -> EffectTask<Action> {
+        state.isPayButtonDisable = state.totalPrice == 0.0
+        return .none
     }
     
-    static let reducer = AnyReducer<
-        State, Action, Environment
-    >.combine(
-        AnyReducer { environment in
-            CartItemDomain()
-        }.forEach(
-            state: \.cartItems,
-            action: /Action.cartItem(id:action:),
-            environment: { $0 }
-        ),
-        .init { state, action, environment in
+    var body: some ReducerProtocol<State, Action> {
+        Reduce { state, action in
             switch action {
             case .didPressCloseButton:
                 return .none
@@ -123,19 +119,15 @@ struct CartListDomain {
                 return .task {
                     await .didReceivePurchaseResponse(
                         TaskResult{
-                            try await environment.sendOrder(items)
+                            try await sendOrder(items)
                         }
                     )
                 }
             }
-       }
-    )
-    
-    private static func verifyPayButtonVisibility(
-        state: inout State
-    ) -> EffectTask<Action> {
-        state.isPayButtonDisable = state.totalPrice == 0.0
-        return .none
+        }
+        .forEach(\.cartItems, action: /Action.cartItem(id:action:)) {
+            CartItemDomain()
+        }
     }
 }
 

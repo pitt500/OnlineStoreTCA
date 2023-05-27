@@ -50,17 +50,15 @@ struct ProductListDomain {
             action: /ProductListDomain.Action.product(id:action:),
             environment: { $0 }
         ),
-        CartListDomain.reducer
-            .optional()
-            .pullback(
-                state: \.cartState,
-                action: /ProductListDomain.Action.cart,
-                environment: {
-                    CartListDomain.Environment(
-                        sendOrder: $0.sendOrder
-                    )
-                }
-            ),
+        AnyReducer { environment in
+            CartListDomain(sendOrder: environment.sendOrder)
+        }
+        .optional()
+        .pullback(
+            state: \.cartState,
+            action: /ProductListDomain.Action.cart,
+            environment: { $0 }
+        ),
         .init { state, action, environment in
             switch action {
             case .fetchProducts:
