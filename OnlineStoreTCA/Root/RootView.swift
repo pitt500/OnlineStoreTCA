@@ -54,7 +54,7 @@ struct RootView_Previews: PreviewProvider {
                 initialState: RootDomain.State()
             ) {
                 RootDomain(
-                    fetchProducts: { gitProduct.sample },
+                    fetchProducts: { Product.sample },
                     sendOrder: { _ in "OK" },
                     fetchUserProfile: { UserProfile.sample },
                     uuid: { UUID() }
