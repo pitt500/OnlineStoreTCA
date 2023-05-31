@@ -8,7 +8,7 @@
 import Foundation
 import ComposableArchitecture
 
-struct ProductListDomain {
+struct ProductListDomain: ReducerProtocol {
     struct State: Equatable {
         var dataLoadingStatus = DataLoadingStatus.notStarted
         var shouldOpenCart = false
@@ -34,32 +34,12 @@ struct ProductListDomain {
         case closeCart
     }
     
-    struct Environment {
-        var fetchProducts:  @Sendable () async throws -> [Product]
-        var sendOrder:  @Sendable ([CartItem]) async throws -> String
-        var uuid: @Sendable () -> UUID
-    }
+    var fetchProducts:  @Sendable () async throws -> [Product]
+    var sendOrder:  @Sendable ([CartItem]) async throws -> String
+    var uuid: @Sendable () -> UUID
     
-    static let reducer = AnyReducer<
-        State, Action, Environment
-    >.combine(
-        AnyReducer { environment in
-            ProductDomain()
-        }.forEach(
-            state: \.productList,
-            action: /ProductListDomain.Action.product(id:action:),
-            environment: { $0 }
-        ),
-        AnyReducer { environment in
-            CartListDomain(sendOrder: environment.sendOrder)
-        }
-        .optional()
-        .pullback(
-            state: \.cartState,
-            action: /ProductListDomain.Action.cart,
-            environment: { $0 }
-        ),
-        .init { state, action, environment in
+    var body: some ReducerProtocol<State, Action> {
+        Reduce { state, action in
             switch action {
             case .fetchProducts:
                 if state.dataLoadingStatus == .success || state.dataLoadingStatus == .loading {
@@ -69,7 +49,7 @@ struct ProductListDomain {
                 state.dataLoadingStatus = .loading
                 return .task {
                     await .fetchProductsResponse(
-                        TaskResult { try await environment.fetchProducts() }
+                        TaskResult { try await fetchProducts() }
                     )
                 }
             case .fetchProductsResponse(.success(let products)):
@@ -77,7 +57,7 @@ struct ProductListDomain {
                 state.productList = IdentifiedArrayOf(
                     uniqueElements: products.map {
                         ProductDomain.State(
-                            id: environment.uuid(),
+                            id: uuid(),
                             product: $0
                         )
                     }
@@ -130,7 +110,7 @@ struct ProductListDomain {
                             .compactMap { state in
                                 state.count > 0
                                 ? CartItemDomain.State(
-                                    id: environment.uuid(),
+                                    id: uuid(),
                                     cartItem: CartItem(
                                         product: state.product,
                                         quantity: state.count
@@ -146,9 +126,15 @@ struct ProductListDomain {
                 return .none
             }
         }
-    )
+        .forEach(\.productList, action: /ProductListDomain.Action.product(id:action:)) {
+            ProductDomain()
+        }
+        .ifLet(\.cartState, action: /ProductListDomain.Action.cart) {
+            CartListDomain(sendOrder: sendOrder)
+        }
+    }
     
-    private static func closeCart(
+    private func closeCart(
         state: inout State
     ) -> EffectTask<Action> {
         state.shouldOpenCart = false
@@ -157,7 +143,7 @@ struct ProductListDomain {
         return .none
     }
     
-    private static func resetProductsToZero(
+    private func resetProductsToZero(
         state: inout State
     ) {
         for id in state.productList.map(\.id) {

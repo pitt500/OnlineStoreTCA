@@ -43,17 +43,17 @@ struct RootDomain {
     static let reducer = AnyReducer<
         State, Action, Environment
     >.combine(
-        ProductListDomain.reducer
+        AnyReducer { environment in
+            ProductListDomain(
+                fetchProducts: environment.fetchProducts,
+                sendOrder: environment.sendOrder,
+                uuid: environment.uuid
+            )
+        }
             .pullback(
                 state: \.productListState,
                 action: /RootDomain.Action.productList,
-                environment: {
-                    ProductListDomain.Environment(
-                        fetchProducts: $0.fetchProducts,
-                        sendOrder: $0.sendOrder,
-                        uuid: $0.uuid
-                    )
-                }
+                environment: { $0 }
             ),
         AnyReducer{ environment in
             ProfileDomain(fetchUserProfile: environment.fetchUserProfile)
