@@ -8,7 +8,7 @@
 import Foundation
 import ComposableArchitecture
 
-struct RootDomain {
+struct RootDomain: ReducerProtocol {
     struct State: Equatable {
         var selectedTab = Tab.products
         var productListState = ProductListDomain.State()
@@ -26,44 +26,20 @@ struct RootDomain {
         case profile(ProfileDomain.Action)
     }
     
-    struct Environment {
-        var fetchProducts: @Sendable () async throws -> [Product]
-        var sendOrder:  @Sendable ([CartItem]) async throws -> String
-        var fetchUserProfile:  @Sendable () async throws -> UserProfile
-        var uuid: @Sendable () -> UUID
-        
-        static let live = Self(
-            fetchProducts: APIClient.live.fetchProducts,
-            sendOrder: APIClient.live.sendOrder,
-            fetchUserProfile: APIClient.live.fetchUserProfile,
-            uuid: { UUID() }
-        )
-    }
+    var fetchProducts: @Sendable () async throws -> [Product]
+    var sendOrder:  @Sendable ([CartItem]) async throws -> String
+    var fetchUserProfile:  @Sendable () async throws -> UserProfile
+    var uuid: @Sendable () -> UUID
     
-    static let reducer = AnyReducer<
-        State, Action, Environment
-    >.combine(
-        AnyReducer { environment in
-            ProductListDomain(
-                fetchProducts: environment.fetchProducts,
-                sendOrder: environment.sendOrder,
-                uuid: environment.uuid
-            )
-        }
-            .pullback(
-                state: \.productListState,
-                action: /RootDomain.Action.productList,
-                environment: { $0 }
-            ),
-        AnyReducer{ environment in
-            ProfileDomain(fetchUserProfile: environment.fetchUserProfile)
-        }
-            .pullback(
-                state: \.profileState,
-                action: /RootDomain.Action.profile,
-                environment: { $0 }
-            ),
-        .init { state, action, environment in
+    static let live = Self(
+        fetchProducts: APIClient.live.fetchProducts,
+        sendOrder: APIClient.live.sendOrder,
+        fetchUserProfile: APIClient.live.fetchUserProfile,
+        uuid: { UUID() }
+    )
+    
+    var body: some ReducerProtocol<State, Action> {
+        Reduce { state, action in
             switch action {
             case .productList:
                 return .none
@@ -74,5 +50,15 @@ struct RootDomain {
                 return .none
             }
         }
-    )
+        Scope(state: \.productListState, action: /RootDomain.Action.productList) {
+            ProductListDomain(
+                fetchProducts: fetchProducts,
+                sendOrder: sendOrder,
+                uuid: uuid
+            )
+        }
+        Scope(state:  \.profileState, action: /RootDomain.Action.profile) {
+            ProfileDomain(fetchUserProfile: fetchUserProfile)
+        }
+    }
 }

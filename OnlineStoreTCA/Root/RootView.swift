@@ -51,15 +51,15 @@ struct RootView_Previews: PreviewProvider {
     static var previews: some View {
         RootView(
             store: Store(
-                initialState: RootDomain.State(),
-                reducer: RootDomain.reducer,
-                environment: RootDomain.Environment(
-                    fetchProducts: { Product.sample },
+                initialState: RootDomain.State()
+            ) {
+                RootDomain(
+                    fetchProducts: { gitProduct.sample },
                     sendOrder: { _ in "OK" },
                     fetchUserProfile: { UserProfile.sample },
                     uuid: { UUID() }
                 )
-            )
+            }
         )
     }
 }
