@@ -122,7 +122,7 @@ struct ProductListDomain: ReducerProtocol {
                 )
                 : nil
                 return .none
-            case .product(let id, let action):
+            case .product:
                 return .none
             }
         }
