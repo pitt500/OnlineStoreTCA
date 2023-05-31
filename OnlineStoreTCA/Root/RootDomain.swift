@@ -55,15 +55,13 @@ struct RootDomain {
                     )
                 }
             ),
-        ProfileDomain.reducer
+        AnyReducer{ environment in
+            ProfileDomain(fetchUserProfile: environment.fetchUserProfile)
+        }
             .pullback(
                 state: \.profileState,
                 action: /RootDomain.Action.profile,
-                environment: {
-                    ProfileDomain.Environment(
-                        fetchUserProfile:  $0.fetchUserProfile
-                    )
-                }
+                environment: { $0 }
             ),
         .init { state, action, environment in
             switch action {
