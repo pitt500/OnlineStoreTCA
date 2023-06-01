@@ -26,8 +26,7 @@ class ProductDomainTest: XCTestCase {
                 id: UUID(),
                 product: product
             ),
-            reducer: ProductDomain.reducer,
-            environment: ProductDomain.Environment()
+            reducer: ProductDomain()
         )
         
         await store.send(.addToCart(.didTapPlusButton)) {
@@ -49,8 +48,7 @@ class ProductDomainTest: XCTestCase {
                 id: UUID(),
                 product: product
             ),
-            reducer: ProductDomain.reducer,
-            environment: ProductDomain.Environment()
+            reducer: ProductDomain()
         )
         
         await store.send(.addToCart(.didTapPlusButton)) {
@@ -81,8 +79,7 @@ class ProductDomainTest: XCTestCase {
                 id: UUID(),
                 product: product
             ),
-            reducer: ProductDomain.reducer,
-            environment: ProductDomain.Environment()
+            reducer: ProductDomain()
         )
         
         await store.send(.addToCart(.didTapMinusButton))
@@ -102,8 +99,7 @@ class ProductDomainTest: XCTestCase {
                 id: UUID(),
                 product: product
             ),
-            reducer: ProductDomain.reducer,
-            environment: ProductDomain.Environment()
+            reducer: ProductDomain()
         )
         
         // No changes expected!
@@ -126,8 +122,7 @@ class ProductDomainTest: XCTestCase {
                 id: UUID(),
                 product: product
             ),
-            reducer: ProductDomain.reducer,
-            environment: ProductDomain.Environment()
+            reducer: ProductDomain()
         )
         
         // No changes expected!
