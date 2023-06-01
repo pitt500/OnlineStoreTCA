@@ -16,8 +16,7 @@ class AddToCartDomainTest: XCTestCase {
     func testIncreaseCounterTappingPlusButtonOnce() async {
         let store = TestStore(
             initialState: AddToCartDomain.State(),
-            reducer: AddToCartDomain.reducer,
-            environment: AddToCartDomain.Environment()
+            reducer: AddToCartDomain()
         )
         
         
@@ -29,8 +28,7 @@ class AddToCartDomainTest: XCTestCase {
     func testIncreaseCounterTappingPlusButtonThreeTimes() async {
         let store = TestStore(
             initialState: AddToCartDomain.State(),
-            reducer: AddToCartDomain.reducer,
-            environment: AddToCartDomain.Environment()
+            reducer: AddToCartDomain()
         )
         
         
@@ -42,8 +40,7 @@ class AddToCartDomainTest: XCTestCase {
     func testDecreaseCounterTappingPlusButtonOnce() async {
         let store = TestStore(
             initialState: AddToCartDomain.State(),
-            reducer: AddToCartDomain.reducer,
-            environment: AddToCartDomain.Environment()
+            reducer: AddToCartDomain()
         )
         
         await store.send(.didTapMinusButton) {
@@ -54,8 +51,7 @@ class AddToCartDomainTest: XCTestCase {
     func testDecreaseCounterTappingPlusButtonThreeTimes() async {
         let store = TestStore(
             initialState: AddToCartDomain.State(),
-            reducer: AddToCartDomain.reducer,
-            environment: AddToCartDomain.Environment()
+            reducer: AddToCartDomain()
         )
         
         await store.send(.didTapMinusButton) { $0.count = -1 }
@@ -66,8 +62,7 @@ class AddToCartDomainTest: XCTestCase {
     func testUpdatingCounterTappingPlusAndMinusButtons() async {
         let store = TestStore(
             initialState: AddToCartDomain.State(),
-            reducer: AddToCartDomain.reducer,
-            environment: AddToCartDomain.Environment()
+            reducer: AddToCartDomain()
         )
         
         await store.send(.didTapMinusButton) { $0.count = -1 }
