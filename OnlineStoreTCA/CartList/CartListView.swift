@@ -71,15 +71,24 @@ struct CartListView: View {
                         viewStore.send(.getTotalPrice)
                     }
                     .alert(
-                        self.store.scope(state: \.confirmationAlert),
+                        self.store.scope(
+                            state: \.confirmationAlert,
+                            action: { $0 } // context: https://github.com/pointfreeco/swift-composable-architecture/commit/da205c71ae72081647dfa1442c811a57181fb990
+                        ),
                         dismiss: .didCancelConfirmation
                     )
                     .alert(
-                        self.store.scope(state: \.successAlert),
+                        self.store.scope(
+                            state: \.successAlert,
+                            action: { $0 }
+                        ),
                         dismiss: .dismissSuccessAlert
                     )
                     .alert(
-                        self.store.scope(state: \.errorAlert),
+                        self.store.scope(
+                            state: \.errorAlert,
+                            action: { $0 }
+                        ),
                         dismiss: .dismissErrorAlert
                     )
                 }
