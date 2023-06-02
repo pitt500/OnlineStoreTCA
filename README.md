@@ -1,5 +1,4 @@
-# NOTICE ⚠️
-ReducerProtocol Migration will come pretty soon as part of the TCA series. Thanks for your patience!
+# NOTE
 If you want to see the legacy version of TCA, check out this [branch](https://github.com/pitt500/OnlineStoreTCA/tree/legacy-tca-with-environment).
 
 # Online Store made with Composable Architecture (TCA)
@@ -57,12 +56,32 @@ Additionally, I've created tests to demostrate one of the key features of TCA an
 
 ## The basics
 ### Archiecture Diagram
-<img src="./Images/TCA_Architecture.png">
+<img src="./Images/TCA_Architecture2.png">
 
 ### Hello World Example
-Let's say that you have a simple app with two buttons, one will increase a counter in the screen and the other will decrease it. This is what will happen if this app was implemented on TCA:
+Consider the following implementation of a simple app using TCA, where you will have two buttons: one to increment a counter displayed on the screen and the other to decrement it.
 
-1. The view is presented in the screen. It shows the current state of the app.
+Here's an example of how this app would be coded with TCA:
+
+1. A struct that will represent the domain of the feature. This struct must conform `ReducerProtocol` protocol and providing `State` struct, `Action` enum and `reduce` method.
+
+```swift
+struct CounterDomain: ReducerProtocol {
+    struct State {
+        // State of the feature
+    }
+
+    enum Action {
+        // actions that use can do in the app
+    }
+    
+    func reduce(into state: inout State, action: Action) -> EffectTask<Action> {
+        // Method that will mutate the state given an action.
+    }
+}
+```
+
+2. The view that is presented in the screen will display the current state of the app.
 <img src="./Images/viewDemo1.png" width="30%" height="30%">
 
 ```swift
@@ -71,7 +90,7 @@ struct State: Equatable {
 }
 ```
 
-2. The user press a button (let's say increase button), that internally send an action to the store.
+3. When the user presses a button (let's say increase button), it will internally send an action to the store.
 <img src="./Images/actionDemo1.png" width="30%" height="30%">
 
 ```swift
@@ -81,27 +100,17 @@ enum Action: Equatable {
 }
 ```
 
-3. The store & reducer require an environment object, that in TCA is just the object holding your dependencies. If you don't have any dependencies yet, just add an empty Environment.
-```swift
-struct Environment {
-    // Future Dependencies...
-}
-```
-
-
-4. The action is received by the reducer and proceed to mutate the state. Reducer MUST also return an effect, that represent logic from the "outside world" (network calls, notifications, database, etc). If no effect is needed, just return `Effect.none` .
+4. The action will be received by the reducer and proceed to mutate the state. Reducer MUST also return an effect, that represent logic from the "outside world" (network calls, notifications, database, etc). If no effect is needed, just return `EffectTask.none` .
 
 ```swift
-let reducer = Reducer<
-    State, Action, Environment
-> { state, action, environment in
+func reduce(into state: inout State, action: Action) -> EffectTask<Action> {
     switch action {
     case .increaseCounter:
         state.counter += 1
-        return Effect.none
+        return .none
     case .decreaseCounter:
         state.counter -= 1
-        return Effect.none
+        return .none
     }
 }
 ```
@@ -109,8 +118,7 @@ let reducer = Reducer<
 5. Once the mutation is done and the reducer returned the effect, the view will render the update in the screen. 
 <img src="./Images/viewUpdateDemo1.png" width="30%" height="30%">
 
-7. To observe object in TCA, we need an object called `viewStore`, that in this example is wrapped within WithViewStore view.
-8. We can send another action using `viewStore.send()` and an `Action` value.
+7. To observe state changes in TCA, we need an object called `viewStore`, that in this example is wrapped within WithViewStore view. We can send an action from the view to the store using `viewStore.send()` and an `Action` value.
 
 ```swift
 struct ContentView: View {
@@ -149,19 +157,20 @@ struct ContentView: View {
 }
 ```
 
-8. View is initialized by a `Store` object.
+7. View is initialized by a `Store` object.
 
 ```swift
 ContentView(
     store: Store(
-        initialState: State(),
-        reducer: reducer,
-        environment: Environment()
+        initialState: CounterDomain.State(),
+        reducer: CounterDomain()
     )
 )
 ```
 
 If you want to learn more about the basics, check out the following [video](https://youtu.be/SfFDj6qT-xg)
+
+> Note: The videos shared here were made using the legacy version of TCA with Environment and without `ReducerProtocol`. If you want to see the legacy version of TCA, check out this [branch](https://github.com/pitt500/OnlineStoreTCA/tree/legacy-tca-with-environment).
 
 ## Composition
 
