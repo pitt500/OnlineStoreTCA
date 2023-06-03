@@ -180,79 +180,82 @@ Composition refers to the process of building complex software systems by combin
 
 We started with a simple button counter, then we add an extra state to display text, next we put the whole button in a Product cell, and finally, each product cell will be part of a Product list. That is composition!
 
-### Single states
+### Body to compose multiple Reducers
+In the previous example, we demonstrated the usage of `reduce(into:action:)` to create our reducer function and define how state will be modified for each action. However, it's important to note that this method is suitable only for leaf components, which refer to the smallest components in your application.
 
-For single states (all, except collections/lists), TCA provides operators to glue the components and make bigger ones.
+For larger components, we can leverage the `body` property provided by the `ReducerProtocol`. This property enables you to combine multiple reducers, facilitating the creation of more comprehensive components. By utilizing the `body` property, you can effectively compose and manage the state mutations of these larger components.
+```swift
+var body: some ReducerProtocol<State, Action> {
+    ChildReducer1()
+    Reduce { state, action in
+        switch action {
+        case .increaseCounter:
+            state.counter += 1
+            return .none
+        case .decreaseCounter:
+            state.counter -= 1
+            return .none
+        }
+    }
+    ChildReducer2()
+}
+```
 
-#### Scope 
-Scope will expose from parent domain (Product) only the required state and action for the child domain (AddToCart). For example, the ProductDomain below contains two properties as part of its state: product and addToCartState.
+The `Reduce` closure will always encapsulate the logic from the parent domain. To understand how to combine additional components, please continue reading below.
+
+> Compared to the previous version of TCA without `ReducerProtocol`, the order of child reducers will not affect the result. Parent Reducer (`Reduce`) will be always executed at the end.
+
+### Single state operators
+
+For single states (all except collections/lists), TCA provides operators to glue the components and make bigger ones.
+
+#### store.scope(state:action:) 
+`store.scope` is an operator used in views to get the child domain's (`AddToCartDomain`) state and action from parent domain (`ProductDomain`) to initialize subviews. 
+For example, the `ProductDomain` below contains two properties as part of its state: `product` and `addToCartState`.
 
 ```swift
-struct ProductDomain {
+struct ProductDomain: ReducerProtocol {
     struct State: Equatable, Identifiable {
         let product: Product
         var addToCartState = AddToCartDomain.State()
     }
     // ...
 ```
-We don't want to pass around the whole ProductDomain state, instead, we want to reduce the scope as much as possible. In order to do that, we use scope on the child component:
+Let's consider the scenario where we need to configure the `ProductCell` view below. The `ProductCell` is designed to handle the `ProductDomain`, while we need to provide some information to initialize the `AddToCartButton`. However, the `AddToCartButton` is only aware of its own domain, `AddToCartDomain`, and not the `ProductDomain`. To address this, we can use the `scope` method from `store` to get the child's state and action from parent domain. This enables us to narrow down the scope of the button to focus solely on its own functionality.
 
 ```swift
-AddToCartButton(
-    store: self.store.scope(
-        state: \.addToCartState,
-        action: ProductDomain.Action.addToCart
-    )
-)
-```
-In this way, AddToCart Domain will only know about its own state and nothing about product and more.
-
-#### Pullback
-
-Pullback works like a mapping function. It transforms the child reducer (AddToCart) into one compatible with parent reducer (Product).
-```swift
-AddToCartDomain.reducer
-    .pullback(
-        state: \.addToCartState,
-        action: /ProductDomain.Action.addToCart,
-        environment: { _ in
-            AddToCartDomain.Environment()
-        }
-    )
-```
-This transformation will be really useful when we combine multiple reducers to build a more complex component.
-
-#### Combine
-
-Combine operator will combine many reducers into a single one by running each one on state in order, and merging all of the effects.
-```swift
-static let reducer = Reducer<
-    State, Action, Environment
->.combine(
-    AddToCartDomain.reducer
-        .pullback(
-            state: \.addToCartState,
-            action: /ProductDomain.Action.addToCart,
-            environment: { _ in
-                AddToCartDomain.Environment()
-            }
-        ),
-    .init { state, action, environment in
-        switch action {
-        case .addToCart(.didTapPlusButton):
-            return .none
-        case .addToCart(.didTapMinusButton):
-            state.addToCartState.count = max(0, state.addToCartState.count)
-            return .none
+struct ProductCell: View {
+    let store: Store<ProductDomain.State, ProductDomain.Action>
+    
+    var body: some View {
+        WithViewStore(self.store) { viewStore in
+            // More views here ...
+            AddToCartButton(
+                store: self.store.scope(
+                    state: \.addToCartState,
+                    action: ProductDomain.Action.addToCart
+                )
+            )
         }
     }
-)
 ```
-With the help of pullback operators, the child reducers can work along with the parent domain to execute each action in order. 
+By employing this approach, the `AddToCartDomain` will solely possess knowledge of its own state and remain unaware of any product-related information.
 
-Be careful because we have to move the parent reducer at the end to run the child reducers first and then capture any [side effects](#side-effects) (note: this is not required in ReducerProtocol anymore).
+#### Scope in Reducers
+`Scope` is utilized within the `body` to seamlessly transform the child reducer (`AddToCart`) into a compatible form that aligns with the parent reducer (`Product`). This allows for smooth integration and interaction between the two.
+```swift
+var body: some ReducerProtocol<State, Action> {
+    Scope(state: \.addToCartState, action: /ProductDomain.Action.addToCart) {
+        AddToCartDomain()
+    }
+    Reduce { state, action in
+        // Parent Reducer logic ...
+    }
+}
+```
+This transformation becomes highly valuable when combining multiple reducers to construct a more complex component.
 
-If you want to learn more about these operators, check out this [video](https://youtu.be/Zf2pFEa3uew).
+> In earlier versions, the `pullback` and `combine` operators were employed to carry out the same operation. You can watch this [video](https://youtu.be/Zf2pFEa3uew).
 
 ### Collection of states
 
