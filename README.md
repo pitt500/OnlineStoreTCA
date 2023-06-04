@@ -221,6 +221,18 @@ struct ProductDomain: ReducerProtocol {
     }
     // ...
 ```
+
+Furthermore, we utilize an action with an associated value that encapsulates all actions from the child domain, providing a comprehensive and cohesive approach.
+```swift
+struct ProductDomain: ReducerProtocol {
+    // State ...
+
+    enum Action {
+        case addToCart(AddToCartDomain.Action)
+    }
+    // ...
+```
+
 Let's consider the scenario where we need to configure the `ProductCell` view below. The `ProductCell` is designed to handle the `ProductDomain`, while we need to provide some information to initialize the `AddToCartButton`. However, the `AddToCartButton` is only aware of its own domain, `AddToCartDomain`, and not the `ProductDomain`. To address this, we can use the `scope` method from `store` to get the child's state and action from parent domain. This enables us to narrow down the scope of the button to focus solely on its own functionality.
 
 ```swift
@@ -259,46 +271,42 @@ This transformation becomes highly valuable when combining multiple reducers to 
 
 ### Collection of states
 
-What about having multiple states to manage?, TCA also have great support for that.
+Are you looking to manage a collection of states? TCA offers excellent support for that as well!
 
-As a first step, we need to hold a list of (Product) states using IdentifiedArray instead of a regular array:
+In this particular example, instead of using a regular array, TCA requires a list of (`Product`) states, which can be achieved by utilizing `IdentifiedArray`:
 ```swift
-struct ProductListDomain {
+struct ProductListDomain: ReducerProtocol {
     struct State: Equatable {
-        var productListState: IdentifiedArrayOf<ProductDomain.State> = []
+        var productList: IdentifiedArrayOf<ProductDomain.State> = []
         // ...    
     }
     // ...
 }
 ```
 
-#### ForEach
+#### forEach in Reducer
 
-`forEach` operator it's basically a pullback operator, but it will work for a collection of states, transforming the child reducers into ones compatible with parent reducer:
+The `forEach` operator functions similarly to the [`Scope`](#scope-in-reducers) operator, with the distinction that it operates on a collection of states. It effectively transforms the child reducers into compatible forms that align with the parent reducer.
 
 ```swift
-struct ProductListDomain {
+struct ProductListDomain: ReducerProtocol {
     // State and Actions ...
     
-    static let reducer = Reducer<
-        State, Action, Environment
-    >.combine(
-        ProductDomain.reducer.forEach(
-            state: \.productListState,
-            action: /ProductListDomain.Action.product(id:action:),
-            environment: { _ in ProductDomain.Environment() }
-        ),
-        // More Reducers ...
-        .init { state, action, environment in
-            switch action {
-                // ...
-            }
+    var body: some ReducerProtocol<State, Action> {
+        Reduce { state, action in
+            // Parent Reducer...
         }
-    )
+        .forEach(
+            \.productList, 
+            action: /ProductListDomain.Action.product(id:action:)
+        ) {
+            ProductDomain()
+        }
+    }
 }
 ```
 
-Then in the UI, we use ForEachStore to iterate over all the (Product) states and actions. This will make possible sending actions to the respective cell and mutate its state.
+Subsequently, in the user interface, we employ `ForEachStore` and `store.scope` to iterate through all the (`Product`) states and actions. This enables us to send actions to the corresponding cell and modify its state accordingly.
 ```swift
 List {
     ForEachStore(
@@ -313,62 +321,78 @@ List {
 }
 ```
 
-If you want to learn more about forEach operator and ForEachStore, check out this [video](https://youtu.be/sid-zfggYhQ)
+> There's a legacy `forEach` operator, If you want to learn more, check out this [video](https://youtu.be/sid-zfggYhQ)
 
-## Environment
+## Dependencies
+In previous iterations of TCA, `Environment` played a crucial role in consolidating all the dependencies utilized by a domain.
 
-The environment is a structure that contains all the dependencies needed by the application to perform its tasks. It was part of the TCA foundation before the introduction of [ReducerProtocol](https://www.pointfree.co/blog/posts/81-announcing-the-reducer-protocol) and [Dependencies Framework](https://github.com/pointfreeco/swift-dependencies).
+With the introduction of the [`ReducerProtocol`](https://www.pointfree.co/blog/posts/81-announcing-the-reducer-protocol), we have eliminated the concept of `Environment`. As a result, dependencies now reside directly within the domain.
 
 ```swift
-struct Environment {
+struct ProductListDomain: ReducerProtocol {
+    // State ...
+
+    // Actions...
+
     var fetchProducts:  () async throws -> [Product]
     var sendOrder: ([CartItem]) async throws -> String
     var uuid: () -> UUID
+
+    // Reducer ...
 }
 ```
 
-If you want to learn more about how Environment object works on TCA, take a look to this [video](https://youtu.be/sid-zfggYhQ?list=PLHWvYoDHvsOVo4tklgLW1g7gy4Kmk4kjw&t=103)
+Nevertheless, we have the option to leverage the [Dependencies Framework](https://github.com/pointfreeco/swift-dependencies) to achieve a more enhanced approach in managing our dependencies:
+
+```swift
+struct ProductListDomain: ReducerProtocol {
+    // State ...
+
+    // Actions...
+
+    @Dependency(\.apiClient.fetchProducts) var fetchProducts
+    @Dependency(\.apiClient.sendOrder) var sendOrder
+    @Dependency(\.uuid) var uuid
+
+    // Reducer ...
+}
+```
+
+> If you want to learn more about how Environment object works on TCA, take a look to this [video](https://youtu.be/sid-zfggYhQ?list=PLHWvYoDHvsOVo4tklgLW1g7gy4Kmk4kjw&t=103)
 
 ## Side Effects
-
-A side effect is an observable change that occurs as a result of running a function or method. This can include things like modifying state outside of the function, performing I/O operations like reading or writing to a file, or making network requests. 
-TCA helps to encapsulate those side effects through Effects objects.
+A side effect refers to an observable change that arises when executing a function or method. This encompasses actions such as modifying state outside the function, performing I/O operations to a file or making network requests. TCA facilitates the encapsulation of such side effects through the use of `EffectTask` objects.
 
 <img src="./Images/sideEffects1.png" width="80%" height="80%">
 
-If you want to learn more about side effects, check out this [video](https://youtu.be/t3HHam3GYkU)
+> If you want to learn more about side effects, check out this [video](https://youtu.be/t3HHam3GYkU)
 
 ### Network calls
+Network calls are a fundamental aspect of mobile development, and TCA offers robust tools to handle them efficiently. As network calls are considered external interactions or [side effects](#side-effects), TCA utilizes the `EffectTask` object to encapsulate these calls. Specifically, network calls are encapsulated within the `EffectTask.task` construct, allowing for streamlined management of asynchronous operations within the TCA framework.
 
-Network calls are one of the most common tasks in mobile development, and of course, TCA provides tools for that. And since network calls are part of the outside world ([side effects](#side-effects)), we use Effect object to wrap the calls, more specifically, into `Effect.task`.
-
-However, this task operator will only call the web API, but to get the actual response, we have to implement an additional action that will hold the result in a `TaskResult:
+However, it's important to note that the task operator alone is responsible for making the web API call. To obtain the actual response, an additional action needs to be implemented, which will capture and store the result within a `TaskResult` object.
 
 ```swift
-struct ProductListDomain {
+struct ProductListDomain: ReducerProtocol {
     // State and more ...
     
     enum Action: Equatable {
         case fetchProducts
         case fetchProductsResponse(TaskResult<[Product]>)
-   }
-   
-   struct Environment {
-        var fetchProducts: () async throws -> [Product]
-        var uuid: () -> UUID
     }
+   
+    var fetchProducts: () async throws -> [Product]
+    var uuid: () -> UUID
     
-    static let reducer = Reducer<
-        State, Action, Environment
-    >.combine(
+    var body: some ReducerProtocol<State, Action> {
         // Other child reducers...
-        .init { state, action, environment in
+        Reduce { state, action in
             switch action {
             case .fetchProducts:
                 return .task {
                     // Just making the call 
                     await .fetchProductsResponse(
-                        TaskResult { try await environment.fetchProducts() }
+                        TaskResult { try await fetchProducts() }
                     )
                 }
             case .fetchProductsResponse(.success(let products)):
@@ -376,7 +400,7 @@ struct ProductListDomain {
                 state.productListState = IdentifiedArrayOf(
                     uniqueElements: products.map {
                         ProductDomain.State(
-                            id: environment.uuid(),
+                            id: uuid(),
                             product: $0
                         )
                     }
@@ -388,11 +412,11 @@ struct ProductListDomain {
                 return .none
             }
         }
-    )
+    }
 }
 ```
 
-For information about network requests in TCA, check out this [video](https://youtu.be/sid-zfggYhQ?list=PLHWvYoDHvsOVo4tklgLW1g7gy4Kmk4kjw&t=144) explaining async requests, and this other [video](https://youtu.be/j2qymM6i9n4) configuring a real web API call.
+> To learn more about network requests in TCA, I recommend watching this insightful [video](https://youtu.be/sid-zfggYhQ?list=PLHWvYoDHvsOVo4tklgLW1g7gy4Kmk4kjw&t=144) that explains asynchronous requests. Additionally, you can refer to this informative [video](https://youtu.be/j2qymM6i9n4) that demonstrates the configuration of a real web API call, providing practical insights into the process.
 
 ## Testing
 
@@ -410,11 +434,32 @@ func sheet<Content>(
 ) -> some View where Content : View
 ```
 
-In other to use this (or any modifier with binding parameters) in TCA, we must use `binding` operator from `viewStore`and provide two parameters:
-* The state property that will be mutated.
-* the action that will trigger the mutation.
+To utilize this modifier (or any modifier with binding parameters) in TCA, it is necessary to employ the `binding` operator from `viewStore` and supply two parameters:
+
+1. The state property that will undergo mutation.
+2. The action that will trigger the mutation.
 
 ```swift
+// Domain:
+struct Domain: ReducerProtocol {
+    struct State {
+        var shouldOpenModal = false
+    }
+    enum Action {
+        case setCartView(isPresented: Bool)
+    }
+
+    var body: some ReducerProtocol<State, Action> {
+        Reduce { state, action in
+            switch action {
+                case .setCartView(let isPresented):
+                    state.shouldOpenModal = isPresented
+            }
+        }
+    }
+}
+
+// UI:
 Text("Parent View")
 .sheet(
     isPresented: viewStore.binding(
@@ -426,16 +471,16 @@ Text("Parent View")
 }
 ```
 
-If you want to lean more about Binding with TCA and SwiftUI, take a look to this [video](https://youtu.be/Ilr8AsoggIY).
+> If you want to lean more about Binding with TCA and SwiftUI, take a look to this [video](https://youtu.be/Ilr8AsoggIY).
 
 ### Optional States
 
-By default, a TCA's state will be kept in memory during the app's lifecycle. However, there are cases where having a state alive is just a waste of resources. For example, a modal view is only displayed a short period of time, it doesn't make sense to keep its state in memory all the time. For that, we have optional states.
+By default, TCA keeps a state in memory throughout the entire lifecycle of an app. However, in certain scenarios, maintaining a state can be resource-intensive and unnecessary. One such case is when dealing with modal views that are displayed for a short duration. In these situations, it is more efficient to use optional states.
 
-The way to create an optional state is similar to any optional value in Swift, just declare the property in the parent state, but instead of assigning a default value, let's declare it as optional. In this example, cartState will hold an optional state for a Cart List:
+Creating an optional state in TCA follows the same approach as declaring any optional value in Swift. Simply define the property within the parent state, but instead of assigning a default value, declare it as optional. For instance, in the provided example, the `cartState` property holds an optional state for a Cart List.
 
 ```swift
-struct ProductListDomain {
+struct ProductListDomain: ReducerProtocol {
     struct State: Equatable {
         var productListState: IdentifiedArrayOf<ProductDomain.State> = []
         var shouldOpenCart = false
@@ -446,27 +491,18 @@ struct ProductListDomain {
 }
 ```
 
-Now in the reducer, we have to use pullback operator to transform the child (CartList) reducer into one compatible with parent (ProductList) reducer, however, pullback doesn't accept optional states. In order to make this work, we need to use `optional` operator, which will enable the reducer once the state is non-nil.
+Now, in the `Reduce` function, we can utilize the `ifLet` operator to transform the child reducer (`CartListDomain`) into one that is compatible with the parent reducer (`ProductList`). 
 
-To assign a new non-optional state, the parent reducer will have to initialize the property (cartState) once a specific action is called (`setCartView`).
+In the provided example, the `CartListDomain` will be evaluated only if the `cartState` is non-nil. To assign a new non-optional state, the parent reducer will need to initialize the property (`cartState`) when a specific action (`setCartView`) is triggered. 
+
+This approach ensures that the optional state is properly handled within the TCA framework and allows for seamless state management between the parent and the optional child reducers.
 
 ```swift
-static let reducer = Reducer<
-        State, Action, Environment
-    >.combine(
-        // More reducers ...
-        CartListDomain.reducer
-            .optional()
-            .pullback(
-                state: \.cartState,
-                action: /ProductListDomain.Action.cart,
-                environment: {
-                    CartListDomain.Environment(
-                        sendOrder: $0.sendOrder
-                    )
-                }
-            ),
-        .init { state, action, environment in
+struct ProductListDomain: ReducerProtocol {
+    // State and Actions ...
+    
+    var body: some ReducerProtocol<State, Action> {
+        Reduce { state, action in
             switch action {
             //  More cases ...
             case .setCartView(let isPresented):
@@ -477,10 +513,14 @@ static let reducer = Reducer<
                 return .none
             }
         }
-    )
+        .ifLet(\.cartState, action: /ProductListDomain.Action.cart) {
+            CartListDomain()
+        }
+    }
+}
 ```
 
-Finally, use `IfLetStore` to unwrap a store of optional state in order to show the respective view that will work with that state. 
+Lastly, in the view, you can employ `IfLetStore` to unwrap a store with optional state. This allows you to conditionally display the corresponding view that operates with that particular state.
 
 
 ```swift
@@ -512,7 +552,7 @@ List {
 }
 ```
 
-If you want to learn more about optional states, check out this [video](https://youtu.be/AV0laQw2OjM).
+> If you want to learn more about optional states, check out this [video](https://youtu.be/AV0laQw2OjM).
 
 ### Private Actions
 
