@@ -11,13 +11,13 @@ The purpose of this demo is to explore the main concepts of TCA. If this is your
     * [Archiecture Diagram](#archiecture-diagram)
     * [Hello World Example](#hello-world-example)
 * [Composition](#composition)
-    * [Single states](#single-states)
-      * [Scope](#scope)
-      * [Pullback](#pullback)
-      * [Combine](#combine)
+    * [Body to compose multiple Reducers](#body-to-compose-multiple-reducers)
+    * [Single state operators](#single-state-operators)
+      * [store.scope(state:action:)](#storescopestateaction)
+      * [Scope in Reducers](#scope-in-reducers)
     * [Collection of states](#collection-of-states)
-      * [ForEach](#foreach)
-* [Environment](#environment)
+      * [forEach in Reducer](#foreach-in-reducer)
+* [Dependencies](#dependencies)
 * [Side Effects](#side-effects)
     * [Network Calls](#network-calls)
 * [Testing](#testing)
@@ -681,10 +681,10 @@ This [video](https://youtu.be/U3EMduy-DhE) explains more about AlertView in Swif
 
 ### Making a Root Domain with Tab View
 
-Creating a Root Domain is like creating any other domain in TCA. Each property in this state will represent a complex substate. For Tab logic, we simply add an enum representing each tab item:
+Creating a Root Domain in TCA is similar to creating any other domain. In this case, each property within the state will correspond to a complex substate. To handle tab logic, we can include an enum that represents each tab item, providing a structured approach to managing the different tabs:
 
 ```swift
-struct RootDomain {
+struct RootDomain: ReducerProtocol {
     struct State: Equatable {
         var selectedTab = Tab.products
         var productListState = ProductListDomain.State()
@@ -702,22 +702,21 @@ struct RootDomain {
         case profile(ProfileDomain.Action)
     }
     
-    struct Environment {
-        // Dependencies
-        
-        static let live = Self(
-            // Dependency Initialization
-        )
-    }
+    // Dependencies
+    var fetchProducts: @Sendable () async throws -> [Product]
+    var sendOrder:  @Sendable ([CartItem]) async throws -> String
+    var fetchUserProfile:  @Sendable () async throws -> UserProfile
+    var uuid: @Sendable () -> UUID
     
-    static let reducer = Reducer<
-        State, Action, Environment
-    >.combine(
-        ProductListDomain.reducer
-            .pullback(...),
-        ProfileDomain.reducer
-            .pullback(...),
-        .init { state, action, environment in
+    static let live = Self(
+        fetchProducts: APIClient.live.fetchProducts,
+        sendOrder: APIClient.live.sendOrder,
+        fetchUserProfile: APIClient.live.fetchUserProfile,
+        uuid: { UUID() }
+    )
+    
+    var body: some ReducerProtocol<State, Action> {
+        Reduce { state, action in
             switch action {
             case .productList:
                 return .none
@@ -728,11 +727,22 @@ struct RootDomain {
                 return .none
             }
         }
-    )
+        Scope(state: \.productListState, action: /RootDomain.Action.productList) {
+            ProductListDomain(
+                fetchProducts: fetchProducts,
+                sendOrder: sendOrder,
+                uuid: uuid
+            )
+        }
+        Scope(state:  \.profileState, action: /RootDomain.Action.profile) {
+            ProfileDomain(fetchUserProfile: fetchUserProfile)
+        }
+    }
 }
 ```
 
-For the UI, it's almost identical to vanilla SwiftUI, except we are holding the store property to manage the current selected tab:
+When it comes to the UI implementation, it closely resembles the standard SwiftUI approach, with a small difference. Instead of using a regular property, we hold the `store` property to manage the currently selected tab:
+
 ```swift
 struct RootView: View {
     let store: Store<RootDomain.State, RootDomain.Action>
@@ -774,9 +784,33 @@ struct RootView: View {
 }
 ```
 
-Check out the full details of this implementation in this [video](https://youtu.be/a_FwMVIhCHY).
+To call RootView, we provide the initial domain state and the reducer:
+To instantiate the `RootView`, you need to provide two parameters: the initial domain state and the reducer:
+
+```swift
+@main
+struct OnlineStoreTCAApp: App {
+    var body: some Scene {
+        WindowGroup {
+            RootView(
+                store: Store(
+                    initialState: RootDomain.State(),
+                    reducer: RootDomain.live
+                )
+            )
+        }
+    }
+}
+```
+
+These elements enable the proper initialization and functioning of the `RootView` within the TCA architecture.
+
+> For a comprehensive understanding of this implementation, I recommend checking out this [video](https://youtu.be/a_FwMVIhCHY).
 
 ## Contact
+If you have any feedback, I would love to hear from you. Please feel free to reach out to me through any of my social media channels:
+
+* [Youtube](https://youtube.com/@swiftandtips)
 * [Twitter](https://twitter.com/swiftandtips)
 * [LinkedIn](https://www.linkedin.com/in/pedrorojaslo/)
 * [Mastodon](https://iosdev.space/@swiftandtips)
