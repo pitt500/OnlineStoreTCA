@@ -556,14 +556,14 @@ List {
 
 ### Private Actions
 
-By default, if you declare an action in a TCA domain, it will be available for other reducers too. There are cases where an action is very specific for a reducer and we don't need to expose it outside of it. For those cases, you can simply declare private functions:
+By default, when you declare an action in a TCA domain, it is accessible to other reducers as well. However, there are situations where an action is intended to be specific to a particular reducer and does not need to be exposed outside of it. 
+
+In such cases, you can simply declare private functions to encapsulate those actions within the domain's scope. This approach ensures that the actions remain private and only accessible within the intended context, enhancing the encapsulation and modularity of your TCA implementation:
 
 ```swift
-static let reducer = Reducer<
-    State, Action, Environment
->.combine(
+var body: some ReducerProtocol<State, Action>
     // More reducers ...
-    .init { state, action, environment in
+    Reduce { state, action in
         switch action {
         // More actions ...
         case .cart(let action):
@@ -581,9 +581,9 @@ static let reducer = Reducer<
             return closeCart(state: &state)
         }
     }
-)
+}
 
-private static func closeCart(
+private func closeCart(
         state: inout State
 ) -> Effect<Action, Never> {
     state.shouldOpenCart = false
@@ -592,7 +592,7 @@ private static func closeCart(
     return .none
 }
 
-private static func resetProductsToZero(
+private func resetProductsToZero(
     state: inout State
 ) {
     for id in state.productListState.map(\.id)
@@ -602,11 +602,11 @@ private static func resetProductsToZero(
 }
 ```
 
-For more about private actions, check out this [video](https://youtu.be/7BkZX_7z-jw).
+> For more about private actions, check out this [video](https://youtu.be/7BkZX_7z-jw).
 
 ### Alert Views in SwiftUI
 
-TCA library provides support for `AlertView` too adding its own state and way to build UI to keep consistency without the architecture. Here's how you can create your own alert:
+The TCA library also offers support for `AlertView`, enabling the addition of custom state and a consistent UI building approach without deviating from the TCA architecture. To create your own alert using TCA, follow these steps:
 
 1. Create an `AlertState with actions of your own domain.
 2. Create the actions that will trigger events for the alert:
@@ -615,7 +615,7 @@ TCA library provides support for `AlertView` too adding its own state and way to
     - Execute the alert's handler (`didConfirmPurchase`)
 
 ```swift
-struct CartListDomain {
+struct CartListDomain: ReducerProtocol {
     struct State: Equatable {
         var confirmationAlert: AlertState<CartListDomain.Action>?
         
@@ -630,15 +630,8 @@ struct CartListDomain {
         // More actions ...
     }
     
-    static let reducer = Reducer<
-        State, Action, Environment
-    >.combine(
-        CartItemDomain.reducer.forEach(
-            state: \.cartItems,
-            action: /CartListDomain.Action.cartItem(id:action:),
-            environment: { _ in CartItemDomain.Environment() }
-        ),
-        .init { state, action, environment in
+    var body: some ReducerProtocol<State, Action> {
+        Reduce { state, action in
             switch action {
             case .didCancelConfirmation:
                 state.confirmationAlert = nil
@@ -660,7 +653,10 @@ struct CartListDomain {
             // More actions ...
             }
         }
-    )
+        .forEach(\.cartItems, action: /Action.cartItem(id:action:)) {
+            CartItemDomain()
+        }
+    }
 }
                 
 ```
@@ -674,10 +670,12 @@ let store: Store<CartListDomain.State, CartListDomain.Action>
 
 Text("Parent View")
 .alert(
-    self.store.scope(state: \.confirmationAlert),
+    self.store.scope(state: \.confirmationAlert, action: { $0 }),
     dismiss: .didCancelConfirmation
 )
 ```
+
+> Explicit action is always needed for `store.scope`. Check out this commit to learn more: https://github.com/pointfreeco/swift-composable-architecture/commit/da205c71ae72081647dfa1442c811a57181fb990
 
 This [video](https://youtu.be/U3EMduy-DhE) explains more about AlertView in SwiftUI and TCA.
 
@@ -777,6 +775,7 @@ struct RootView: View {
 ```
 
 Check out the full details of this implementation in this [video](https://youtu.be/a_FwMVIhCHY).
+
 ## Contact
 * [Twitter](https://twitter.com/swiftandtips)
 * [LinkedIn](https://www.linkedin.com/in/pedrorojaslo/)
