@@ -2,7 +2,7 @@
 - This demo was implemented using version [0.54.0](https://pointfreeco.github.io/swift-composable-architecture/0.54.0/documentation/composablearchitecture/) of TCA.
 - I have plans to migrate this demo to [version 1.0](https://github.com/pointfreeco/swift-composable-architecture/discussions/1477#discussioncomment-6012640) of TCA once it is officially released. This update will also involve incorporating a [navigation](https://www.pointfree.co/blog/posts/106-navigation-tools-come-to-the-composable-architecture) demo, showcasing the new features and enhancements.
 - I will finish the [Testing](#testing) section once I have completed the `ReducerProtocol` video (stay tuned! 😉). However, I invite you to take a look at the tests created in the demo right away! 
-- All credits about TCA are for [Brandon Willams](https://twitter.com/mbrandonw), [Stephen Celis](https://twitter.com/stephencelis) and [pointfree.co](https://www.pointfree.co/) ❤️.
+- All credits about TCA go to [Brandon Willams](https://twitter.com/mbrandonw), [Stephen Celis](https://twitter.com/stephencelis) and the incredible team at [pointfree.co](https://www.pointfree.co/) ❤️.
 
 # Online Store made with Composable Architecture (TCA)
 The purpose of this demo is to provide an introduction to the main concepts of TCA. If you are new to TCA, I **highly** recommend starting with the README from the [main repository](https://github.com/pointfreeco/swift-composable-architecture) and watching the informative [Tour of TCA](https://www.pointfree.co/collections/composable-architecture/a-tour-of-the-composable-architecture). These resources will provide you with a solid foundation and a comprehensive understanding of the TCA framework.
