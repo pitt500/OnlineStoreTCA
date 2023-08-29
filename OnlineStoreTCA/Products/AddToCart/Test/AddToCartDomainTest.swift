@@ -15,9 +15,9 @@ class AddToCartDomainTest: XCTestCase {
     
     func testIncreaseCounterTappingPlusButtonOnce() async {
         let store = TestStore(
-            initialState: AddToCartDomain.State(),
-            reducer: AddToCartDomain()
-        )
+            initialState: AddToCartDomain.State()) {
+                AddToCartDomain()
+            }
         
         
         await store.send(.didTapPlusButton) {
@@ -27,10 +27,9 @@ class AddToCartDomainTest: XCTestCase {
     
     func testIncreaseCounterTappingPlusButtonThreeTimes() async {
         let store = TestStore(
-            initialState: AddToCartDomain.State(),
-            reducer: AddToCartDomain()
-        )
-        
+            initialState: AddToCartDomain.State()) {
+                AddToCartDomain()
+            }
         
         await store.send(.didTapPlusButton) { $0.count = 1 }
         await store.send(.didTapPlusButton) { $0.count = 2 }
@@ -39,9 +38,9 @@ class AddToCartDomainTest: XCTestCase {
     
     func testDecreaseCounterTappingPlusButtonOnce() async {
         let store = TestStore(
-            initialState: AddToCartDomain.State(),
-            reducer: AddToCartDomain()
-        )
+            initialState: AddToCartDomain.State()) {
+                AddToCartDomain()
+            }
         
         await store.send(.didTapMinusButton) {
             $0.count = -1
@@ -50,9 +49,9 @@ class AddToCartDomainTest: XCTestCase {
     
     func testDecreaseCounterTappingPlusButtonThreeTimes() async {
         let store = TestStore(
-            initialState: AddToCartDomain.State(),
-            reducer: AddToCartDomain()
-        )
+            initialState: AddToCartDomain.State()) {
+                AddToCartDomain()
+            }
         
         await store.send(.didTapMinusButton) { $0.count = -1 }
         await store.send(.didTapMinusButton) { $0.count = -2 }
@@ -61,9 +60,9 @@ class AddToCartDomainTest: XCTestCase {
     
     func testUpdatingCounterTappingPlusAndMinusButtons() async {
         let store = TestStore(
-            initialState: AddToCartDomain.State(),
-            reducer: AddToCartDomain()
-        )
+            initialState: AddToCartDomain.State()) {
+                AddToCartDomain()
+            }
         
         await store.send(.didTapMinusButton) { $0.count = -1 }
         await store.send(.didTapPlusButton) { $0.count = 0 }

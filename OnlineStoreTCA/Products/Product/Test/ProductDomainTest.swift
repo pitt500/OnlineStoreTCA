@@ -22,13 +22,10 @@ class ProductDomainTest: XCTestCase {
             imageString: "image"
         )
         let store = TestStore(
-            initialState: ProductDomain.State(
-                id: UUID(),
-                product: product
-            ),
-            reducer: ProductDomain()
-        )
-        
+            initialState: ProductDomain.State(id: UUID(), product: product)) {
+                ProductDomain()
+            }
+            
         await store.send(.addToCart(.didTapPlusButton)) {
             $0.addToCartState = AddToCartDomain.State(count: 1)
         }
@@ -44,12 +41,9 @@ class ProductDomainTest: XCTestCase {
             imageString: "image"
         )
         let store = TestStore(
-            initialState: ProductDomain.State(
-                id: UUID(),
-                product: product
-            ),
-            reducer: ProductDomain()
-        )
+            initialState: ProductDomain.State(id: UUID(), product: product)) {
+                ProductDomain()
+            }
         
         await store.send(.addToCart(.didTapPlusButton)) {
             $0.addToCartState = AddToCartDomain.State(count: 1)
@@ -75,12 +69,9 @@ class ProductDomainTest: XCTestCase {
             imageString: "image"
         )
         let store = TestStore(
-            initialState: ProductDomain.State(
-                id: UUID(),
-                product: product
-            ),
-            reducer: ProductDomain()
-        )
+            initialState: ProductDomain.State(id: UUID(),product: product)) {
+                ProductDomain()
+            }
         
         await store.send(.addToCart(.didTapMinusButton))
     }
@@ -95,12 +86,9 @@ class ProductDomainTest: XCTestCase {
             imageString: "image"
         )
         let store = TestStore(
-            initialState: ProductDomain.State(
-                id: UUID(),
-                product: product
-            ),
-            reducer: ProductDomain()
-        )
+            initialState: ProductDomain.State(id: UUID(), product: product)) {
+                ProductDomain()
+            }
         
         // No changes expected!
         await store.send(.addToCart(.didTapMinusButton))
@@ -118,12 +106,9 @@ class ProductDomainTest: XCTestCase {
             imageString: "image"
         )
         let store = TestStore(
-            initialState: ProductDomain.State(
-                id: UUID(),
-                product: product
-            ),
-            reducer: ProductDomain()
-        )
+            initialState: ProductDomain.State(id: UUID(),product: product)) {
+                ProductDomain()
+            }
         
         // No changes expected!
         await store.send(.addToCart(.didTapMinusButton))

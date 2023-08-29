@@ -12,7 +12,7 @@ struct ProductListView: View {
     let store: Store<ProductListDomain.State,ProductListDomain.Action>
     
     var body: some View {
-        WithViewStore(self.store) { viewStore in
+        WithViewStore(self.store, observe: { $0 }) { viewStore in
             NavigationView {
                 Group {
                     if viewStore.isLoading {
@@ -69,21 +69,5 @@ struct ProductListView: View {
                 
             }
         }
-    }
-}
-
-struct ProductListView_Previews: PreviewProvider {
-    static var previews: some View {
-        ProductListView(
-            store: Store(
-                initialState: ProductListDomain.State()
-            ) {
-                ProductListDomain(
-                    fetchProducts: { Product.sample },
-                    sendOrder: { _ in "OK" },
-                    uuid: { UUID() }
-                )
-            }
-        )
     }
 }

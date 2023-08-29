@@ -12,7 +12,7 @@ struct CartListView: View {
     let store: Store<CartListDomain.State, CartListDomain.Action>
     
     var body: some View {
-        WithViewStore(self.store) { viewStore in
+        WithViewStore(self.store, observe: { $0 }) { viewStore in
             ZStack {
                 NavigationStack {
                     Group {
@@ -71,25 +71,28 @@ struct CartListView: View {
                         viewStore.send(.getTotalPrice)
                     }
                     .alert(
-                        self.store.scope(
-                            state: \.confirmationAlert,
-                            action: { $0 } // context: https://github.com/pointfreeco/swift-composable-architecture/commit/da205c71ae72081647dfa1442c811a57181fb990
-                        ),
-                        dismiss: .didCancelConfirmation
+                        store: self.store.scope(
+                            state: \.$confirmationAlert,
+                            action: { _ in
+                                    .didConfirmPurchase
+                            }
+                        )
                     )
                     .alert(
-                        self.store.scope(
-                            state: \.successAlert,
-                            action: { $0 }
-                        ),
-                        dismiss: .dismissSuccessAlert
+                        store: self.store.scope(
+                            state: \.$successAlert,
+                            action: { _ in
+                                    .dismissSuccessAlert
+                            }
+                        )
                     )
                     .alert(
-                        self.store.scope(
-                            state: \.errorAlert,
-                            action: { $0 }
-                        ),
-                        dismiss: .dismissErrorAlert
+                        store: self.store.scope(
+                            state: \.$errorAlert,
+                            action: { _ in
+                                    .dismissErrorAlert
+                            }
+                        )
                     )
                 }
                 if viewStore.isRequestInProcess {
@@ -99,26 +102,5 @@ struct CartListView: View {
                 }
             }
         }
-    }
-}
-
-struct CartListView_Previews: PreviewProvider {
-    static var previews: some View {
-        CartListView(
-            store: Store(
-                initialState: CartListDomain.State(
-                    cartItems: IdentifiedArrayOf(
-                        uniqueElements: CartItem.sample
-                            .map {
-                                CartItemDomain.State(
-                                    id: UUID(),
-                                    cartItem: $0
-                                )
-                            }
-                    )
-                ),
-                reducer: CartListDomain(sendOrder: { _ in "OK" })
-            )
-        )
     }
 }

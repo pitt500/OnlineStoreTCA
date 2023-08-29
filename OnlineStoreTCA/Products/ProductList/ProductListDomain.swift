@@ -8,7 +8,7 @@
 import Foundation
 import ComposableArchitecture
 
-struct ProductListDomain: ReducerProtocol {
+struct ProductListDomain: Reducer {
     struct State: Equatable {
         var dataLoadingStatus = DataLoadingStatus.notStarted
         var shouldOpenCart = false
@@ -38,7 +38,7 @@ struct ProductListDomain: ReducerProtocol {
     var sendOrder:  @Sendable ([CartItem]) async throws -> String
     var uuid: @Sendable () -> UUID
     
-    var body: some ReducerProtocol<State, Action> {
+    var body: some Reducer<State, Action> {
         Reduce { state, action in
             switch action {
             case .fetchProducts:
@@ -47,10 +47,10 @@ struct ProductListDomain: ReducerProtocol {
                 }
                 
                 state.dataLoadingStatus = .loading
-                return .task {
-                    await .fetchProductsResponse(
+                return .run { send in
+                    await send(.fetchProductsResponse(
                         TaskResult { try await fetchProducts() }
-                    )
+                    ))
                 }
             case .fetchProductsResponse(.success(let products)):
                 state.dataLoadingStatus = .success
@@ -75,15 +75,12 @@ struct ProductListDomain: ReducerProtocol {
                 case .dismissSuccessAlert:
                     resetProductsToZero(state: &state)
                     
-                    return .task {
-                        .closeCart
-                    }
+                    return .send(.closeCart)
+                    
                 case .cartItem(_, let action):
                     switch action {
                     case .deleteCartItem(let product):
-                        return .task {
-                            .resetProduct(product: product)
-                        }
+                        return .send(.resetProduct(product: product))
                     }
                 default:
                     return .none
@@ -136,7 +133,7 @@ struct ProductListDomain: ReducerProtocol {
     
     private func closeCart(
         state: inout State
-    ) -> EffectTask<Action> {
+    ) -> Effect<Action> {
         state.shouldOpenCart = false
         state.cartState = nil
         

@@ -8,7 +8,7 @@
 import Foundation
 import ComposableArchitecture
 
-struct RootDomain: ReducerProtocol {
+struct RootDomain: Reducer {
     struct State: Equatable {
         var selectedTab = Tab.products
         var productListState = ProductListDomain.State()
@@ -38,7 +38,21 @@ struct RootDomain: ReducerProtocol {
         uuid: { UUID() }
     )
     
-    var body: some ReducerProtocol<State, Action> {
+    static let demo = Self(
+        fetchProducts: APIClient.demo.fetchProducts,
+        sendOrder: APIClient.demo.sendOrder,
+        fetchUserProfile: APIClient.demo.fetchUserProfile,
+        uuid: { UUID() }
+    )
+    
+    static let dev = Self(
+        fetchProducts: APIClient.live.fetchProducts,
+        sendOrder: APIClient.live.sendOrder,
+        fetchUserProfile: APIClient.live.fetchUserProfile,
+        uuid: { UUID() }
+    )
+    
+    var body: some Reducer<State, Action> {
         Reduce { state, action in
             switch action {
             case .productList:

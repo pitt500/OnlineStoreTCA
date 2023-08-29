@@ -12,7 +12,7 @@ struct PlusMinusButton: View {
     let store: Store<AddToCartDomain.State, AddToCartDomain.Action>
     
     var body: some View {
-        WithViewStore(self.store) { viewStore in
+        WithViewStore(self.store, observe: { $0 }) { viewStore in
             HStack {
                 Button {
                     viewStore.send(.didTapMinusButton)
@@ -40,16 +40,5 @@ struct PlusMinusButton: View {
                 .buttonStyle(.plain)
             }
         }
-    }
-}
-
-struct PlusMinusButton_Previews: PreviewProvider {
-    static var previews: some View {
-        PlusMinusButton(
-            store: Store(
-                initialState: AddToCartDomain.State(),
-                reducer: AddToCartDomain()
-            )
-        )
     }
 }

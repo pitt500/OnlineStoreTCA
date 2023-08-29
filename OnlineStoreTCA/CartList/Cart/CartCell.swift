@@ -12,7 +12,7 @@ struct CartCell: View {
     let store: Store<CartItemDomain.State,CartItemDomain.Action>
     
     var body: some View {
-        WithViewStore(self.store) { viewStore in
+        WithViewStore(self.store, observe: { $0 }) { viewStore in
             VStack {
                 HStack {
                     AsyncImage(
@@ -67,20 +67,5 @@ struct CartCell: View {
             .font(.custom("AmericanTypewriter", size: 20))
             .padding([.bottom, .top], 10)
         }
-    }
-}
-
-struct CartCell_Previews: PreviewProvider {
-    static var previews: some View {
-        CartCell(
-            store: Store(
-                initialState: CartItemDomain.State(
-                    id: UUID(),
-                    cartItem: CartItem.sample.first!
-                ),
-                reducer: CartItemDomain()
-            )
-        )
-        .previewLayout(.fixed(width: 300, height: 300))
     }
 }

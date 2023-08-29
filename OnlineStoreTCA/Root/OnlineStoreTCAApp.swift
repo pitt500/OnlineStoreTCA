@@ -13,10 +13,9 @@ struct OnlineStoreTCAApp: App {
     var body: some Scene {
         WindowGroup {
             RootView(
-                store: Store(
-                    initialState: RootDomain.State(),
-                    reducer: RootDomain.live
-                )
+                store: Store(initialState: RootDomain.State(), reducer: {
+                    RootDomain.live
+                })
             )
         }
     }

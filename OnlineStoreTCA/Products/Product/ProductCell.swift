@@ -12,7 +12,7 @@ struct ProductCell: View {
     let store: Store<ProductDomain.State, ProductDomain.Action>
     
     var body: some View {
-        WithViewStore(self.store) { viewStore in
+        WithViewStore(self.store, observe: { $0 }) { viewStore in
             VStack {
                 AsyncImage(
                     url: URL(string: viewStore.product.imageString)
@@ -45,20 +45,5 @@ struct ProductCell: View {
             }
             .padding(20)
         }
-    }
-}
-
-struct ProductCell_Previews: PreviewProvider {
-    static var previews: some View {
-        ProductCell(
-            store: Store(
-                initialState: ProductDomain.State(
-                    id: UUID(),
-                    product: Product.sample[0]
-                ),
-                reducer: ProductDomain()
-            )
-        )
-        .previewLayout(.fixed(width: 300, height: 300))
     }
 }
