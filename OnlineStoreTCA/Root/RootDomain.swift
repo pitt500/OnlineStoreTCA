@@ -38,20 +38,6 @@ struct RootDomain: Reducer {
         uuid: { UUID() }
     )
     
-    static let demo = Self(
-        fetchProducts: APIClient.demo.fetchProducts,
-        sendOrder: APIClient.demo.sendOrder,
-        fetchUserProfile: APIClient.demo.fetchUserProfile,
-        uuid: { UUID() }
-    )
-    
-    static let dev = Self(
-        fetchProducts: APIClient.live.fetchProducts,
-        sendOrder: APIClient.live.sendOrder,
-        fetchUserProfile: APIClient.live.fetchUserProfile,
-        uuid: { UUID() }
-    )
-    
     var body: some Reducer<State, Action> {
         Reduce { state, action in
             switch action {
