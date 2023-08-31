@@ -71,3 +71,19 @@ struct ProductListView: View {
         }
     }
 }
+
+struct ProductListView_Previews: PreviewProvider {
+    static var previews: some View {
+        ProductListView(
+            store: Store(
+                initialState: ProductListDomain.State()
+            ) {
+                ProductListDomain(
+                    fetchProducts: { Product.sample },
+                    sendOrder: { _ in "OK" },
+                    uuid: { UUID() }
+                )
+            }
+        )
+    }
+}

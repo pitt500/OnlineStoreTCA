@@ -104,3 +104,20 @@ struct CartListView: View {
         }
     }
 }
+
+struct CartListView_Previews: PreviewProvider {
+    static var previews: some View {
+        CartListView(
+            store: Store(
+                initialState: CartListDomain.State(
+                    cartItems: IdentifiedArrayOf(
+                        uniqueElements: CartItem.sample.map {
+                            CartItemDomain.State(id: UUID(), cartItem: $0)
+                        }
+                    )
+                )) {
+                    CartListDomain(sendOrder: { _ in "OK" })
+                }
+        )
+    }
+}

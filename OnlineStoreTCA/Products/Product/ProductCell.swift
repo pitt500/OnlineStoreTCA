@@ -47,3 +47,18 @@ struct ProductCell: View {
         }
     }
 }
+
+struct ProductCell_Previews: PreviewProvider {
+    static var previews: some View {
+        ProductCell(
+            store: Store(
+                initialState: ProductDomain.State(
+                    id: UUID(),
+                    product: Product.sample[0]
+                )) {
+                    ProductDomain()
+                }
+        )
+        .previewLayout(.fixed(width: 300, height: 300))
+    }
+}

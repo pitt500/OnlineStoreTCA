@@ -42,3 +42,14 @@ struct PlusMinusButton: View {
         }
     }
 }
+
+struct PlusMinusButton_Previews: PreviewProvider {
+    static var previews: some View {
+        PlusMinusButton(
+            store: Store(
+                initialState: AddToCartDomain.State()) {
+                    AddToCartDomain()
+                }
+        )
+    }
+}

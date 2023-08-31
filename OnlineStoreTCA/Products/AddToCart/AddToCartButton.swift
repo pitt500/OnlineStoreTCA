@@ -30,3 +30,14 @@ struct AddToCartButton: View {
         }
     }
 }
+
+struct AddToCartButton_Previews: PreviewProvider {
+    static var previews: some View {
+        AddToCartButton(
+            store: Store(
+                initialState: AddToCartDomain.State()) {
+                    AddToCartDomain()
+                }
+        )
+    }
+}
