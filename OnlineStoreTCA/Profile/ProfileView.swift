@@ -12,7 +12,7 @@ struct ProfileView: View {
     let store: Store<ProfileDomain.State, ProfileDomain.Action>
     
     var body: some View {
-        WithViewStore(self.store) { viewStore in
+        WithViewStore(self.store, observe: { $0 }) { viewStore in
             NavigationView {
                 ZStack {
                     Form {

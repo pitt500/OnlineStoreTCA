@@ -8,15 +8,16 @@
 import Foundation
 import ComposableArchitecture
 
-struct CartListDomain: ReducerProtocol {
+struct CartListDomain: Reducer {
     struct State: Equatable {
         var dataLoadingStatus = DataLoadingStatus.notStarted
         var cartItems: IdentifiedArrayOf<CartItemDomain.State> = []
         var totalPrice: Double = 0.0
         var isPayButtonDisable = false
-        var confirmationAlert: AlertState<Action>?
-        var errorAlert: AlertState<Action>?
-        var successAlert: AlertState<Action>?
+        
+        @PresentationState var confirmationAlert: AlertState<Action>?
+        @PresentationState var errorAlert: AlertState<Action>?
+        @PresentationState var successAlert: AlertState<Action>?
         
         var totalPriceString: String {
             let roundedValue = round(totalPrice * 100) / 100.0
@@ -44,12 +45,12 @@ struct CartListDomain: ReducerProtocol {
     
     private func verifyPayButtonVisibility(
         state: inout State
-    ) -> EffectTask<Action> {
+    ) -> Effect<Action> {
         state.isPayButtonDisable = state.totalPrice == 0.0
         return .none
     }
     
-    var body: some ReducerProtocol<State, Action> {
+    var body: some Reducer<State, Action> {
         Reduce { state, action in
             switch action {
             case .didPressCloseButton:
@@ -58,7 +59,7 @@ struct CartListDomain: ReducerProtocol {
                 switch action {
                 case .deleteCartItem:
                     state.cartItems.remove(id: id)
-                    return EffectTask(value: .getTotalPrice)
+                    return .send(.getTotalPrice)
                 }
             case .getTotalPrice:
                 let items = state.cartItems.map { $0.cartItem }
@@ -116,12 +117,10 @@ struct CartListDomain: ReducerProtocol {
             case .didConfirmPurchase:
                 state.dataLoadingStatus = .loading
                 let items = state.cartItems.map { $0.cartItem }
-                return .task {
-                    await .didReceivePurchaseResponse(
-                        TaskResult{
-                            try await sendOrder(items)
-                        }
-                    )
+                return .run { send in
+                    await send(.didReceivePurchaseResponse(
+                        TaskResult { try await sendOrder(items) }
+                    ))
                 }
             }
         }

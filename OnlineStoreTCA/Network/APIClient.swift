@@ -48,4 +48,16 @@ extension APIClient {
         return profile
     }
   )
+    
+  static let demo = Self(
+    fetchProducts: {
+        return Product.sample
+    },
+    sendOrder: { cartItems in
+        return "Status: 200"
+    },
+    fetchUserProfile: {
+        return UserProfile.sample
+    }
+  )
 }

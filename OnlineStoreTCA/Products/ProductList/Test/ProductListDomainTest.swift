@@ -36,17 +36,15 @@ class ProductListDomainTest: XCTestCase {
                 imageString: "image2"
             ),
         ]
-        
-        let store = TestStore(
-            initialState: ProductListDomain.State(),
-            reducer: ProductListDomain(
+        let store = TestStore(initialState: ProductListDomain.State(), reducer: {
+            ProductListDomain(
                 fetchProducts: {
                     products
                 },
                 sendOrder: { _ in fatalError("unimplemented") },
                 uuid: { UUID.newUUIDForTest }
             )
-        )
+        })
         
         let productId1 = UUID(uuidString: "00000000-0000-0000-0000-000000000000")!
         let productId2 = UUID(uuidString: "00000000-0000-0000-0000-000000000001")!
@@ -64,8 +62,8 @@ class ProductListDomainTest: XCTestCase {
             ]
         )
         
-        await store.send(.fetchProducts) {
-            $0.dataLoadingStatus = .loading
+        await store.send(.fetchProducts) { send in
+            send.dataLoadingStatus = .loading
         }
         
         await store.receive(.fetchProductsResponse(.success(products))) {
@@ -76,16 +74,15 @@ class ProductListDomainTest: XCTestCase {
     
     func testFetchProductsFailure() async {
         let error = APIClient.Failure()
-        let store = TestStore(
-            initialState: ProductListDomain.State(),
-            reducer: ProductListDomain(
+        let store = TestStore(initialState: ProductListDomain.State()) {
+            ProductListDomain(
                 fetchProducts: {
                     throw error
                 },
                 sendOrder: { _ in fatalError("unimplemented") },
                 uuid: { UUID.newUUIDForTest }
             )
-        )
+        }
         
         await store.send(.fetchProducts) {
             $0.dataLoadingStatus = .loading
@@ -133,18 +130,15 @@ class ProductListDomainTest: XCTestCase {
             ]
         )
         
-        let store = TestStore(
-            initialState: ProductListDomain.State(
-                productList: identifiedProducts
-            ),
-            reducer: ProductListDomain(
+        let store = TestStore(initialState: ProductListDomain.State(productList: identifiedProducts)) {
+            ProductListDomain(
                 fetchProducts: {
                     fatalError("unimplemented")
                 },
                 sendOrder: { _ in fatalError("unimplemented") },
                 uuid: { UUID.newUUIDForTest }
             )
-        )
+        }
         
         await store.send(
             .product(
@@ -233,18 +227,15 @@ class ProductListDomainTest: XCTestCase {
             ]
         )
         
-        let store = TestStore(
-            initialState: ProductListDomain.State(
-                productList: identifiedProducts
-            ),
-            reducer: ProductListDomain(
+        let store = TestStore(initialState: ProductListDomain.State(productList: identifiedProducts)) {
+            ProductListDomain(
                 fetchProducts: {
                     fatalError("unimplemented")
                 },
                 sendOrder: { _ in fatalError("unimplemented") },
                 uuid: { UUID.newUUIDForTest }
             )
-        )
+        }
         
         let expectedCartState = CartListDomain.State(
             cartItems: IdentifiedArrayOf(

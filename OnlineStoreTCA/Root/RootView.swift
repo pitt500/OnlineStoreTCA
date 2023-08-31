@@ -12,7 +12,7 @@ struct RootView: View {
     let store: Store<RootDomain.State, RootDomain.Action>
     
     var body: some View {
-        WithViewStore(self.store) { viewStore in
+        WithViewStore(self.store, observe: { $0 }) { viewStore in
             TabView(
                 selection: viewStore.binding(
                     get: \.selectedTab,

@@ -12,7 +12,7 @@ struct AddToCartButton: View {
     let store: Store<AddToCartDomain.State, AddToCartDomain.Action>
     
     var body: some View {
-        WithViewStore(self.store) { viewStore in
+        WithViewStore(self.store, observe: { $0 }) { viewStore in
             if viewStore.count > 0 {
                 PlusMinusButton(store: self.store)
             } else {
@@ -35,9 +35,9 @@ struct AddToCartButton_Previews: PreviewProvider {
     static var previews: some View {
         AddToCartButton(
             store: Store(
-                initialState: AddToCartDomain.State(),
-                reducer: AddToCartDomain()
-            )
+                initialState: AddToCartDomain.State()) {
+                    AddToCartDomain()
+                }
         )
     }
 }
