@@ -8,11 +8,14 @@
 import Foundation
 import ComposableArchitecture
 
-struct ProductListDomain: ReducerProtocol {
+@Reducer
+struct ProductListDomain {
+    
+    @ObservableState
     struct State: Equatable {
         var dataLoadingStatus = DataLoadingStatus.notStarted
         var shouldOpenCart = false
-        var cartState: CartListDomain.State?
+        @Presents var cartState: CartListDomain.State?
         var productList: IdentifiedArrayOf<ProductDomain.State> = []
         
         var shouldShowError: Bool {
@@ -27,31 +30,23 @@ struct ProductListDomain: ReducerProtocol {
     enum Action: Equatable {
         case fetchProducts
         case fetchProductsResponse(TaskResult<[Product]>)
-        case setCartView(isPresented: Bool)
+        case showCart(PresentationAction<CartListDomain.Action>)
         case cart(CartListDomain.Action)
-        case product(id: ProductDomain.State.ID, action: ProductDomain.Action)
+        case products(IdentifiedActionOf<ProductDomain>)
         case resetProduct(product: Product)
         case closeCart
+        case goToCartButtonTapped
     }
     
     var fetchProducts:  @Sendable () async throws -> [Product]
     var sendOrder:  @Sendable ([CartItem]) async throws -> String
     var uuid: @Sendable () -> UUID
     
-    var body: some ReducerProtocol<State, Action> {
+    var body: some Reducer<State, Action> {
         Reduce { state, action in
             switch action {
             case .fetchProducts:
-                if state.dataLoadingStatus == .success || state.dataLoadingStatus == .loading {
-                    return .none
-                }
-                
-                state.dataLoadingStatus = .loading
-                return .task {
-                    await .fetchProductsResponse(
-                        TaskResult { try await fetchProducts() }
-                    )
-                }
+                return fetchProducts(state: &state)
             case .fetchProductsResponse(.success(let products)):
                 state.dataLoadingStatus = .success
                 state.productList = IdentifiedArrayOf(
@@ -72,17 +67,17 @@ struct ProductListDomain: ReducerProtocol {
                 switch action {
                 case .didPressCloseButton:
                     return closeCart(state: &state)
-                case .dismissSuccessAlert:
+                case .alert(.presented(.dismissSuccessAlert)):
                     resetProductsToZero(state: &state)
                     
-                    return .task {
-                        .closeCart
+                    return .run { send in
+                        await send(.closeCart)
                     }
-                case .cartItem(_, let action):
+                case .cartItems(.element(_, let action)):
                     switch action {
                     case .deleteCartItem(let product):
-                        return .task {
-                            .resetProduct(product: product)
+                        return .run { send in
+                            await send(.resetProduct(product: product))
                         }
                     }
                 default:
@@ -100,43 +95,30 @@ struct ProductListDomain: ReducerProtocol {
                 
                 state.productList[id: productStateId]?.addToCartState.count = 0
                 return .none
-            case .setCartView(let isPresented):
-                state.shouldOpenCart = isPresented
-                state.cartState = isPresented
-                ? CartListDomain.State(
-                    cartItems: IdentifiedArrayOf(
-                        uniqueElements: state
-                            .productList
-                            .compactMap { state in
-                                state.count > 0
-                                ? CartItemDomain.State(
-                                    id: uuid(),
-                                    cartItem: CartItem(
-                                        product: state.product,
-                                        quantity: state.count
-                                    )
-                                )
-                                : nil
-                            }
-                    )
-                )
-                : nil
+                
+            case .goToCartButtonTapped:
+                configureCartState(state: &state)
                 return .none
-            case .product:
+            case .showCart(.presented(.didPressCloseButton)):
+                state.cartState = nil
+                return .none
+            case .showCart:
+                return .none
+            case .products:
                 return .none
             }
         }
-        .forEach(\.productList, action: /ProductListDomain.Action.product(id:action:)) {
+        .forEach(\.productList, action: \.products) {
             ProductDomain()
         }
-        .ifLet(\.cartState, action: /ProductListDomain.Action.cart) {
+        .ifLet(\.cartState, action: \.cart) {
             CartListDomain(sendOrder: sendOrder)
         }
     }
     
     private func closeCart(
         state: inout State
-    ) -> EffectTask<Action> {
+    ) -> Effect<Action> {
         state.shouldOpenCart = false
         state.cartState = nil
         
@@ -148,6 +130,46 @@ struct ProductListDomain: ReducerProtocol {
     ) {
         for id in state.productList.map(\.id) {
             state.productList[id: id]?.count = 0
+        }
+    }
+    
+    private func configureCartState(
+        state: inout State
+    ) {
+        state.cartState = CartListDomain.State(
+            cartItems: IdentifiedArrayOf(
+                uniqueElements: state
+                    .productList
+                    .compactMap { state in
+                        state.count > 0
+                        ? CartItemDomain.State(
+                            id: uuid(),
+                            cartItem: CartItem(
+                                product: state.product,
+                                quantity: state.count
+                            )
+                        )
+                        : nil
+                    }
+            )
+        )
+    }
+    
+    private func fetchProducts(
+        state: inout State
+    ) -> Effect<Action> {
+        if state.dataLoadingStatus == .success || state.dataLoadingStatus == .loading {
+            return .none
+        }
+        
+        state.dataLoadingStatus = .loading
+        return .run { send in
+            do {
+                let products = try await fetchProducts()
+                await send(.fetchProductsResponse(.success(products)))
+            } catch {
+                await send(.fetchProductsResponse(.failure(error)))
+            }
         }
     }
 }

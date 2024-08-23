@@ -8,7 +8,9 @@
 import Foundation
 import ComposableArchitecture
 
-struct RootDomain: ReducerProtocol {
+@Reducer
+struct RootDomain {
+    @ObservableState
     struct State: Equatable {
         var selectedTab = Tab.products
         var productListState = ProductListDomain.State()
@@ -38,7 +40,7 @@ struct RootDomain: ReducerProtocol {
         uuid: { UUID() }
     )
     
-    var body: some ReducerProtocol<State, Action> {
+    var body: some Reducer<State, Action> {
         Reduce { state, action in
             switch action {
             case .productList:
@@ -50,14 +52,20 @@ struct RootDomain: ReducerProtocol {
                 return .none
             }
         }
-        Scope(state: \.productListState, action: /RootDomain.Action.productList) {
+        Scope(
+            state: \.productListState,
+            action: \.productList
+        ) {
             ProductListDomain(
                 fetchProducts: fetchProducts,
                 sendOrder: sendOrder,
                 uuid: uuid
             )
         }
-        Scope(state:  \.profileState, action: /RootDomain.Action.profile) {
+        Scope(
+            state:  \.profileState,
+            action: \.profile
+        ) {
             ProfileDomain(fetchUserProfile: fetchUserProfile)
         }
     }

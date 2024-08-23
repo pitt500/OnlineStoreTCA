@@ -9,37 +9,35 @@ import SwiftUI
 import ComposableArchitecture
 
 struct ProfileView: View {
-    let store: Store<ProfileDomain.State, ProfileDomain.Action>
+    let store: StoreOf<ProfileDomain>
     
     var body: some View {
-        WithViewStore(self.store) { viewStore in
-            NavigationView {
-                ZStack {
-                    Form {
-                        Section {
-                            Text(viewStore.profile.firstName.capitalized)
-                            +
-                            Text(" \(viewStore.profile.lastName.capitalized)")
-                        } header: {
-                            Text("Full name")
-                        }
-                        
-                        Section {
-                            Text(viewStore.profile.email)
-                        } header: {
-                            Text("Email")
-                        }
-                    }
-                    
-                    if viewStore.isLoading {
-                        ProgressView()
-                    }
-                }
-                .task {
-                    viewStore.send(.fetchUserProfile)
-                }
-                .navigationTitle("Profile")
+        NavigationView {
+            ZStack {
+//                Form {
+//                    Section {
+//                        Text(store.profile.firstName.capitalized)
+//                        +
+//                        Text(" \(store.profile.lastName.capitalized)")
+//                    } header: {
+//                        Text("Full name")
+//                    }
+//                    
+//                    Section {
+//                        Text(store.profile.email)
+//                    } header: {
+//                        Text("Email")
+//                    }
+//                }
+//                
+//                if store.isLoading {
+//                    ProgressView()
+//                }
             }
+            .task {
+                store.send(.fetchUserProfile)
+            }
+            .navigationTitle("Profile")
         }
     }
 }

@@ -8,7 +8,9 @@
 import Foundation
 import ComposableArchitecture
 
-struct ProductDomain: ReducerProtocol {
+@Reducer
+struct ProductDomain {
+    @ObservableState
     struct State: Equatable, Identifiable {
         let id: UUID
         let product: Product
@@ -24,8 +26,11 @@ struct ProductDomain: ReducerProtocol {
         case addToCart(AddToCartDomain.Action)
     }
     
-    var body: some ReducerProtocol<State, Action> {
-        Scope(state: \.addToCartState, action: /ProductDomain.Action.addToCart) {
+    var body: some Reducer<State, Action> {
+        Scope(
+            state: \.addToCartState,
+            action: \.addToCart
+        ) {
             AddToCartDomain()
         }
         Reduce { state, action in
