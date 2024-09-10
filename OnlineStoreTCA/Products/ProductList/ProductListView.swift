@@ -9,67 +9,66 @@ import SwiftUI
 import ComposableArchitecture
 
 struct ProductListView: View {
-    let store: StoreOf<ProductListDomain>
-    
-    var body: some View {
-			WithViewStore(self.store, observe: { $0 }) { viewStore in
-            NavigationView {
-                Group {
-                    if viewStore.isLoading {
-                        ProgressView()
-                            .frame(width: 100, height: 100)
-                    } else if viewStore.shouldShowError {
-                        ErrorView(
-                            message: "Oops, we couldn't fetch product list",
-                            retryAction: { viewStore.send(.fetchProducts) }
-                        )
-                        
-                    } else {
-                        List {
-                            ForEachStore(
-                                self.store.scope(
-                                    state: \.productList,
-                                    action: ProductListDomain.Action
-                                        .product(id: action:)
-                                )
-                            ) {
-                                ProductCell(store: $0)
-                            }
-                        }
-                    }
-                }
-                .task {
-                    viewStore.send(.fetchProducts)
-                }
-                .navigationTitle("Products")
-                .toolbar {
-                    ToolbarItem(placement: .navigationBarTrailing) {
-                        Button {
-                            viewStore.send(.setCartView(isPresented: true))
-                        } label: {
-                            Text("Go to Cart")
-                        }
-                    }
-                }
-                .sheet(
-                    isPresented: viewStore.binding(
-                        get: \.shouldOpenCart,
-                        send: ProductListDomain.Action.setCartView(isPresented:)
-                    )
-                ) {
-                    IfLetStore(
-                        self.store.scope(
-                            state: \.cartState,
-                            action: ProductListDomain.Action.cart
-                        )
-                    ) {
-                        CartListView(store: $0)
-                    }
-                }
-                
-            }
-        }
-    }
+	@Perception.Bindable var store: StoreOf<ProductListDomain>
+	
+	var body: some View {
+		WithPerceptionTracking {
+			NavigationView {
+				Group {
+					if store.isLoading {
+						ProgressView()
+							.frame(width: 100, height: 100)
+					} else if store.shouldShowError {
+						ErrorView(
+							message: "Oops, we couldn't fetch product list",
+							retryAction: { store.send(.fetchProducts) }
+						)
+						
+					} else {
+						List {
+							ForEach(
+								store.scope(
+									state: \.productList,
+									action: \.product
+								),
+								id: \.id
+							) { store in
+								WithPerceptionTracking {
+									ProductCell(store: store)
+								}
+							}
+						}
+					}
+				}
+				.task {
+					store.send(.fetchProducts)
+				}
+				.navigationTitle("Products")
+				.toolbar {
+					ToolbarItem(placement: .navigationBarTrailing) {
+						Button {
+							store.send(.setCartView(isPresented: true))
+						} label: {
+							Text("Go to Cart")
+						}
+					}
+				}
+				.sheet(
+					isPresented: $store.shouldOpenCart.sending(\.setCartView)
+				) {
+					if let store = self.store.scope(
+							state: \.cartState,
+							action: \.cart
+					) {
+						WithPerceptionTracking {
+							CartListView(store: store)
+						}
+					}
+				}
+				
+			}
+		}
+	}
 }
 
 struct ProductListView_Previews: PreviewProvider {

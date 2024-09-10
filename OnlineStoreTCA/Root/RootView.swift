@@ -9,21 +9,17 @@ import SwiftUI
 import ComposableArchitecture
 
 struct RootView: View {
-	let store: StoreOf<RootDomain>
+	@Perception.Bindable var store: StoreOf<RootDomain>
 	
 	var body: some View {
-		WithViewStore(self.store, observe: { $0 }) { viewStore in
+		WithPerceptionTracking {
 			TabView(
-				selection: viewStore.binding(
-					get: \.selectedTab,
-					send: RootDomain.Action.tabSelected
-				)
+				selection: $store.selectedTab.sending(\.tabSelected)
 			) {
 				ProductListView(
 					store: self.store.scope(
 						state: \.productListState,
-						action: RootDomain.Action
-							.productList
+						action: \.productList
 					)
 				)
 				.tabItem {
@@ -34,7 +30,7 @@ struct RootView: View {
 				ProfileView(
 					store: self.store.scope(
 						state: \.profileState,
-						action: RootDomain.Action.profile
+						action: \.profile
 					)
 				)
 				.tabItem {

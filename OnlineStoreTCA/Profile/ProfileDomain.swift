@@ -10,6 +10,7 @@ import ComposableArchitecture
 
 @Reducer
 struct ProfileDomain {
+	@ObservableState
 	struct State: Equatable {
 		var profile: UserProfile = .default
 		fileprivate var dataState = DataState.notStarted

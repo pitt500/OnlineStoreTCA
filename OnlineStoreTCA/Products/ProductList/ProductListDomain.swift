@@ -10,6 +10,7 @@ import ComposableArchitecture
 
 @Reducer
 struct ProductListDomain {
+	@ObservableState
 	struct State: Equatable {
 		var dataLoadingStatus = DataLoadingStatus.notStarted
 		var shouldOpenCart = false
@@ -30,7 +31,7 @@ struct ProductListDomain {
 		case fetchProductsResponse(TaskResult<[Product]>)
 		case setCartView(isPresented: Bool)
 		case cart(CartListDomain.Action)
-		case product(id: ProductDomain.State.ID, action: ProductDomain.Action)
+		case product(IdentifiedActionOf<ProductDomain>)
 		case resetProduct(product: Product)
 		case closeCart
 	}
@@ -124,7 +125,7 @@ struct ProductListDomain {
 					return .none
 			}
 		}
-		.forEach(\.productList, action: /ProductListDomain.Action.product(id:action:)) {
+		.forEach(\.productList, action: \.product) {
 			ProductDomain()
 		}
 		.ifLet(\.cartState, action: /ProductListDomain.Action.cart) {
