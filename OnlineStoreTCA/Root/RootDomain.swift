@@ -8,7 +8,8 @@
 import Foundation
 import ComposableArchitecture
 
-struct RootDomain: ReducerProtocol {
+@Reducer
+struct RootDomain {
     struct State: Equatable {
         var selectedTab = Tab.products
         var productListState = ProductListDomain.State()
@@ -26,19 +27,7 @@ struct RootDomain: ReducerProtocol {
         case profile(ProfileDomain.Action)
     }
     
-    var fetchProducts: @Sendable () async throws -> [Product]
-    var sendOrder:  @Sendable ([CartItem]) async throws -> String
-    var fetchUserProfile:  @Sendable () async throws -> UserProfile
-    var uuid: @Sendable () -> UUID
-    
-    static let live = Self(
-        fetchProducts: APIClient.live.fetchProducts,
-        sendOrder: APIClient.live.sendOrder,
-        fetchUserProfile: APIClient.live.fetchUserProfile,
-        uuid: { UUID() }
-    )
-    
-    var body: some ReducerProtocol<State, Action> {
+    var body: some ReducerOf<Self> {
         Reduce { state, action in
             switch action {
             case .productList:
@@ -50,15 +39,11 @@ struct RootDomain: ReducerProtocol {
                 return .none
             }
         }
-        Scope(state: \.productListState, action: /RootDomain.Action.productList) {
-            ProductListDomain(
-                fetchProducts: fetchProducts,
-                sendOrder: sendOrder,
-                uuid: uuid
-            )
+        Scope(state: \.productListState, action: \.productList) {
+            ProductListDomain()
         }
-        Scope(state:  \.profileState, action: /RootDomain.Action.profile) {
-            ProfileDomain(fetchUserProfile: fetchUserProfile)
+        Scope(state:  \.profileState, action: \.profile) {
+            ProfileDomain()
         }
     }
 }

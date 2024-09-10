@@ -9,10 +9,10 @@ import SwiftUI
 import ComposableArchitecture
 
 struct AddToCartButton: View {
-    let store: Store<AddToCartDomain.State, AddToCartDomain.Action>
+    let store: StoreOf<AddToCartDomain>
     
     var body: some View {
-        WithViewStore(self.store) { viewStore in
+			WithViewStore(self.store, observe: { $0 }) { viewStore in
             if viewStore.count > 0 {
                 PlusMinusButton(store: self.store)
             } else {
@@ -36,7 +36,7 @@ struct AddToCartButton_Previews: PreviewProvider {
         AddToCartButton(
             store: Store(
                 initialState: AddToCartDomain.State(),
-                reducer: AddToCartDomain()
+								reducer: { AddToCartDomain() }
             )
         )
     }

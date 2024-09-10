@@ -7,13 +7,27 @@
 
 import Foundation
 import ComposableArchitecture
+import DependenciesMacros
 
+extension DependencyValues {
+	var apiClient: APIClient {
+		get { self[APIClient.self] }
+		set { self[APIClient.self] = newValue }
+	}
+}
+
+
+@DependencyClient
 struct APIClient {
     var fetchProducts:  @Sendable () async throws -> [Product]
     var sendOrder:  @Sendable ([CartItem]) async throws -> String
     var fetchUserProfile:  @Sendable () async throws -> UserProfile
     
     struct Failure: Error, Equatable {}
+}
+
+extension APIClient: TestDependencyKey {
+	public static let testValue = Self()
 }
 
 // This is the "live" fact dependency that reaches into the outside world to fetch the data from network.

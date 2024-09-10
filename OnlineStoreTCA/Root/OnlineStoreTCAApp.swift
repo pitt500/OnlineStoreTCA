@@ -15,7 +15,7 @@ struct OnlineStoreTCAApp: App {
             RootView(
                 store: Store(
                     initialState: RootDomain.State(),
-                    reducer: RootDomain.live
+										reducer: { RootDomain() }
                 )
             )
         }

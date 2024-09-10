@@ -9,10 +9,10 @@ import SwiftUI
 import ComposableArchitecture
 
 struct ProfileView: View {
-    let store: Store<ProfileDomain.State, ProfileDomain.Action>
+    let store: StoreOf<ProfileDomain>
     
     var body: some View {
-        WithViewStore(self.store) { viewStore in
+        WithViewStore(self.store, observe: { $0 }) { viewStore in
             NavigationView {
                 ZStack {
                     Form {
@@ -45,11 +45,13 @@ struct ProfileView: View {
 }
 
 struct ProfileView_Previews: PreviewProvider {
-    static var previews: some View {
-        ProfileView(
-            store: Store(initialState: ProfileDomain.State()) {
-                ProfileDomain(fetchUserProfile: { .sample })
-            }
-        )
-    }
+	static var previews: some View {
+		ProfileView(
+			store: Store(initialState: ProfileDomain.State()) {
+				ProfileDomain()
+			} withDependencies: {
+				$0.apiClient.fetchUserProfile = { .sample }
+			}
+		)
+	}
 }
