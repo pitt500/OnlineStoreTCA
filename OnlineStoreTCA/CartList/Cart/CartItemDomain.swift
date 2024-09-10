@@ -10,6 +10,7 @@ import ComposableArchitecture
 
 @Reducer
 struct CartItemDomain {
+	@ObservableState
     struct State: Equatable, Identifiable {
         let id: UUID
         let cartItem: CartItem

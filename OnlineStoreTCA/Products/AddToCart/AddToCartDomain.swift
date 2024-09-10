@@ -10,23 +10,24 @@ import ComposableArchitecture
 
 @Reducer
 struct AddToCartDomain {
-    struct State: Equatable {
-        var count = 0
-    }
-    
-    enum Action: Equatable {
-        case didTapPlusButton
-        case didTapMinusButton
-    }
-    
-    func reduce(into state: inout State, action: Action) -> Effect<Action> {
-        switch action {
-        case .didTapPlusButton:
-            state.count += 1
-            return .none
-        case .didTapMinusButton:
-            state.count -= 1
-            return .none
-        }
-    }
+	@ObservableState
+	struct State: Equatable {
+		var count = 0
+	}
+	
+	enum Action: Equatable {
+		case didTapPlusButton
+		case didTapMinusButton
+	}
+	
+	func reduce(into state: inout State, action: Action) -> Effect<Action> {
+		switch action {
+			case .didTapPlusButton:
+				state.count += 1
+				return .none
+			case .didTapMinusButton:
+				state.count -= 1
+				return .none
+		}
+	}
 }
