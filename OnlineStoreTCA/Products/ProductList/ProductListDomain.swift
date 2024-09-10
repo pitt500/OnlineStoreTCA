@@ -75,11 +75,11 @@ struct ProductListDomain {
 					switch action {
 						case .didPressCloseButton:
 							return closeCart(state: &state)
-						case .dismissSuccessAlert:
+						case .alert(.presented(.dismissSuccessAlert)):
 							resetProductsToZero(state: &state)
 							
 							return .send(.closeCart)
-						case .cartItem(_, let action):
+						case .cartItem(.element(id: _, action: let action)):
 							switch action {
 								case .deleteCartItem(let product):
 									return .send(.resetProduct(product: product))
@@ -128,7 +128,7 @@ struct ProductListDomain {
 		.forEach(\.productList, action: \.product) {
 			ProductDomain()
 		}
-		.ifLet(\.cartState, action: /ProductListDomain.Action.cart) {
+		.ifLet(\.cartState, action: \.cart) {
 			CartListDomain()
 		}
 	}
