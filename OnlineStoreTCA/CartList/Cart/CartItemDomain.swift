@@ -10,7 +10,7 @@ import ComposableArchitecture
 
 @Reducer
 struct CartItemDomain {
-	@ObservableState
+    @ObservableState
     struct State: Equatable, Identifiable {
         let id: UUID
         let cartItem: CartItem
@@ -22,8 +22,8 @@ struct CartItemDomain {
     
     func reduce(into state: inout State, action: Action) -> Effect<Action> {
         switch action {
-        case .deleteCartItem:
-            return .none
+            case .deleteCartItem:
+                return .none
         }
     }
 }

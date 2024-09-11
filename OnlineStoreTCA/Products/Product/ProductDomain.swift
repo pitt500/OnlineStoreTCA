@@ -10,7 +10,7 @@ import ComposableArchitecture
 
 @Reducer
 struct ProductDomain {
-	@ObservableState
+    @ObservableState
     struct State: Equatable, Identifiable {
         let id: UUID
         let product: Product
@@ -32,11 +32,11 @@ struct ProductDomain {
         }
         Reduce { state, action in
             switch action {
-            case .addToCart(.didTapPlusButton):
-                return .none
-            case .addToCart(.didTapMinusButton):
-                state.addToCartState.count = max(0, state.addToCartState.count)
-                return .none
+                case .addToCart(.didTapPlusButton):
+                    return .none
+                case .addToCart(.didTapMinusButton):
+                    state.addToCartState.count = max(0, state.addToCartState.count)
+                    return .none
             }
         }
     }
