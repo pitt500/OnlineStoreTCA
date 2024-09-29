@@ -8,7 +8,9 @@
 import Foundation
 import ComposableArchitecture
 
-struct AddToCartDomain: ReducerProtocol {
+@Reducer
+struct AddToCartDomain {
+    @ObservableState
     struct State: Equatable {
         var count = 0
     }
@@ -18,14 +20,14 @@ struct AddToCartDomain: ReducerProtocol {
         case didTapMinusButton
     }
     
-    func reduce(into state: inout State, action: Action) -> EffectTask<Action> {
+    func reduce(into state: inout State, action: Action) -> Effect<Action> {
         switch action {
-        case .didTapPlusButton:
-            state.count += 1
-            return .none
-        case .didTapMinusButton:
-            state.count -= 1
-            return .none
+            case .didTapPlusButton:
+                state.count += 1
+                return .none
+            case .didTapMinusButton:
+                state.count -= 1
+                return .none
         }
     }
 }

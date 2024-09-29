@@ -9,13 +9,13 @@ import SwiftUI
 import ComposableArchitecture
 
 struct PlusMinusButton: View {
-    let store: Store<AddToCartDomain.State, AddToCartDomain.Action>
+    let store: StoreOf<AddToCartDomain>
     
     var body: some View {
-        WithViewStore(self.store) { viewStore in
+        WithPerceptionTracking {
             HStack {
                 Button {
-                    viewStore.send(.didTapMinusButton)
+                    store.send(.didTapMinusButton)
                 } label: {
                     Text("-")
                         .padding(10)
@@ -25,11 +25,11 @@ struct PlusMinusButton: View {
                 }
                 .buttonStyle(.plain)
                 
-                Text(viewStore.count.description)
+                Text(store.count.description)
                     .padding(5)
                 
                 Button {
-                    viewStore.send(.didTapPlusButton)
+                    store.send(.didTapPlusButton)
                 } label: {
                     Text("+")
                         .padding(10)
@@ -48,7 +48,7 @@ struct PlusMinusButton_Previews: PreviewProvider {
         PlusMinusButton(
             store: Store(
                 initialState: AddToCartDomain.State(),
-                reducer: AddToCartDomain()
+                reducer: { AddToCartDomain() }
             )
         )
     }

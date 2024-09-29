@@ -9,13 +9,13 @@ import SwiftUI
 import ComposableArchitecture
 
 struct ProductCell: View {
-    let store: Store<ProductDomain.State, ProductDomain.Action>
+    let store: StoreOf<ProductDomain>
     
     var body: some View {
-        WithViewStore(self.store) { viewStore in
+        WithPerceptionTracking {
             VStack {
                 AsyncImage(
-                    url: URL(string: viewStore.product.imageString)
+                    url: URL(string: store.product.imageString)
                 ) { image in
                     image
                         .resizable()
@@ -27,16 +27,16 @@ struct ProductCell: View {
                 }
                 
                 VStack(alignment: .leading) {
-                    Text(viewStore.product.title)
+                    Text(store.product.title)
                     HStack {
-                        Text("$\(viewStore.product.price.description)")
+                        Text("$\(store.product.price.description)")
                             .font(.custom("AmericanTypewriter", size: 25))
                             .fontWeight(.bold)
                         Spacer()
                         AddToCartButton(
                             store: self.store.scope(
                                 state: \.addToCartState,
-                                action: ProductDomain.Action.addToCart
+                                action: \.addToCart
                             )
                         )
                     }
@@ -56,7 +56,7 @@ struct ProductCell_Previews: PreviewProvider {
                     id: UUID(),
                     product: Product.sample[0]
                 ),
-                reducer: ProductDomain()
+                reducer: { ProductDomain() }
             )
         )
         .previewLayout(.fixed(width: 300, height: 300))

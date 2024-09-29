@@ -39,14 +39,11 @@ class ProductListDomainTest: XCTestCase {
         
         let store = TestStore(
             initialState: ProductListDomain.State(),
-            reducer: ProductListDomain(
-                fetchProducts: {
-                    products
-                },
-                sendOrder: { _ in fatalError("unimplemented") },
-                uuid: { UUID.newUUIDForTest }
-            )
-        )
+            reducer: { ProductListDomain() }
+        ) {
+            $0.apiClient.fetchProducts = { products }
+            $0.uuid = .incrementing
+        }
         
         let productId1 = UUID(uuidString: "00000000-0000-0000-0000-000000000000")!
         let productId2 = UUID(uuidString: "00000000-0000-0000-0000-000000000001")!
@@ -78,14 +75,11 @@ class ProductListDomainTest: XCTestCase {
         let error = APIClient.Failure()
         let store = TestStore(
             initialState: ProductListDomain.State(),
-            reducer: ProductListDomain(
-                fetchProducts: {
-                    throw error
-                },
-                sendOrder: { _ in fatalError("unimplemented") },
-                uuid: { UUID.newUUIDForTest }
-            )
-        )
+            reducer: { ProductListDomain() }
+        ) {
+            $0.apiClient.fetchProducts = { throw error }
+            $0.uuid = .incrementing
+        }
         
         await store.send(.fetchProducts) {
             $0.dataLoadingStatus = .loading
@@ -137,19 +131,14 @@ class ProductListDomainTest: XCTestCase {
             initialState: ProductListDomain.State(
                 productList: identifiedProducts
             ),
-            reducer: ProductListDomain(
-                fetchProducts: {
-                    fatalError("unimplemented")
-                },
-                sendOrder: { _ in fatalError("unimplemented") },
-                uuid: { UUID.newUUIDForTest }
-            )
-        )
+            reducer: { ProductListDomain() }
+        ) {
+            $0.uuid = .incrementing
+        }
         
         await store.send(
             .product(
-                id: id1,
-                action: .addToCart(.didTapPlusButton)
+                .element(id: id1, action: .addToCart(.didTapPlusButton))
             )
         ) {
             $0.productList[id: id1]?.addToCartState.count = 1
@@ -157,8 +146,7 @@ class ProductListDomainTest: XCTestCase {
         
         await store.send(
             .product(
-                id: id1,
-                action: .addToCart(.didTapPlusButton)
+                .element(id: id1, action: .addToCart(.didTapPlusButton))
             )
         ) {
             $0.productList[id: id1]?.addToCartState.count = 2
@@ -183,7 +171,7 @@ class ProductListDomainTest: XCTestCase {
             $0.cartState = expectedCartState
         }
         
-        await store.send(.cart(.dismissSuccessAlert)) {
+        await store.send(.cart(.alert(.presented(.dismissSuccessAlert)))) {
             $0.productList[id: id1]?.addToCartState.count = 0
         }
         
@@ -237,14 +225,10 @@ class ProductListDomainTest: XCTestCase {
             initialState: ProductListDomain.State(
                 productList: identifiedProducts
             ),
-            reducer: ProductListDomain(
-                fetchProducts: {
-                    fatalError("unimplemented")
-                },
-                sendOrder: { _ in fatalError("unimplemented") },
-                uuid: { UUID.newUUIDForTest }
-            )
-        )
+            reducer: { ProductListDomain() }
+        ) {
+            $0.uuid = .incrementing
+        }
         
         let expectedCartState = CartListDomain.State(
             cartItems: IdentifiedArrayOf(
@@ -267,8 +251,7 @@ class ProductListDomainTest: XCTestCase {
         await store.send(
             .cart(
                 .cartItem(
-                    id: id1,
-                    action: .deleteCartItem(product: products[0])
+                    .element(id: id1, action: .deleteCartItem(product: products[0]))
                 )
             )
         ) {

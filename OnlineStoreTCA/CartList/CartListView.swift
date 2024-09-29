@@ -9,35 +9,32 @@ import SwiftUI
 import ComposableArchitecture
 
 struct CartListView: View {
-    let store: Store<CartListDomain.State, CartListDomain.Action>
+    let store: StoreOf<CartListDomain>
     
     var body: some View {
-        WithViewStore(self.store) { viewStore in
+        WithPerceptionTracking {
             ZStack {
                 NavigationStack {
                     Group {
-                        if viewStore.cartItems.isEmpty {
+                        if store.cartItems.isEmpty {
                             Text("Oops, your cart is empty! \n")
                                 .font(.custom("AmericanTypewriter", size: 25))
                         } else {
                             List {
-                                ForEachStore(
-                                    self.store.scope(
-                                        state: \.cartItems,
-                                        action: CartListDomain.Action
-                                            .cartItem(id:action:)
-                                    )
-                                ) {
-                                    CartCell(store: $0)
+                                ForEach(
+                                    store.scope(state: \.cartItems, action: \.cartItem),
+                                    id: \.id
+                                ) { store in
+                                    CartCell(store: store)
                                 }
                             }
                             .safeAreaInset(edge: .bottom) {
                                 Button {
-                                    viewStore.send(.didPressPayButton)
+                                    store.send(.didPressPayButton)
                                 } label: {
                                     HStack(alignment: .center) {
                                         Spacer()
-                                        Text("Pay \(viewStore.totalPriceString)")
+                                        Text("Pay \(store.totalPriceString)")
                                             .font(.custom("AmericanTypewriter", size: 30))
                                             .foregroundColor(.white)
                                         
@@ -47,13 +44,13 @@ struct CartListView: View {
                                 }
                                 .frame(maxWidth: .infinity, minHeight: 60)
                                 .background(
-                                    viewStore.isPayButtonDisable
+                                    store.isPayButtonDisable
                                     ? .gray
                                     : .blue
                                 )
                                 .cornerRadius(10)
                                 .padding()
-                                .disabled(viewStore.isPayButtonDisable)
+                                .disabled(store.isPayButtonDisable)
                             }
                         }
                     }
@@ -61,38 +58,18 @@ struct CartListView: View {
                     .toolbar {
                         ToolbarItem(placement: .navigationBarLeading) {
                             Button {
-                                viewStore.send(.didPressCloseButton)
+                                store.send(.didPressCloseButton)
                             } label: {
                                 Text("Close")
                             }
                         }
                     }
                     .onAppear {
-                        viewStore.send(.getTotalPrice)
+                        store.send(.getTotalPrice)
                     }
-                    .alert(
-                        self.store.scope(
-                            state: \.confirmationAlert,
-                            action: { $0 } // context: https://github.com/pointfreeco/swift-composable-architecture/commit/da205c71ae72081647dfa1442c811a57181fb990
-                        ),
-                        dismiss: .didCancelConfirmation
-                    )
-                    .alert(
-                        self.store.scope(
-                            state: \.successAlert,
-                            action: { $0 }
-                        ),
-                        dismiss: .dismissSuccessAlert
-                    )
-                    .alert(
-                        self.store.scope(
-                            state: \.errorAlert,
-                            action: { $0 }
-                        ),
-                        dismiss: .dismissErrorAlert
-                    )
+                    .alert(store: store.scope(state: \.$alert, action: \.alert))
                 }
-                if viewStore.isRequestInProcess {
+                if store.isRequestInProcess {
                     Color.black.opacity(0.2)
                         .ignoresSafeArea()
                     ProgressView()
@@ -117,7 +94,10 @@ struct CartListView_Previews: PreviewProvider {
                             }
                     )
                 ),
-                reducer: CartListDomain(sendOrder: { _ in "OK" })
+                reducer: { CartListDomain() },
+                withDependencies: {
+                    $0.apiClient.sendOrder = { _ in "OK" }
+                }
             )
         )
     }

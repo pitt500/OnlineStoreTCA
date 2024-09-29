@@ -9,61 +9,60 @@ import SwiftUI
 import ComposableArchitecture
 
 struct ProductListView: View {
-    let store: Store<ProductListDomain.State,ProductListDomain.Action>
+    @Perception.Bindable var store: StoreOf<ProductListDomain>
     
     var body: some View {
-        WithViewStore(self.store) { viewStore in
+        WithPerceptionTracking {
             NavigationView {
                 Group {
-                    if viewStore.isLoading {
+                    if store.isLoading {
                         ProgressView()
                             .frame(width: 100, height: 100)
-                    } else if viewStore.shouldShowError {
+                    } else if store.shouldShowError {
                         ErrorView(
                             message: "Oops, we couldn't fetch product list",
-                            retryAction: { viewStore.send(.fetchProducts) }
+                            retryAction: { store.send(.fetchProducts) }
                         )
                         
                     } else {
                         List {
-                            ForEachStore(
-                                self.store.scope(
+                            ForEach(
+                                store.scope(
                                     state: \.productList,
-                                    action: ProductListDomain.Action
-                                        .product(id: action:)
-                                )
-                            ) {
-                                ProductCell(store: $0)
+                                    action: \.product
+                                ),
+                                id: \.id
+                            ) { store in
+                                WithPerceptionTracking {
+                                    ProductCell(store: store)
+                                }
                             }
                         }
                     }
                 }
                 .task {
-                    viewStore.send(.fetchProducts)
+                    store.send(.fetchProducts)
                 }
                 .navigationTitle("Products")
                 .toolbar {
                     ToolbarItem(placement: .navigationBarTrailing) {
                         Button {
-                            viewStore.send(.setCartView(isPresented: true))
+                            store.send(.setCartView(isPresented: true))
                         } label: {
                             Text("Go to Cart")
                         }
                     }
                 }
                 .sheet(
-                    isPresented: viewStore.binding(
-                        get: \.shouldOpenCart,
-                        send: ProductListDomain.Action.setCartView(isPresented:)
-                    )
+                    isPresented: $store.shouldOpenCart.sending(\.setCartView)
                 ) {
-                    IfLetStore(
-                        self.store.scope(
-                            state: \.cartState,
-                            action: ProductListDomain.Action.cart
-                        )
+                    if let store = self.store.scope(
+                        state: \.cartState,
+                        action: \.cart
                     ) {
-                        CartListView(store: $0)
+                        WithPerceptionTracking {
+                            CartListView(store: store)
+                        }
                     }
                 }
                 
@@ -78,11 +77,10 @@ struct ProductListView_Previews: PreviewProvider {
             store: Store(
                 initialState: ProductListDomain.State()
             ) {
-                ProductListDomain(
-                    fetchProducts: { Product.sample },
-                    sendOrder: { _ in "OK" },
-                    uuid: { UUID() }
-                )
+                ProductListDomain()
+            } withDependencies: {
+                $0.apiClient.fetchProducts = { Product.sample }
+                $0.apiClient.sendOrder = { _ in "OK" }
             }
         )
     }

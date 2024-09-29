@@ -9,15 +9,15 @@ import SwiftUI
 import ComposableArchitecture
 
 struct AddToCartButton: View {
-    let store: Store<AddToCartDomain.State, AddToCartDomain.Action>
+    let store: StoreOf<AddToCartDomain>
     
     var body: some View {
-        WithViewStore(self.store) { viewStore in
-            if viewStore.count > 0 {
+        WithPerceptionTracking {
+            if store.count > 0 {
                 PlusMinusButton(store: self.store)
             } else {
                 Button {
-                    viewStore.send(.didTapPlusButton)
+                    store.send(.didTapPlusButton)
                 } label: {
                     Text("Add to Cart")
                         .padding(10)
@@ -36,7 +36,7 @@ struct AddToCartButton_Previews: PreviewProvider {
         AddToCartButton(
             store: Store(
                 initialState: AddToCartDomain.State(),
-                reducer: AddToCartDomain()
+                reducer: { AddToCartDomain() }
             )
         )
     }

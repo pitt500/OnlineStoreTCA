@@ -9,34 +9,34 @@ import SwiftUI
 import ComposableArchitecture
 
 struct ProfileView: View {
-    let store: Store<ProfileDomain.State, ProfileDomain.Action>
+    let store: StoreOf<ProfileDomain>
     
     var body: some View {
-        WithViewStore(self.store) { viewStore in
+        WithPerceptionTracking {
             NavigationView {
                 ZStack {
                     Form {
                         Section {
-                            Text(viewStore.profile.firstName.capitalized)
+                            Text(store.profile.firstName.capitalized)
                             +
-                            Text(" \(viewStore.profile.lastName.capitalized)")
+                            Text(" \(store.profile.lastName.capitalized)")
                         } header: {
                             Text("Full name")
                         }
                         
                         Section {
-                            Text(viewStore.profile.email)
+                            Text(store.profile.email)
                         } header: {
                             Text("Email")
                         }
                     }
                     
-                    if viewStore.isLoading {
+                    if store.isLoading {
                         ProgressView()
                     }
                 }
                 .task {
-                    viewStore.send(.fetchUserProfile)
+                    store.send(.fetchUserProfile)
                 }
                 .navigationTitle("Profile")
             }
@@ -48,7 +48,9 @@ struct ProfileView_Previews: PreviewProvider {
     static var previews: some View {
         ProfileView(
             store: Store(initialState: ProfileDomain.State()) {
-                ProfileDomain(fetchUserProfile: { .sample })
+                ProfileDomain()
+            } withDependencies: {
+                $0.apiClient.fetchUserProfile = { .sample }
             }
         )
     }

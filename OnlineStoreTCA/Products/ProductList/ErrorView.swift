@@ -29,7 +29,7 @@ struct ErrorView: View {
             .background(.blue)
             .cornerRadius(10)
             .padding()
-
+            
         }
     }
 }
@@ -40,6 +40,6 @@ struct ErrorView_Previews: PreviewProvider {
             message: "Oops, we couldn't fetch product list",
             retryAction: {}
         )
-            
+        
     }
 }

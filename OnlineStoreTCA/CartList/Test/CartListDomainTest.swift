@@ -36,15 +36,12 @@ class CartListDomainTest: XCTestCase {
         
         let store = TestStore(
             initialState: CartListDomain.State(cartItems: cartItems),
-            reducer: CartListDomain(
-                sendOrder: { _ in fatalError("unimplemented") }
-            )
+            reducer: { CartListDomain() }
         )
         
         await store.send(
             .cartItem(
-                id: cartItemId1,
-                action: .deleteCartItem(product: Product.sample[0])
+                .element(id: cartItemId1, action: .deleteCartItem(product: Product.sample[0]))
             )
         ) {
             $0.cartItems = [
@@ -88,15 +85,12 @@ class CartListDomainTest: XCTestCase {
         
         let store = TestStore(
             initialState: CartListDomain.State(cartItems: cartItems),
-            reducer: CartListDomain(
-                sendOrder: { _ in fatalError("unimplemented") }
-            )
+            reducer: { CartListDomain() }
         )
         
         await store.send(
             .cartItem(
-                id: cartItemId1,
-                action: .deleteCartItem(product: Product.sample[0])
+                .element(id: cartItemId1, action: .deleteCartItem(product: Product.sample[0]))
             )
         ) {
             $0.cartItems = [
@@ -117,13 +111,12 @@ class CartListDomainTest: XCTestCase {
         
         await store.send(
             .cartItem(
-                id: cartItemId2,
-                action: .deleteCartItem(product: Product.sample[1])
+                .element(id: cartItemId2, action: .deleteCartItem(product: Product.sample[1]))
             )
         ) {
             $0.cartItems = []
         }
-
+        
         await store.receive(.getTotalPrice) {
             $0.totalPrice = 0
             $0.isPayButtonDisable = true
@@ -155,25 +148,19 @@ class CartListDomainTest: XCTestCase {
         
         let store = TestStore(
             initialState: CartListDomain.State(cartItems: cartItems),
-            reducer: CartListDomain(
-                sendOrder: { _ in "Success" }
-            )
-        )
+            reducer: { CartListDomain() }
+        ) {
+            $0.apiClient.sendOrder = { _ in "Success" }
+        }
         
-        await store.send(.didConfirmPurchase) {
+        await store.send(.alert(.presented(.didConfirmPurchase))) {
             $0.dataLoadingStatus = .loading
         }
         
         
         await store.receive(.didReceivePurchaseResponse(.success("Success"))) {
             $0.dataLoadingStatus = .success
-            $0.successAlert = AlertState(
-                title: TextState("Thank you!"),
-                message: TextState("Your order is in process."),
-                buttons: [
-                    .default(TextState("Done"), action: .send(.dismissSuccessAlert))
-                ]
-            )
+            $0.alert = .successAlert
         }
     }
     
@@ -201,25 +188,19 @@ class CartListDomainTest: XCTestCase {
         
         let store = TestStore(
             initialState: CartListDomain.State(cartItems: cartItems),
-            reducer: CartListDomain(
-                sendOrder: { _ in throw APIClient.Failure() }
-            )
-        )
+            reducer: { CartListDomain() }
+        ) {
+            $0.apiClient.sendOrder = { _ in throw APIClient.Failure() }
+        }
         
-        await store.send(.didConfirmPurchase) {
+        await store.send(.alert(.presented(.didConfirmPurchase))) {
             $0.dataLoadingStatus = .loading
         }
         
         
         await store.receive(.didReceivePurchaseResponse(.failure(APIClient.Failure()))) {
             $0.dataLoadingStatus = .error
-            $0.errorAlert = AlertState(
-                title: TextState("Oops!"),
-                message: TextState("Unable to send order, try again later."),
-                buttons: [
-                    .default(TextState("Done"), action: .send(.dismissErrorAlert))
-                ]
-            )
+            $0.alert = .errorAlert
         }
     }
 }
