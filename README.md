@@ -25,6 +25,8 @@ The purpose of this demo is to provide an introduction to the main concepts of T
 * [Side Effects](#side-effects)
     * [Network Calls](#network-calls)
 * [Testing](#testing)
+    * [Basics](#testing-basics)
+    * [Side Effects](#testing-side-effects)
 * [Other Topics](#other-topics)
     * [Opening Modal Views](#opening-modal-views)
     * [Optional States](#optional-states)
@@ -183,7 +185,7 @@ ContentView(
 
 If you want to learn more about the basics, check out the following [video](https://youtu.be/SfFDj6qT-xg)
 
-> Note: The videos shared here were made using the legacy version of TCA with Environment and without `ReducerProtocol`. If you want to see the legacy version of TCA, check out this [branch](https://github.com/pitt500/OnlineStoreTCA/tree/legacy-tca-with-environment).
+> Note: The videos shared here were made using the legacy version of TCA with Environment and without `Reducer`. If you want to see the legacy version of TCA, check out this [branch](https://github.com/pitt500/OnlineStoreTCA/tree/legacy-tca-with-environment).
 
 ## Composition
 
@@ -198,7 +200,7 @@ In the previous example, we demonstrated the usage of `reduce(into:action:)` to 
 
 For larger components, we can leverage the `body` property provided by the `Reducer`. This property enables you to combine multiple reducers, facilitating the creation of more comprehensive components. By utilizing the `body` property, you can effectively compose and manage the state mutations of these larger components.
 ```swift
-var body: some Reducer<State, Action> {
+var body: some ReducerOf<Self> {
     ChildReducer1()
     Reduce { state, action in
         switch action {
@@ -293,11 +295,11 @@ In this particular example, instead of using a regular array, TCA requires a lis
 @Reducer
 struct ProductListDomain {
     struct State: Equatable {
-        var productList: IdentifiedArrayOf<ProductDomain.State> = []
+        var products: IdentifiedArrayOf<ProductDomain.State> = []
         // ...    
     }
     enum Action: Equatable {
-        case product(IdentifiedActionOf<ProductDomain>)
+        case products(IdentifiedActionOf<ProductDomain>)
     }
 }
 ```
@@ -311,11 +313,11 @@ The `forEach` operator functions similarly to the [`Scope`](#scope-in-reducers) 
 struct ProductListDomain {
     // State and Actions ...
     
-    var body: some ReducerProtocol<State, Action> {
+    var body: some ReducerOf<Self> {
         Reduce { state, action in
             // Parent Reducer...
         }
-        .forEach(\.productList, action: \.product) {
+        .forEach(\.products, action: \.products) {
             ProductDomain()
         }
     }
@@ -323,12 +325,14 @@ struct ProductListDomain {
 ```
 
 Subsequently, in the user interface, we employ SwiftUI `ForEach` modifier and `store.scope` to iterate through all the (`Product`) states and actions. This enables us to send actions to the corresponding cell and modify its state accordingly.
+
+Remember that `WithPerceptionTracking` is not necessary when you are in iOS 17 and above.
 ```swift
 List {
     ForEach(
         self.store.scope(
-            state: \.productList,
-            action: \.product
+            state: \.products,
+            action: \.products
         ),
         id: \.id
     ) {
@@ -347,7 +351,8 @@ In previous iterations of TCA, `Environment` played a crucial role in consolidat
 With the introduction of the [`Reducer`](https://www.pointfree.co/blog/posts/81-announcing-the-reducer-protocol), we have eliminated the concept of `Environment`. As a result, dependencies now reside directly within the domain.
 
 ```swift
-struct ProductListDomain: ReducerProtocol {
+@Reducer
+struct ProductListDomain {
     // State ...
 
     // Actions...
@@ -440,7 +445,67 @@ struct ProductListDomain {
 
 ## Testing
 
-TBD
+### Testing Basics
+
+Testing is a crucial part of software development. TCA has its own tools to test reducers in a very simple way.
+
+When you test a reducer, you will use TestStore class passing an initial state and a reducer like Store you are using in production code.
+
+Next, you can send an action but, in this case, send receive a closure that you need to expect the result of this action. For example, when you send increseCounter action, you expect that count is equal to 1.
+
+Finally, you send a decreaseCounter and the expectation of this action is count state equal to 0 because previously count was setted to 1.
+
+```swift
+@MainActor
+class CounterDomainTest: XCTestCase {
+    func testHappyPath() {
+        let store = TestStore(
+            initialState: CounterDomain.State(),
+            reducer: { CounterDomain() }
+        )
+
+        await store.send(.increaseCounter) {
+            $0.count = 1
+        }
+
+        await store.send(.decreaseCounter) {
+            $0.count = 0
+        }
+    }
+}
+```
+
+### Testing Side effects
+
+The last topic is testing with side effects.
+
+The first thing is the ability to mock every side effect of the system. To do that TestStore has a closure for this purpose.
+
+Notice that `fetchProducts` has a side effect. When it finishes, send an action back to the system, in this case, with `fetchProductsResponse`. When you test this, you will use `store.receive` for response actions.
+
+```swift
+@MainActor
+class ProductListDomainTest: XCTestCase {
+    func testSideEffects() {
+        let products: [Product] = ...
+        let store = TestStore(
+            initialState: ProductListDomain.State(),
+            reducer: { ProductListDomain() }
+        ) {
+            $0.apiClient.fetchProducts = { products }
+        }
+
+         await store.send(.fetchProducts) {
+            $0.dataLoadingStatus = .loading
+        }
+        
+        await store.receive(.fetchProductsResponse(.success(products))) {
+            $0.products = products
+            $0.dataLoadingStatus = .success
+        }
+    }
+}
+```
 
 ## Other topics
 
