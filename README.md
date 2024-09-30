@@ -67,21 +67,11 @@ Consider the following implementation of a simple app using TCA, where you will 
 
 Here's an example of how this app would be coded with TCA:
 
-1. A struct that will represent the domain of the feature. This struct must conform `ReducerProtocol` protocol and providing `State` struct, `Action` enum and `reduce` method.
+1. A struct that will represent the domain of the feature using the @Reducer macro. In the past, the reducer needed an state, an action and reduce method but now, it is not a requirement.
 
 ```swift
-struct CounterDomain: ReducerProtocol {
-    struct State {
-        // State of the feature
-    }
-
-    enum Action {
-        // actions that use can do in the app
-    }
-    
-    func reduce(into state: inout State, action: Action) -> EffectTask<Action> {
-        // Method that will mutate the state given an action.
-    }
+@Reducer
+struct CounterDomain {
 }
 ```
 
@@ -89,8 +79,11 @@ struct CounterDomain: ReducerProtocol {
 <img src="./Images/viewDemo1.png" width="30%" height="30%">
 
 ```swift
-struct State: Equatable {
-    var counter = 0
+@Reducer
+struct CounterDomain {
+    struct State: Equatable {
+        var counter = 0
+    }
 }
 ```
 
@@ -98,23 +91,39 @@ struct State: Equatable {
 <img src="./Images/actionDemo1.png" width="30%" height="30%">
 
 ```swift
-enum Action: Equatable {
-    case increaseCounter
-    case decreaseCounter
+@Reducer
+struct CounterDomain {
+    struct State: Equatable {
+        var counter = 0
+    }
+    enum Action: Equatable {
+        case increaseCounter
+        case decreaseCounter
+    }
 }
 ```
 
-4. The action will be received by the reducer and proceed to mutate the state. Reducer MUST also return an effect, that represent logic from the "outside world" (network calls, notifications, database, etc). If no effect is needed, just return `EffectTask.none` .
+4. The action will be received by the reducer and proceed to mutate the state. Reducer MUST also return an effect, that represent logic from the "outside world" (network calls, notifications, database, etc). If no effect is needed, just return `Effect.none` .
 
 ```swift
-func reduce(into state: inout State, action: Action) -> EffectTask<Action> {
-    switch action {
-    case .increaseCounter:
-        state.counter += 1
-        return .none
-    case .decreaseCounter:
-        state.counter -= 1
-        return .none
+@Reducer
+struct CounterDomain {
+    struct State: Equatable {
+        var counter = 0
+    }
+    enum Action: Equatable {
+        case increaseCounter
+        case decreaseCounter
+    }
+    func reduce(into state: inout State, action: Action) -> Effect<Action> {
+        switch action {
+        case .increaseCounter:
+            state.counter += 1
+            return .none
+        case .decreaseCounter:
+            state.counter -= 1
+            return .none
+        }
     }
 }
 ```
@@ -122,17 +131,17 @@ func reduce(into state: inout State, action: Action) -> EffectTask<Action> {
 5. Once the mutation is done and the reducer returned the effect, the view will render the update in the screen. 
 <img src="./Images/viewUpdateDemo1.png" width="30%" height="30%">
 
-7. To observe state changes in TCA, we need an object called `viewStore`, that in this example is wrapped within WithViewStore view. We can send an action from the view to the store using `viewStore.send()` and an `Action` value.
+7. To observe state changes in TCA, use directly store. If you are using a previous version than iOS 17, you need to use WithPerceptionTracking. We can send an action from the view to the store using `store.send()` and an `Action` value.
 
 ```swift
 struct ContentView: View {
-    let store: Store<State, Action>
+    let store: StoreOf<CounterDomain>
 
     var body: some View {
-        WithViewStore(self.store) { viewStore in
+        WithPerceptionTracking {
             HStack {
                 Button {
-                    viewStore.send(.decreaseCounter)
+                    store.send(.decreaseCounter)
                 } label: {
                     Text("-")
                         .padding(10)
@@ -142,11 +151,11 @@ struct ContentView: View {
                 }
                 .buttonStyle(.plain)
 
-                Text(viewStore.counter.description)
+                Text(store.counter.description)
                     .padding(5)
 
                 Button {
-                    viewStore.send(.increaseCounter)
+                    store.send(.increaseCounter)
                 } label: {
                     Text("+")
                         .padding(10)
@@ -167,7 +176,7 @@ struct ContentView: View {
 ContentView(
     store: Store(
         initialState: CounterDomain.State(),
-        reducer: CounterDomain()
+        reducer: { CounterDomain() }
     )
 )
 ```
@@ -187,9 +196,9 @@ We started with a simple button counter, then we add an extra state to display t
 ### Body to compose multiple Reducers
 In the previous example, we demonstrated the usage of `reduce(into:action:)` to create our reducer function and define how state will be modified for each action. However, it's important to note that this method is suitable only for leaf components, which refer to the smallest components in your application.
 
-For larger components, we can leverage the `body` property provided by the `ReducerProtocol`. This property enables you to combine multiple reducers, facilitating the creation of more comprehensive components. By utilizing the `body` property, you can effectively compose and manage the state mutations of these larger components.
+For larger components, we can leverage the `body` property provided by the `Reducer`. This property enables you to combine multiple reducers, facilitating the creation of more comprehensive components. By utilizing the `body` property, you can effectively compose and manage the state mutations of these larger components.
 ```swift
-var body: some ReducerProtocol<State, Action> {
+var body: some Reducer<State, Action> {
     ChildReducer1()
     Reduce { state, action in
         switch action {
@@ -207,7 +216,7 @@ var body: some ReducerProtocol<State, Action> {
 
 The `Reduce` closure will always encapsulate the logic from the parent domain. To understand how to combine additional components, please continue reading below.
 
-> Compared to the previous version of TCA without `ReducerProtocol`, the order of child reducers will not affect the result. Parent Reducer (`Reduce`) will be always executed at the end.
+> Compared to the previous version of TCA without `Reducer`, the order of child reducers will not affect the result. Parent Reducer (`Reduce`) will be always executed at the end.
 
 ### Single state operators
 
@@ -218,17 +227,19 @@ For single states (all except collections/lists), TCA provides operators to glue
 For example, the `ProductDomain` below contains two properties as part of its state: `product` and `addToCartState`.
 
 ```swift
-struct ProductDomain: ReducerProtocol {
+@Reducer
+struct ProductDomain {
     struct State: Equatable, Identifiable {
         let product: Product
-        var addToCartState = AddToCartDomain.State()
+        var addToCart = AddToCartDomain.State()
     }
     // ...
 ```
 
 Furthermore, we utilize an action with an associated value that encapsulates all actions from the child domain, providing a comprehensive and cohesive approach.
 ```swift
-struct ProductDomain: ReducerProtocol {
+@Reducer
+struct ProductDomain {
     // State ...
 
     enum Action {
@@ -241,15 +252,15 @@ Let's consider the scenario where we need to configure the `ProductCell` view be
 
 ```swift
 struct ProductCell: View {
-    let store: Store<ProductDomain.State, ProductDomain.Action>
+    let store: StoreOf<ProductDomain>
     
     var body: some View {
-        WithViewStore(self.store) { viewStore in
+        WithPerceptionTracking {
             // More views here ...
             AddToCartButton(
                 store: self.store.scope(
-                    state: \.addToCartState,
-                    action: ProductDomain.Action.addToCart
+                    state: \.addToCart,
+                    action: \.addToCart
                 )
             )
         }
@@ -260,8 +271,8 @@ By employing this approach, the `AddToCartDomain` will solely possess knowledge 
 #### Scope in Reducers
 `Scope` is utilized within the `body` to seamlessly transform the child reducer (`AddToCart`) into a compatible form that aligns with the parent reducer (`Product`). This allows for smooth integration and interaction between the two.
 ```swift
-var body: some ReducerProtocol<State, Action> {
-    Scope(state: \.addToCartState, action: /ProductDomain.Action.addToCart) {
+var body: some ReducerOf<Self> {
+    Scope(state: \.addToCart, action: \.addToCart) {
         AddToCartDomain()
     }
     Reduce { state, action in
@@ -279,12 +290,15 @@ Are you looking to manage a collection of states? TCA offers excellent support f
 
 In this particular example, instead of using a regular array, TCA requires a list of (`Product`) states, which can be achieved by utilizing `IdentifiedArray`:
 ```swift
-struct ProductListDomain: ReducerProtocol {
+@Reducer
+struct ProductListDomain {
     struct State: Equatable {
         var productList: IdentifiedArrayOf<ProductDomain.State> = []
         // ...    
     }
-    // ...
+    enum Action: Equatable {
+        case product(IdentifiedActionOf<ProductDomain>)
+    }
 }
 ```
 
@@ -293,34 +307,34 @@ struct ProductListDomain: ReducerProtocol {
 The `forEach` operator functions similarly to the [`Scope`](#scope-in-reducers) operator, with the distinction that it operates on a collection of states. It effectively transforms the child reducers into compatible forms that align with the parent reducer.
 
 ```swift
-struct ProductListDomain: ReducerProtocol {
+@Reducer
+struct ProductListDomain {
     // State and Actions ...
     
     var body: some ReducerProtocol<State, Action> {
         Reduce { state, action in
             // Parent Reducer...
         }
-        .forEach(
-            \.productList, 
-            action: /ProductListDomain.Action.product(id:action:)
-        ) {
+        .forEach(\.productList, action: \.product) {
             ProductDomain()
         }
     }
 }
 ```
 
-Subsequently, in the user interface, we employ `ForEachStore` and `store.scope` to iterate through all the (`Product`) states and actions. This enables us to send actions to the corresponding cell and modify its state accordingly.
+Subsequently, in the user interface, we employ SwiftUI `ForEach` modifier and `store.scope` to iterate through all the (`Product`) states and actions. This enables us to send actions to the corresponding cell and modify its state accordingly.
 ```swift
 List {
-    ForEachStore(
+    ForEach(
         self.store.scope(
-            state: \.productListState,
-            action: ProductListDomain.Action
-                .product(id: action:)
-        )
+            state: \.productList,
+            action: \.product
+        ),
+        id: \.id
     ) {
-        ProductCell(store: $0)
+        WithPerceptionTracking {
+            ProductCell(store: $0)
+        }
     }
 }
 ```
@@ -330,7 +344,7 @@ List {
 ## Dependencies
 In previous iterations of TCA, `Environment` played a crucial role in consolidating all the dependencies utilized by a domain.
 
-With the introduction of the [`ReducerProtocol`](https://www.pointfree.co/blog/posts/81-announcing-the-reducer-protocol), we have eliminated the concept of `Environment`. As a result, dependencies now reside directly within the domain.
+With the introduction of the [`Reducer`](https://www.pointfree.co/blog/posts/81-announcing-the-reducer-protocol), we have eliminated the concept of `Environment`. As a result, dependencies now reside directly within the domain.
 
 ```swift
 struct ProductListDomain: ReducerProtocol {
@@ -349,7 +363,8 @@ struct ProductListDomain: ReducerProtocol {
 Nevertheless, we have the option to leverage the [Dependencies Framework](https://github.com/pointfreeco/swift-dependencies) to achieve a more enhanced approach in managing our dependencies:
 
 ```swift
-struct ProductListDomain: ReducerProtocol {
+@Reducer
+struct ProductListDomain {
     // State ...
 
     // Actions...
@@ -365,19 +380,20 @@ struct ProductListDomain: ReducerProtocol {
 > If you want to learn more about how Environment object works on TCA, take a look to this [video](https://youtu.be/sid-zfggYhQ?list=PLHWvYoDHvsOVo4tklgLW1g7gy4Kmk4kjw&t=103)
 
 ## Side Effects
-A side effect refers to an observable change that arises when executing a function or method. This encompasses actions such as modifying state outside the function, performing I/O operations to a file or making network requests. TCA facilitates the encapsulation of such side effects through the use of `EffectTask` objects.
+A side effect refers to an observable change that arises when executing a function or method. This encompasses actions such as modifying state outside the function, performing I/O operations to a file or making network requests. TCA facilitates the encapsulation of such side effects through the use of `Effect` objects.
 
 <img src="./Images/sideEffects1.png" width="80%" height="80%">
 
 > If you want to learn more about side effects, check out this [video](https://youtu.be/t3HHam3GYkU)
 
 ### Network calls
-Network calls are a fundamental aspect of mobile development, and TCA offers robust tools to handle them efficiently. As network calls are considered external interactions or [side effects](#side-effects), TCA utilizes the `EffectTask` object to encapsulate these calls. Specifically, network calls are encapsulated within the `EffectTask.task` construct, allowing for streamlined management of asynchronous operations within the TCA framework.
+Network calls are a fundamental aspect of mobile development, and TCA offers robust tools to handle them efficiently. As network calls are considered external interactions or [side effects](#side-effects), TCA utilizes the `Effect` object to encapsulate these calls. Specifically, network calls are encapsulated within the `Effect.task` construct, allowing for streamlined management of asynchronous operations within the TCA framework.
 
 However, it's important to note that the task operator alone is responsible for making the web API call. To obtain the actual response, an additional action needs to be implemented, which will capture and store the result within a `TaskResult` object.
 
 ```swift
-struct ProductListDomain: ReducerProtocol {
+@Reducer
+struct ProductListDomain {
     // State and more ...
     
     enum Action: Equatable {
@@ -385,8 +401,8 @@ struct ProductListDomain: ReducerProtocol {
         case fetchProductsResponse(TaskResult<[Product]>)
     }
    
-    var fetchProducts: () async throws -> [Product]
-    var uuid: () -> UUID
+    @Dependency(\.apiClient.fetchProducts) var fetchProducts
+    @Dependency(\.uuid) var uuid
     
     var body: some ReducerProtocol<State, Action> {
         // Other child reducers...
@@ -396,7 +412,7 @@ struct ProductListDomain: ReducerProtocol {
                 return .task {
                     // Just making the call 
                     await .fetchProductsResponse(
-                        TaskResult { try await fetchProducts() }
+                        TaskResult { try await self.fetchProducts() }
                     )
                 }
             case .fetchProductsResponse(.success(let products)):
