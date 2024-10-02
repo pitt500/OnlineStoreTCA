@@ -1,6 +1,5 @@
 # Before starting
-- This demo was implemented using version [1.14.0](https://pointfreeco.github.io/swift-composable-architecture/1.14.0/documentation/composablearchitecture/) of TCA.
-- This README is still not fully migrated to 1.14.0. Please expect legacy code until then.
+- This demo was implemented using version [1.15.0](https://pointfreeco.github.io/swift-composable-architecture/1.14.0/documentation/composablearchitecture/) of TCA.
 - The demo runs on iOS 17.6 and above.
 - The [Testing](#testing) section is still a WIP.
 - All credits about TCA go to [Brandon Willams](https://twitter.com/mbrandonw), [Stephen Celis](https://twitter.com/stephencelis) and the incredible team at [pointfree.co](https://www.pointfree.co/) ❤️.
