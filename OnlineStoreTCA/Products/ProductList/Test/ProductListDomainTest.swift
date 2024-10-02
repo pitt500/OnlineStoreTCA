@@ -171,7 +171,12 @@ class ProductListDomainTest: XCTestCase {
             $0.cartState = expectedCartState
         }
         
+        await store.send(.cart(.didPressPayButton)) {
+            $0.cartState?.alert = .confirmationAlert(totalPriceString: "$0.0")
+        }
+        
         await store.send(.cart(.alert(.presented(.dismissSuccessAlert)))) {
+            $0.cartState?.alert = nil
             $0.productList[id: id1]?.addToCartState.count = 0
         }
         

@@ -118,7 +118,6 @@ struct CartListDomain {
                     return .none
             }
         }
-        .ifLet(\.$alert, action: \.alert)
         .forEach(\.cartItems, action: \.cartItem) {
             CartItemDomain()
         }
