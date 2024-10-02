@@ -408,7 +408,7 @@ struct ProductListDomain {
     @Dependency(\.apiClient.fetchProducts) var fetchProducts
     @Dependency(\.uuid) var uuid
     
-    var body: some ReducerProtocol<State, Action> {
+    var body: some ReducerOf<Self> {
         // Other child reducers...
         Reduce { state, action in
             switch action {
@@ -527,7 +527,8 @@ To utilize this modifier (or any modifier with binding parameters) in TCA, it is
 
 ```swift
 // Domain:
-struct Domain: ReducerProtocol {
+@Reducer
+struct Domain {
     struct State {
         var shouldOpenModal = false
     }
@@ -535,7 +536,7 @@ struct Domain: ReducerProtocol {
         case setCartView(isPresented: Bool)
     }
 
-    var body: some ReducerProtocol<State, Action> {
+    var body: some ReducerOf<Self> {
         Reduce { state, action in
             switch action {
                 case .setCartView(let isPresented):
@@ -705,7 +706,8 @@ The TCA library also offers support for `AlertView`, enabling the addition of cu
 3. For deriving optional domains in navigation create an `ifLet` with the binding store.
 
 ```swift
-struct CartListDomain: ReducerProtocol {
+@Reducer
+struct CartListDomain {
     struct State: Equatable {
         @Presents var alert: AlertState<Action.Alert>?
         
@@ -722,7 +724,7 @@ struct CartListDomain: ReducerProtocol {
         }
     }
     
-    var body: some ReducerProtocol<State, Action> {
+    var body: some ReducerOf<Self> {
         Reduce { state, action in
             switch action {
                 case let .alert(.presented(alertAction)):
@@ -788,7 +790,8 @@ This [video](https://youtu.be/U3EMduy-DhE) explains more about AlertView in Swif
 Creating a Root Domain in TCA is similar to creating any other domain. In this case, each property within the state will correspond to a complex substate. To handle tab logic, we can include an enum that represents each tab item, providing a structured approach to managing the different tabs:
 
 ```swift
-struct RootDomain: ReducerProtocol {
+@Reducer
+struct RootDomain {
     struct State: Equatable {
         var selectedTab = Tab.products
         var productListState = ProductListDomain.State()
@@ -806,7 +809,7 @@ struct RootDomain: ReducerProtocol {
         case profile(ProfileDomain.Action)
     }
     
-    var body: some ReducerProtocol<State, Action> {
+    var body: some ReducerOf<Self> {
         Reduce { state, action in
             switch action {
             case .productList:
