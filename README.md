@@ -519,10 +519,12 @@ func sheet<Content>(
 ) -> some View where Content : View
 ```
 
-To utilize this modifier (or any modifier with binding parameters) in TCA, it is necessary to employ the `binding` operator from `viewStore` and supply two parameters:
+To utilize this modifier (or any modifier with binding parameters) in TCA, it is necessary to employ the `binding` operator `$` and supply two parameters:
 
 1. The state property that will undergo mutation.
 2. The action that will trigger the mutation.
+
+`$` operator needs the store will be `@Bindable`. Remember if you are in a previous iOS 17 version, you will need `@Perception.Bindable`.
 
 ```swift
 // Domain:
@@ -545,14 +547,17 @@ struct Domain: ReducerProtocol {
 }
 
 // UI:
-Text("Parent View")
-.sheet(
-    isPresented: viewStore.binding(
-        get: \.shouldOpenModal,
-        send: Action.setModalView(isPresented:)
-    )
-) {
-    Text("I'm a Modal View!")
+struct ParentView: View {
+    @Perception.Bindable var store: StoreOf<Domain>
+
+    var body: some View {
+        Text("Parent View")
+            .sheet(
+                isPresented: $store.shouldOpenModal.sending(\.setModalView)
+            ) {
+                Text("I'm a Modal View!")
+            }
+    }
 }
 ```
 
@@ -565,7 +570,8 @@ By default, TCA keeps a state in memory throughout the entire lifecycle of an ap
 Creating an optional state in TCA follows the same approach as declaring any optional value in Swift. Simply define the property within the parent state, but instead of assigning a default value, declare it as optional. For instance, in the provided example, the `cartState` property holds an optional state for a Cart List.
 
 ```swift
-struct ProductListDomain: ReducerProtocol {
+@Reducer
+struct ProductListDomain {
     struct State: Equatable {
         var productListState: IdentifiedArrayOf<ProductDomain.State> = []
         var shouldOpenCart = false
@@ -583,10 +589,11 @@ In the provided example, the `CartListDomain` will be evaluated only if the `car
 This approach ensures that the optional state is properly handled within the TCA framework and allows for seamless state management between the parent and the optional child reducers.
 
 ```swift
-struct ProductListDomain: ReducerProtocol {
+@Reducer
+struct ProductListDomain {
     // State and Actions ...
     
-    var body: some ReducerProtocol<State, Action> {
+    var body: some ReducerOf<Self> {
         Reduce { state, action in
             switch action {
             //  More cases ...
@@ -598,39 +605,36 @@ struct ProductListDomain: ReducerProtocol {
                 return .none
             }
         }
-        .ifLet(\.cartState, action: /ProductListDomain.Action.cart) {
+        .ifLet(\.cartState, action: \.cart) {
             CartListDomain()
         }
     }
 }
 ```
 
-Lastly, in the view, you can employ `IfLetStore` to unwrap a store with optional state. This allows you to conditionally display the corresponding view that operates with that particular state.
+Lastly, in the view, you can employ `if let` to unwrap a store with optional state. This allows you to conditionally display the corresponding view that operates with that particular state.
 
 
 ```swift
 List {
-    ForEachStore(
+    ForEach(
         self.store.scope(
-            state: \.productListState,
-            action: ProductListDomain.Action
-                .product(id: action:)
-        )
+            state: \.products,
+            action: \.products
+        ),
+        id: \.id
     ) {
-        ProductCell(store: $0)
+        WithPerceptionTracking {
+            ProductCell(store: $0)
+        }
     }
 }
 .sheet(
-    isPresented: viewStore.binding(
-        get: \.shouldOpenCart,
-        send: ProductListDomain.Action.setCartView(isPresented:)
-    )
+    isPresented: $store.shouldOpenCart.sending(\.setCartView)
 ) {
-    IfLetStore(
-        self.store.scope(
-            state: \.cartState,
-            action: ProductListDomain.Action.cart
-        )
+    if let store = store.scope(
+        state: \.cartState, 
+        action: \.cart
     ) {
         CartListView(store: $0)
     }
@@ -646,7 +650,8 @@ By default, when you declare an action in a TCA domain, it is accessible to othe
 In such cases, you can simply declare private functions to encapsulate those actions within the domain's scope. This approach ensures that the actions remain private and only accessible within the intended context, enhancing the encapsulation and modularity of your TCA implementation:
 
 ```swift
-var body: some ReducerProtocol<State, Action>
+
+var body: some ReducerOf<Self>
     // More reducers ...
     Reduce { state, action in
         switch action {
@@ -693,53 +698,66 @@ private func resetProductsToZero(
 
 The TCA library also offers support for `AlertView`, enabling the addition of custom state and a consistent UI building approach without deviating from the TCA architecture. To create your own alert using TCA, follow these steps:
 
-1. Create an `AlertState with actions of your own domain.
-2. Create the actions that will trigger events for the alert:
+1. Create an `AlertState with actions of your own domain using @Presents wrapper.
+2. Create the actions that will trigger events for the alert using PresentationAction:
     - Initialize AlertState (`didPressPayButton`)
     - Dismiss the alert (`didCancelConfirmation`)
     - Execute the alert's handler (`didConfirmPurchase`)
+3. For deriving optional domains in navigation create an `ifLet` with the binding store.
 
 ```swift
 struct CartListDomain: ReducerProtocol {
     struct State: Equatable {
-        var confirmationAlert: AlertState<CartListDomain.Action>?
+        @Presents var alert: AlertState<Action.Alert>?
         
         // More properties ...
     }
     
     enum Action: Equatable {
-        case didPressPayButton
-        case didCancelConfirmation
-        case didConfirmPurchase
-        
+        case alert(PresentationAction<Alert>)
         // More actions ...
+        enum Alert: Equatable {
+            case didPressPayButton
+            case didCancelConfirmation
+            case didConfirmPurchase
+        }
     }
     
     var body: some ReducerProtocol<State, Action> {
         Reduce { state, action in
             switch action {
-            case .didCancelConfirmation:
-                state.confirmationAlert = nil
-                return .none
-            case .didConfirmPurchase:
-                // Sent order and Pay ...
-            case .didPressPayButton:
-                state.confirmationAlert = AlertState(
-                    title: TextState("Confirm your purchase"),
-                    message: TextState("Do you want to proceed with your purchase of \(state.totalPriceString)?"),
-                    buttons: [
-                        .default(
-                            TextState("Pay \(state.totalPriceString)"),
-                            action: .send(.didConfirmPurchase)),
-                        .cancel(TextState("Cancel"), action: .send(.didCancelConfirmation))
-                    ]
-                )
-                return .none
-            // More actions ...
+                case let .alert(.presented(alertAction)):
+                    switch alertAction {
+                        case .didCancelConfirmation:
+                            state.alert = nil
+                            return .none
+                        case .didConfirmPurchase:
+                            // Sent order and Pay ...
+                        case .didPressPayButton:
+                            state.alert = .confirmationAlert(totalPriceString: state.totalPriceString)
+                            return .none
+                    }
+                case .alert(.dismiss):
+                    return .none
+                // More actions ...
             }
         }
-        .forEach(\.cartItems, action: /Action.cartItem(id:action:)) {
+        .ifLet(\.$alert, action: \.alert)
+        .forEach(\.cartItems, action: \.cartItem) {
             CartItemDomain()
+        }
+    }
+}
+
+extension AlertState where Action == CartListDomain.Action.Alert {
+    static func confirmationAlert(totalPriceString: String) -> AlertState {
+        AlertState {
+            TextState("Confirm your purchase")
+        } actions: {
+            ButtonState(action: .didConfirmPurchase, label: { TextState("Pay \(totalPriceString)") })
+            ButtonState(role: .cancel, action: .didCancelConfirmation, label: { TextState("Cancel") })
+        } message: {
+            TextState("Do you want to proceed with your purchase of \(totalPriceString)?")
         }
     }
 }
@@ -751,13 +769,15 @@ struct CartListDomain: ReducerProtocol {
 <img src="./Images/alertView1.png" width="50%" height="50%">
 
 ```swift
-let store: Store<CartListDomain.State, CartListDomain.Action>
+let store: StoreOf<CartListDomain>
 
 Text("Parent View")
-.alert(
-    self.store.scope(state: \.confirmationAlert, action: { $0 }),
-    dismiss: .didCancelConfirmation
-)
+    .alert(
+        store: store.scope(
+            state: \.$alert, 
+            action: \.alert
+        )
+    )
 ```
 
 > Explicit action is always needed for `store.scope`. Check out this commit to learn more: https://github.com/pointfreeco/swift-composable-architecture/commit/da205c71ae72081647dfa1442c811a57181fb990
@@ -787,19 +807,6 @@ struct RootDomain: ReducerProtocol {
         case profile(ProfileDomain.Action)
     }
     
-    // Dependencies
-    var fetchProducts: @Sendable () async throws -> [Product]
-    var sendOrder:  @Sendable ([CartItem]) async throws -> String
-    var fetchUserProfile:  @Sendable () async throws -> UserProfile
-    var uuid: @Sendable () -> UUID
-    
-    static let live = Self(
-        fetchProducts: APIClient.live.fetchProducts,
-        sendOrder: APIClient.live.sendOrder,
-        fetchUserProfile: APIClient.live.fetchUserProfile,
-        uuid: { UUID() }
-    )
-    
     var body: some ReducerProtocol<State, Action> {
         Reduce { state, action in
             switch action {
@@ -812,15 +819,11 @@ struct RootDomain: ReducerProtocol {
                 return .none
             }
         }
-        Scope(state: \.productListState, action: /RootDomain.Action.productList) {
-            ProductListDomain(
-                fetchProducts: fetchProducts,
-                sendOrder: sendOrder,
-                uuid: uuid
-            )
+        Scope(state: \.productListState, action: \.productList) {
+            ProductListDomain()
         }
-        Scope(state:  \.profileState, action: /RootDomain.Action.profile) {
-            ProfileDomain(fetchUserProfile: fetchUserProfile)
+        Scope(state: \.profileState, action: \.profile) {
+            ProfileDomain()
         }
     }
 }
@@ -830,21 +833,17 @@ When it comes to the UI implementation, it closely resembles the standard SwiftU
 
 ```swift
 struct RootView: View {
-    let store: Store<RootDomain.State, RootDomain.Action>
+    @Perception.Bindable var store: StoreOf<RootDomain>
     
     var body: some View {
-        WithViewStore(self.store) { viewStore in
+        WithPerceptionTracking {
             TabView(
-                selection: viewStore.binding(
-                    get: \.selectedTab,
-                    send: RootDomain.Action.tabSelected
-                )
+                selection: $store.selectedTab.sending(\.tabSelected)
             ) {
                 ProductListView(
                     store: self.store.scope(
                         state: \.productListState,
-                        action: RootDomain.Action
-                            .productList
+                        action: \.productList
                     )
                 )
                 .tabItem {
@@ -855,7 +854,7 @@ struct RootView: View {
                 ProfileView(
                     store: self.store.scope(
                         state: \.profileState,
-                        action: RootDomain.Action.profile
+                        action: \.profile
                     )
                 )
                 .tabItem {
@@ -880,7 +879,7 @@ struct OnlineStoreTCAApp: App {
             RootView(
                 store: Store(
                     initialState: RootDomain.State(),
-                    reducer: RootDomain.live
+                    reducer: { RootDomain() }
                 )
             )
         }
