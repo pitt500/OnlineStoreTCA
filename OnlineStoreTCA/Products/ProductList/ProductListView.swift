@@ -47,41 +47,44 @@ struct ProductListView: View {
                 .toolbar {
                     ToolbarItem(placement: .navigationBarTrailing) {
                         Button {
-                            store.send(.setCartView(isPresented: true))
+                            store.send(.cartButtonTapped)
                         } label: {
                             Text("Go to Cart")
                         }
                     }
                 }
                 .sheet(
-                    isPresented: $store.shouldOpenCart.sending(\.setCartView)
-                ) {
-                    if let store = self.store.scope(
+                    item: $store.scope(
                         state: \.cartState,
                         action: \.cart
-                    ) {
-                        WithPerceptionTracking {
-                            CartListView(store: store)
+                    )
+                ) { store in
+                    CartListView(store: store)
+                        .navigationTitle("Cart")
+                        .toolbar {
+                            ToolbarItem(placement: .navigationBarLeading) {
+                                Button {
+                                    self.store.send(.cancelButtonTapped)
+                                } label: {
+                                    Text("Close")
+                                }
+                            }
                         }
-                    }
                 }
-                
             }
         }
     }
 }
 
-struct ProductListView_Previews: PreviewProvider {
-    static var previews: some View {
-        ProductListView(
-            store: Store(
-                initialState: ProductListDomain.State()
-            ) {
-                ProductListDomain()
-            } withDependencies: {
-                $0.apiClient.fetchProducts = { Product.sample }
-                $0.apiClient.sendOrder = { _ in "OK" }
-            }
-        )
-    }
+#Preview {
+    ProductListView(
+        store: Store(
+            initialState: ProductListDomain.State()
+        ) {
+            ProductListDomain()
+        } withDependencies: {
+            $0.apiClient.fetchProducts = { Product.sample }
+            $0.apiClient.sendOrder = { _ in "OK" }
+        }
+    )
 }

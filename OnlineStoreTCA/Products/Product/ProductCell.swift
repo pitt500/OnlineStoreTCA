@@ -48,17 +48,15 @@ struct ProductCell: View {
     }
 }
 
-struct ProductCell_Previews: PreviewProvider {
-    static var previews: some View {
-        ProductCell(
-            store: Store(
-                initialState: ProductDomain.State(
-                    id: UUID(),
-                    product: Product.sample[0]
-                ),
-                reducer: { ProductDomain() }
-            )
+@available(iOS 17, *)
+#Preview(traits: .fixedLayout(width: 300, height: 300)) {
+    ProductCell(
+        store: Store(
+            initialState: ProductDomain.State(
+                id: UUID(),
+                product: Product.sample[0]
+            ),
+            reducer: { ProductDomain() }
         )
-        .previewLayout(.fixed(width: 300, height: 300))
-    }
+    )
 }

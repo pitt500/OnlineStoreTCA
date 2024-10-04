@@ -29,7 +29,7 @@ class ProductDomainTest: XCTestCase {
             reducer: { ProductDomain() }
         )
         
-        await store.send(.addToCart(.didTapPlusButton)) {
+        await store.send(\.addToCart.didTapPlusButton) {
             $0.addToCartState = AddToCartDomain.State(count: 1)
         }
     }
@@ -51,15 +51,15 @@ class ProductDomainTest: XCTestCase {
             reducer: { ProductDomain() }
         )
         
-        await store.send(.addToCart(.didTapPlusButton)) {
+        await store.send(\.addToCart.didTapPlusButton) {
             $0.addToCartState = AddToCartDomain.State(count: 1)
         }
         
-        await store.send(.addToCart(.didTapPlusButton)) {
+        await store.send(\.addToCart.didTapPlusButton) {
             $0.addToCartState = AddToCartDomain.State(count: 2)
         }
         
-        await store.send(.addToCart(.didTapPlusButton)) {
+        await store.send(\.addToCart.didTapPlusButton) {
             $0.addToCartState = AddToCartDomain.State(count: 3)
         }
     }
@@ -82,7 +82,7 @@ class ProductDomainTest: XCTestCase {
             reducer: { ProductDomain() }
         )
         
-        await store.send(.addToCart(.didTapMinusButton))
+        await store.send(\.addToCart.didTapMinusButton)
     }
     
     func testIncreaseProductCounterTappingMinusButtonThreeTimes() async {
@@ -103,9 +103,9 @@ class ProductDomainTest: XCTestCase {
         )
         
         // No changes expected!
-        await store.send(.addToCart(.didTapMinusButton))
-        await store.send(.addToCart(.didTapMinusButton))
-        await store.send(.addToCart(.didTapMinusButton))
+        await store.send(\.addToCart.didTapMinusButton)
+        await store.send(\.addToCart.didTapMinusButton)
+        await store.send(\.addToCart.didTapMinusButton)
     }
     
     func testIncreaseProductCounterTappingMinusTwoTimesAndPlusOnce() async {
@@ -126,11 +126,11 @@ class ProductDomainTest: XCTestCase {
         )
         
         // No changes expected!
-        await store.send(.addToCart(.didTapMinusButton))
-        await store.send(.addToCart(.didTapMinusButton))
+        await store.send(\.addToCart.didTapMinusButton)
+        await store.send(\.addToCart.didTapMinusButton)
         
         // Change expected!
-        await store.send(.addToCart(.didTapPlusButton)) {
+        await store.send(\.addToCart.didTapPlusButton) {
             $0.addToCartState = AddToCartDomain.State(count: 1)
         }
     }

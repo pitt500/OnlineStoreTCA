@@ -13,8 +13,7 @@ struct ProductListDomain {
     @ObservableState
     struct State: Equatable {
         var dataLoadingStatus = DataLoadingStatus.notStarted
-        var shouldOpenCart = false
-        var cartState: CartListDomain.State?
+        @Presents var cartState: CartListDomain.State?
         var productList: IdentifiedArrayOf<ProductDomain.State> = []
         
         var shouldShowError: Bool {
@@ -29,11 +28,11 @@ struct ProductListDomain {
     enum Action: Equatable {
         case fetchProducts
         case fetchProductsResponse(TaskResult<[Product]>)
-        case setCartView(isPresented: Bool)
-        case cart(CartListDomain.Action)
+        case cancelButtonTapped
+        case cartButtonTapped
+        case cart(PresentationAction<CartListDomain.Action>)
         case product(IdentifiedActionOf<ProductDomain>)
         case resetProduct(product: Product)
-        case closeCart
     }
     
     @Dependency(\.apiClient.fetchProducts) var fetchProducts
@@ -71,14 +70,15 @@ struct ProductListDomain {
                     print(error)
                     print("Error getting products, try again later.")
                     return .none
-                case .cart(let action):
+                case .cancelButtonTapped:
+                    state.cartState = nil
+                    return .none
+                case .cart(.presented(let action)):
                     switch action {
-                        case .didPressCloseButton:
-                            return closeCart(state: &state)
-                        case .alert(.presented(.dismissSuccessAlert)):
+                        case .delegate(.orderFinished):
                             resetProductsToZero(state: &state)
-                            
-                            return .send(.closeCart)
+                            state.cartState = nil
+                            return .none
                         case .cartItem(.element(id: _, action: let action)):
                             switch action {
                                 case .deleteCartItem(let product):
@@ -87,8 +87,8 @@ struct ProductListDomain {
                         default:
                             return .none
                     }
-                case .closeCart:
-                    return closeCart(state: &state)
+                case .cart:
+                    return .none
                 case .resetProduct(let product):
                     
                     guard let index = state.productList.firstIndex(
@@ -99,10 +99,8 @@ struct ProductListDomain {
                     
                     state.productList[id: productStateId]?.addToCartState.count = 0
                     return .none
-                case .setCartView(let isPresented):
-                    state.shouldOpenCart = isPresented
-                    state.cartState = isPresented
-                    ? CartListDomain.State(
+                case .cartButtonTapped:
+                    state.cartState = CartListDomain.State(
                         cartItems: IdentifiedArrayOf(
                             uniqueElements: state
                                 .productList
@@ -119,7 +117,6 @@ struct ProductListDomain {
                                 }
                         )
                     )
-                    : nil
                     return .none
                 case .product:
                     return .none
@@ -128,18 +125,9 @@ struct ProductListDomain {
         .forEach(\.productList, action: \.product) {
             ProductDomain()
         }
-        .ifLet(\.cartState, action: \.cart) {
+        .ifLet(\.$cartState, action: \.cart) {
             CartListDomain()
         }
-    }
-    
-    private func closeCart(
-        state: inout State
-    ) -> Effect<Action> {
-        state.shouldOpenCart = false
-        state.cartState = nil
-        
-        return .none
     }
     
     private func resetProductsToZero(

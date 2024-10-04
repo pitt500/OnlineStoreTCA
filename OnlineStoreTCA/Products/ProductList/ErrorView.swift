@@ -34,12 +34,9 @@ struct ErrorView: View {
     }
 }
 
-struct ErrorView_Previews: PreviewProvider {
-    static var previews: some View {
-        ErrorView(
-            message: "Oops, we couldn't fetch product list",
-            retryAction: {}
-        )
-        
-    }
+#Preview {
+    ErrorView(
+        message: "Oops, we couldn't fetch product list",
+        retryAction: {}
+    )
 }
