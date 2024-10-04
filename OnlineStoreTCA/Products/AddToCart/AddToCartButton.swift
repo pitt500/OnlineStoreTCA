@@ -31,13 +31,11 @@ struct AddToCartButton: View {
     }
 }
 
-struct AddToCartButton_Previews: PreviewProvider {
-    static var previews: some View {
-        AddToCartButton(
-            store: Store(
-                initialState: AddToCartDomain.State(),
-                reducer: { AddToCartDomain() }
-            )
+#Preview {
+    AddToCartButton(
+        store: Store(
+            initialState: AddToCartDomain.State(),
+            reducer: { AddToCartDomain() }
         )
-    }
+    )
 }

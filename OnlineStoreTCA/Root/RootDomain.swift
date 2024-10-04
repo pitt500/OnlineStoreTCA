@@ -13,8 +13,8 @@ struct RootDomain {
     @ObservableState
     struct State: Equatable {
         var selectedTab = Tab.products
-        var productListState = ProductListDomain.State()
-        var profileState = ProfileDomain.State()
+        var productList = ProductListDomain.State()
+        var profile = ProfileDomain.State()
     }
     
     enum Tab {
@@ -22,28 +22,28 @@ struct RootDomain {
         case profile
     }
     
-    enum Action: Equatable {
-        case tabSelected(Tab)
+    enum Action: Equatable, BindableAction {
+        case binding(BindingAction<State>)
         case productList(ProductListDomain.Action)
         case profile(ProfileDomain.Action)
     }
     
     var body: some ReducerOf<Self> {
+        BindingReducer()
         Reduce { state, action in
             switch action {
-                case .productList:
+                case .binding:
                     return .none
-                case .tabSelected(let tab):
-                    state.selectedTab = tab
+                case .productList:
                     return .none
                 case .profile:
                     return .none
             }
         }
-        Scope(state: \.productListState, action: \.productList) {
+        Scope(state: \.productList, action: \.productList) {
             ProductListDomain()
         }
-        Scope(state:  \.profileState, action: \.profile) {
+        Scope(state:  \.profile, action: \.profile) {
             ProfileDomain()
         }
     }

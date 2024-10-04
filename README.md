@@ -23,14 +23,19 @@ The purpose of this demo is to provide an introduction to the main concepts of T
 * [Dependencies](#dependencies)
 * [Side Effects](#side-effects)
     * [Network Calls](#network-calls)
+* [Navigation](#navigation)
+    * [Alerts](#alerts)
+    * [Sheets](#sheets)
 * [Testing](#testing)
     * [Basics](#testing-basics)
     * [Side Effects](#testing-side-effects)
+    * [CasePathable](#testing-CasePathable)
 * [Other Topics](#other-topics)
-    * [Opening Modal Views](#opening-modal-views)
     * [Optional States](#optional-states)
     * [Private Actions](#private-actions)
-    * [Alert Views in SwiftUI](#alert-views-in-swiftui)
+    * [Bindable Action](#bindable-actions)
+    * [Delegate Action](#delegate-actions)
+    * [View Action](#view-actions)
     * [Making a Root Domain with Tab View](#making-a-root-domain-with-tab-view)
 * [Contact](#contact)
 
@@ -442,6 +447,209 @@ struct ProductListDomain {
 
 > To learn more about network requests in TCA, I recommend watching this insightful [video](https://youtu.be/sid-zfggYhQ?list=PLHWvYoDHvsOVo4tklgLW1g7gy4Kmk4kjw&t=144) that explains asynchronous requests. Additionally, you can refer to this informative [video](https://youtu.be/j2qymM6i9n4) that demonstrates the configuration of a real web API call, providing practical insights into the process.
 
+## Navigation
+
+### Alerts
+<ins>Alerts and CustomDialogs</ins>
+
+The TCA library also offers support for `AlertView`, enabling the addition of custom state and a consistent UI building approach without deviating from the TCA architecture. To create your own alert using TCA, follow these steps:
+
+1. Create an `AlertState` with actions of your own domain using @Presents wrapper.
+2. Create the actions that will trigger events for the alert using `PresentationAction`.
+
+```swift
+public enum PresentationAction<Action> {
+    case dismiss
+    indirect case presented(Action)
+}
+```
+`PresentationAction` is just an generic enum that has two elements. 
+
+1. `dismiss` action is used when dismiss the view that you presented before. It can be an alert, a sheet, pop a view in a navigation or you custom modal view. 
+2. `presented` represents the rest of actions of the view.
+
+In our example, the actions are:
+
+- Initialize AlertState (`didPressPayButton`)
+- Dismiss the alert (`didCancelConfirmation`)
+- Execute the alert's handler (`didConfirmPurchase`)
+
+3. For deriving optional domains in navigation create an `ifLet` with the binding state. We need a binding because when the `dismiss` action is fired, automatically, state will set to `nil`. Alerts and CustomDialogs are ephemerals, they don´t need define an specific reducer.
+
+> If your presented view has a long side effect like playing a sound or a timer, you could use the `finish()` method. This method allows to cancel any side effect that you have running when you dismiss the view.
+
+```swift
+.task { await store.send(.onTask).finish() }
+```
+
+```swift
+@Reducer
+struct CartListDomain {
+    struct State: Equatable {
+        @Presents var alert: AlertState<Action.Alert>?
+        
+        // More properties ...
+    }
+    
+    enum Action: Equatable {
+        case alert(PresentationAction<Alert>)
+        // More actions ...
+        enum Alert: Equatable {
+            case didPressPayButton
+            case didCancelConfirmation
+            case didConfirmPurchase
+        }
+    }
+    
+    var body: some ReducerOf<Self> {
+        Reduce { state, action in
+            switch action {
+                case let .alert(.presented(alertAction)):
+                    switch alertAction {
+                        case .didCancelConfirmation:
+                            state.alert = nil
+                            return .none
+                        case .didConfirmPurchase:
+                            // Sent order and Pay ...
+                        case .didPressPayButton:
+                            state.alert = .confirmationAlert(totalPriceString: state.totalPriceString)
+                            return .none
+                    }
+                case .alert(.dismiss):
+                    return .none
+                // More actions ...
+            }
+        }
+        .ifLet(\.$alert, action: \.alert)
+    }
+}
+
+It is a good practice to extend every alert state you are using.
+
+extension AlertState where Action == CartListDomain.Action.Alert {
+    static func confirmationAlert(totalPriceString: String) -> AlertState {
+        AlertState {
+            TextState("Confirm your purchase")
+        } actions: {
+            ButtonState(action: .didConfirmPurchase, label: { TextState("Pay \(totalPriceString)") })
+            ButtonState(role: .cancel, action: .didCancelConfirmation, label: { TextState("Cancel") })
+        } message: {
+            TextState("Do you want to proceed with your purchase of \(totalPriceString)?")
+        }
+    }
+}
+                
+```
+
+3. Invoke the UI
+
+<img src="./Images/alertView1.png" width="50%" height="50%">
+
+```swift
+let store: StoreOf<CartListDomain>
+
+Text("Parent View")
+    .alert(
+        store: store.scope(
+            state: \.$alert, 
+            action: \.alert
+        )
+    )
+```
+
+> Explicit action is always needed for `store.scope`. Check out this commit to learn more: https://github.com/pointfreeco/swift-composable-architecture/commit/da205c71ae72081647dfa1442c811a57181fb990
+
+This [video](https://youtu.be/U3EMduy-DhE) explains more about AlertView in SwiftUI and TCA.
+
+### Sheets
+ <ins>Sheets, fullScreenCovers and Popovers</ins>
+
+ The way to define a sheet in TCA is the same that `Alerts`.
+
+ 1. We create a `@Presents` optional state and a `PresentationAction` for action.
+ 2. In this case, we define an `ifLet` specifying the reducer for the reducer of the sheet.
+
+```swift
+@Reducer
+struct ProductListDomain {
+    @ObservableState
+    struct State: Equatable {
+        @Presents var cartState: CartListDomain.State?
+    }
+    
+    enum Action: Equatable {
+        case cartButtonTapped
+        case cart(PresentationAction<CartListDomain.Action>)
+    }
+     
+    var body: some ReducerOf<Self> {
+        Reduce { state, action in
+            switch action {
+                case .cart(.presented(let action)):
+                    // your cart actions
+                case .cart(.dismiss):
+                    return .none
+                case .cartButtonTapped:
+                    state.cartState = CartListDomain.State(
+                        cartItems: IdentifiedArrayOf(
+                            uniqueElements: state
+                                .productList
+                                .compactMap { state in
+                                    state.count > 0
+                                    ? CartItemDomain.State(
+                                        id: uuid(),
+                                        cartItem: CartItem(
+                                            product: state.product,
+                                            quantity: state.count
+                                        )
+                                    )
+                                    : nil
+                                }
+                        )
+                    )
+                    return .none
+            }
+        }
+        .ifLet(\.$cartState, action: \.cart) {
+            CartListDomain()
+        }
+    }
+}
+```
+
+In the view, we create a sheet modifier for a optional item.
+
+```swift
+nonisolated public func sheet<Item, Content>(
+    item: Binding<Item?>, 
+    onDismiss: (() -> Void)? = nil, 
+    @ViewBuilder content: @escaping (Item) -> Content
+) -> some View where Item : Identifiable, Content : View
+```
+
+In order to not create a lot of actions, it is recommended to set the toolbar at this level. First, toolbar actions like dismiss or create an item is better to manage here. Second, in order to reuse this feature it is better to extract the navigation logic like the navigation title or the toolbar.
+
+```swift
+.sheet(
+    item: $store.scope(
+        state: \.cartState,
+        action: \.cart
+    )
+) { store in
+    CartListView(store: store)
+        .navigationTitle("Cart")
+        .toolbar {
+            ToolbarItem(placement: .navigationBarLeading) {
+                Button {
+                    self.store.send(.cancelButtonTapped)
+                } label: {
+                    Text("Close")
+                }
+            }
+        }
+}
+```
+
 ## Testing
 
 ### Testing Basics
@@ -506,62 +714,41 @@ class ProductListDomainTest: XCTestCase {
 }
 ```
 
-## Other topics
+### Testing CasePathable
 
-### Opening Modal Views
-
-If you require to open a view modally in SwiftUI, you will need to use sheet modifier and provide a binding parameter:
-```swift
-func sheet<Content>(
-    isPresented: Binding<Bool>,
-    onDismiss: (() -> Void)? = nil, @ViewBuilder content: @escaping () -> Content
-) -> some View where Content : View
-```
-
-To utilize this modifier (or any modifier with binding parameters) in TCA, it is necessary to employ the `binding` operator `$` and supply two parameters:
-
-1. The state property that will undergo mutation.
-2. The action that will trigger the mutation.
-
-`$` operator needs the store will be `@Bindable`. Remember if you are in a previous iOS 17 version, you will need `@Perception.Bindable`.
+CasePathable is a nice macro that it has a lot of useful tips. One of those is using keypaths for testing actions. For example, if you have this test.
 
 ```swift
-// Domain:
-@Reducer
-struct Domain {
-    struct State {
-        var shouldOpenModal = false
-    }
-    enum Action {
-        case setCartView(isPresented: Bool)
-    }
-
-    var body: some ReducerOf<Self> {
-        Reduce { state, action in
-            switch action {
-                case .setCartView(let isPresented):
-                    state.shouldOpenModal = isPresented
-            }
+await store.send(
+            .cartItem(
+                .element(
+                    id: cartItemId1,
+                    action: .deleteCartItem(product: Product.sample[0]))
+            )
+        ) {
+            ...
         }
-    }
-}
+```
 
-// UI:
-struct ParentView: View {
-    @Perception.Bindable var store: StoreOf<Domain>
+We can update this with:
 
-    var body: some View {
-        Text("Parent View")
-            .sheet(
-                isPresented: $store.shouldOpenModal.sending(\.setModalView)
-            ) {
-                Text("I'm a Modal View!")
-            }
-    }
+```swift
+await store.send(\.cartItem[id: cartItemId1].deleteCartItem, Product.sample[0]) {
+    ...
 }
 ```
 
-> If you want to lean more about Binding with TCA and SwiftUI, take a look to this [video](https://youtu.be/Ilr8AsoggIY).
+Another example:
+
+```swift
+await store.send(.alert(.presented(.didConfirmPurchase)))
+```
+
+```swift
+await store.send(\.alert.didConfirmPurchase)
+```
+
+## Other topics
 
 ### Optional States
 
@@ -650,7 +837,6 @@ By default, when you declare an action in a TCA domain, it is accessible to othe
 In such cases, you can simply declare private functions to encapsulate those actions within the domain's scope. This approach ensures that the actions remain private and only accessible within the intended context, enhancing the encapsulation and modularity of your TCA implementation:
 
 ```swift
-
 var body: some ReducerOf<Self>
     // More reducers ...
     Reduce { state, action in
@@ -694,33 +880,118 @@ private func resetProductsToZero(
 
 > For more about private actions, check out this [video](https://youtu.be/7BkZX_7z-jw).
 
-### Alert Views in SwiftUI
+### Bindable Actions
 
-The TCA library also offers support for `AlertView`, enabling the addition of custom state and a consistent UI building approach without deviating from the TCA architecture. To create your own alert using TCA, follow these steps:
+Imagine that you have a simple form like this with two textfields like this.
 
-1. Create an `AlertState with actions of your own domain using @Presents wrapper.
-2. Create the actions that will trigger events for the alert using PresentationAction:
-    - Initialize AlertState (`didPressPayButton`)
-    - Dismiss the alert (`didCancelConfirmation`)
-    - Execute the alert's handler (`didConfirmPurchase`)
-3. For deriving optional domains in navigation create an `ifLet` with the binding store.
+```swift
+@Reducer
+struct Domain {
+    @ObservableState
+    struct State: Equatable {
+        var email: String
+        var username: String
+    }
+    
+    enum Action: Equatable {
+        case emailChanged(String)
+        case usernameChanged(String)
+    }
+    
+    var body: some ReducerOf<Self> {
+        Reduce { state, action in
+            switch action {
+                case let .emailChanged(email):
+                    state.email = email
+                    return .none
+                case let .usernameChanged(username):
+                    state.username = username
+                    return .none
+            }
+        }
+    }
+}
+```
+
+Next, in the view, if you want to use those elements, email and username, you need to use this.
+
+```swift
+TextField("Email", text: $store.email).sending(\.emailChanged)
+TextField("Username", text: $store.username).sending(\.usernameChanged)
+```
+
+Sometimes you want to develop a large complex from. In this scenario, you can use `BindableAction`. 
+
+1. Add BindableAction for your Action.
+2. Create a new case action with `binding(BindingAction<State>)`
+3. Add `BindingReducer()' at the top of your reducer.
+
+
+```swift
+@Reducer
+struct Domain {
+    @ObservableState
+    struct State: Equatable {
+        var username: String
+        var email: String
+    }
+    
+    enum Action: Equatable, BindableAction {
+        case binding(BindingAction<State>)
+    }
+    
+    var body: some ReducerOf<Self> {
+        BindingReducer()
+    }
+}
+```
+
+Notice now that you don't need any specific action like `usernameChanged` or `emailChanged`.
+
+Next, in the view you need to use the binding of the store and, now, you only need specify the reference of the state that you want to bind. No need `sending` method anymore.
+
+```swift
+struct MainView: View {
+    @Perception.Bindable var store: StoreOf<RootDomain>
+    
+    var body: some View {
+        WithPerceptionTracking {
+            VStack {
+                TextField("Username", text: $store.username)
+                TextField("Email", text: $store.email)
+            }
+        }
+    }
+}
+```
+
+### Delegate Actions
+
+The communication between parent and child features is through actions. While the reducers are small is not a problem, but when reducers grows could be difficult to manage. To create a delegate action could solve this communication problem.
+
+First, create a delegate action in the child reducer. Next, the way to communicate to the parent is when order is finished. Create a new delegate action named orderFinished.
+
+Now, when the alert is shown, if the user press success button, the reducer will send the orderFinished.
 
 ```swift
 @Reducer
 struct CartListDomain {
+    @ObservableState
     struct State: Equatable {
         @Presents var alert: AlertState<Action.Alert>?
-        
-        // More properties ...
     }
     
-    enum Action: Equatable {
+    enum Action: Equatable, ViewAction {
         case alert(PresentationAction<Alert>)
-        // More actions ...
+        
+        @CasePathable
         enum Alert: Equatable {
-            case didPressPayButton
-            case didCancelConfirmation
-            case didConfirmPurchase
+            case success
+        }
+        
+        @CasePathable
+        enum Delegate: Equatable {
+            case orderFinished
         }
     }
     
@@ -729,61 +1000,63 @@ struct CartListDomain {
             switch action {
                 case let .alert(.presented(alertAction)):
                     switch alertAction {
-                        case .didCancelConfirmation:
+                        case .success:
                             state.alert = nil
-                            return .none
-                        case .didConfirmPurchase:
-                            // Sent order and Pay ...
-                        case .didPressPayButton:
-                            state.alert = .confirmationAlert(totalPriceString: state.totalPriceString)
-                            return .none
+                            return .send(.delegate(.orderFinished))
                     }
-                case .alert(.dismiss):
+                case .alert:
                     return .none
-                // More actions ...
+                case .delegate:
+                    return .none
             }
         }
         .ifLet(\.$alert, action: \.alert)
-        .forEach(\.cartItems, action: \.cartItem) {
-            CartItemDomain()
-        }
     }
 }
-
-extension AlertState where Action == CartListDomain.Action.Alert {
-    static func confirmationAlert(totalPriceString: String) -> AlertState {
-        AlertState {
-            TextState("Confirm your purchase")
-        } actions: {
-            ButtonState(action: .didConfirmPurchase, label: { TextState("Pay \(totalPriceString)") })
-            ButtonState(role: .cancel, action: .didCancelConfirmation, label: { TextState("Cancel") })
-        } message: {
-            TextState("Do you want to proceed with your purchase of \(totalPriceString)?")
-        }
-    }
-}
-                
 ```
 
-3. Invoke the UI
-
-<img src="./Images/alertView1.png" width="50%" height="50%">
+Now, in the parent feature, we need to catch the delegate actions.
 
 ```swift
-let store: StoreOf<CartListDomain>
-
-Text("Parent View")
-    .alert(
-        store: store.scope(
-            state: \.$alert, 
-            action: \.alert
-        )
-    )
+case .delegate(.orderFinished):
+    // do the specific action when order is finished
 ```
 
-> Explicit action is always needed for `store.scope`. Check out this commit to learn more: https://github.com/pointfreeco/swift-composable-architecture/commit/da205c71ae72081647dfa1442c811a57181fb990
+### View Actions
 
-This [video](https://youtu.be/U3EMduy-DhE) explains more about AlertView in SwiftUI and TCA.
+Following the idea of delegate actions, we have another tool, the `ViewAction` macro.
+
+First, set `@ViewAction(for:)` at the top of the view. Then use the static method `send()` for any action of the view (remove store.).
+
+```swift
+@ViewAction(for: CartListDomain.self)
+struct CartListView: View {
+    let store: StoreOf<CartListDomain>
+    
+    var body: some View {
+
+        Button {
+            send(.buttonTapped)
+        } label: {
+            ....
+        }
+    }
+}
+```
+
+Now, conforms `Action` with `ViewAction` prototol and create a new case `view`. Finally, update the reducers adding the correct case for the view, in this example using `.view(.buttonTapped)` or `\.view.buttonTapped` for tests.
+
+```swift
+enum Action: Equatable, ViewAction {
+    ....
+    case view(View)
+        
+    @CasePathable
+    enum View: Equatable {
+        case buttonTapped
+    }
+}
+ ```
 
 ### Making a Root Domain with Tab View
 

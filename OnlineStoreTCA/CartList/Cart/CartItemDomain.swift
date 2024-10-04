@@ -19,11 +19,4 @@ struct CartItemDomain {
     enum Action: Equatable {
         case deleteCartItem(product: Product)
     }
-    
-    func reduce(into state: inout State, action: Action) -> Effect<Action> {
-        switch action {
-            case .deleteCartItem:
-                return .none
-        }
-    }
 }

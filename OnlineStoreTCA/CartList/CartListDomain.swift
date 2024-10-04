@@ -17,9 +17,6 @@ struct CartListDomain {
         var cartItems: IdentifiedArrayOf<CartItemDomain.State> = []
         var totalPrice: Double = 0.0
         var isPayButtonDisable = false
-        var confirmationAlert: AlertState<Action>?
-        var errorAlert: AlertState<Action>?
-        var successAlert: AlertState<Action>?
         
         var totalPriceString: String {
             let roundedValue = round(totalPrice * 100) / 100.0
@@ -31,20 +28,29 @@ struct CartListDomain {
         }
     }
     
-    enum Action: Equatable {
+    enum Action: Equatable, ViewAction {
         case alert(PresentationAction<Alert>)
-        case didPressCloseButton
         case cartItem(IdentifiedActionOf<CartItemDomain>)
-        case getTotalPrice
-        case didPressPayButton
-        case didReceivePurchaseResponse(TaskResult<String>)
+        case delegate(Delegate)
         case didCancelConfirmation
+        case didReceivePurchaseResponse(TaskResult<String>)
+        case view(View)
         
+        @CasePathable
         enum Alert: Equatable {
             case didConfirmPurchase
-            case didCancelConfirmation
-            case dismissSuccessAlert
-            case dismissErrorAlert
+            case success
+        }
+        
+        @CasePathable
+        enum Delegate: Equatable {
+            case orderFinished
+        }
+        
+        @CasePathable
+        enum View: Equatable {
+            case didPressPayButton
+            case getTotalPrice
         }
     }
     
@@ -68,43 +74,28 @@ struct CartListDomain {
                             return .run { send in
                                 await send(
                                     .didReceivePurchaseResponse(
-                                        TaskResult{
+                                        TaskResult {
                                             try await sendOrder(items)
                                         }
                                     )
                                 )
                             }
-                        case .didCancelConfirmation:
+                        case .success:
                             state.alert = nil
-                            return .none
-                        case .dismissSuccessAlert:
-                            state.alert = nil
-                            return .none
-                        case .dismissErrorAlert:
-                            state.alert = nil
-                            return .none
+                            return .send(.delegate(.orderFinished))
                     }
                 case .alert:
-                    return .none
-                case .didPressCloseButton:
                     return .none
                 case let .cartItem(.element(id: id, action: action)):
                     switch action {
                         case .deleteCartItem:
                             state.cartItems.remove(id: id)
-                            return.send(.getTotalPrice)
+                            return.send(.view(.getTotalPrice))
                     }
-                case .getTotalPrice:
-                    let items = state.cartItems.map { $0.cartItem }
-                    state.totalPrice = items.reduce(0.0, {
-                        $0 + ($1.product.price * Double($1.quantity))
-                    })
-                    return verifyPayButtonVisibility(state: &state)
-                case .didPressPayButton:
-                    state.alert = .confirmationAlert(totalPriceString: state.totalPriceString)
+                case .delegate:
                     return .none
                 case .didCancelConfirmation:
-                    state.confirmationAlert = nil
+                    state.alert = nil
                     return .none
                 case .didReceivePurchaseResponse(.success(let message)):
                     state.dataLoadingStatus = .success
@@ -116,9 +107,25 @@ struct CartListDomain {
                     state.alert = .errorAlert
                     print("Error sending your order:", error.localizedDescription)
                     return .none
+                case let .view(viewAction):
+                    switch viewAction {
+                        case .getTotalPrice:
+                            let items = state.cartItems.map { $0.cartItem }
+                            state.totalPrice = items.reduce(0.0, {
+                                $0 + ($1.product.price * Double($1.quantity))
+                            })
+                            return verifyPayButtonVisibility(state: &state)
+                        case .didPressPayButton:
+                            state.alert = .confirmationAlert(totalPriceString: state.totalPriceString)
+                            return .none
+                    }
             }
         }
-        .forEach(\.cartItems, action: \.cartItem) {
+        .ifLet(\.$alert, action: \.alert)
+        .forEach(
+            \.cartItems,
+             action: \.cartItem
+        ) {
             CartItemDomain()
         }
     }
@@ -130,7 +137,7 @@ extension AlertState where Action == CartListDomain.Action.Alert {
             TextState("Confirm your purchase")
         } actions: {
             ButtonState(action: .didConfirmPurchase, label: { TextState("Pay \(totalPriceString)") })
-            ButtonState(role: .cancel, action: .didCancelConfirmation, label: { TextState("Cancel") })
+            ButtonState(role: .cancel, label: { TextState("Cancel") })
         } message: {
             TextState("Do you want to proceed with your purchase of \(totalPriceString)?")
         }
@@ -140,8 +147,8 @@ extension AlertState where Action == CartListDomain.Action.Alert {
         AlertState {
             TextState("Thank you!")
         } actions: {
-            ButtonState(action: .dismissSuccessAlert, label: { TextState("Done") })
-            ButtonState(role: .cancel, action: .didCancelConfirmation, label: { TextState("Cancel") })
+            ButtonState(action: .success, label: { TextState("Done") })
+            ButtonState(role: .cancel, label: { TextState("Cancel") })
         } message: {
             TextState("Your order is in process.")
         }
@@ -151,7 +158,7 @@ extension AlertState where Action == CartListDomain.Action.Alert {
         AlertState {
             TextState("Oops!")
         } actions: {
-            ButtonState(action: .dismissErrorAlert, label: { TextState("Done") })
+            ButtonState(label: { TextState("Done") })
         } message: {
             TextState("Unable to send order, try again later.")
         }

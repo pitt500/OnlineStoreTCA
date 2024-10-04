@@ -20,7 +20,7 @@ class AddToCartDomainTest: XCTestCase {
         )
         
         
-        await store.send(.didTapPlusButton) {
+        await store.send(\.didTapPlusButton) {
             $0.count = 1
         }
     }
@@ -32,9 +32,9 @@ class AddToCartDomainTest: XCTestCase {
         )
         
         
-        await store.send(.didTapPlusButton) { $0.count = 1 }
-        await store.send(.didTapPlusButton) { $0.count = 2 }
-        await store.send(.didTapPlusButton) { $0.count = 3 }
+        await store.send(\.didTapPlusButton) { $0.count = 1 }
+        await store.send(\.didTapPlusButton) { $0.count = 2 }
+        await store.send(\.didTapPlusButton) { $0.count = 3 }
     }
     
     func testDecreaseCounterTappingPlusButtonOnce() async {
@@ -43,7 +43,7 @@ class AddToCartDomainTest: XCTestCase {
             reducer: { AddToCartDomain() }
         )
         
-        await store.send(.didTapMinusButton) {
+        await store.send(\.didTapMinusButton) {
             $0.count = -1
         }
     }
@@ -54,9 +54,9 @@ class AddToCartDomainTest: XCTestCase {
             reducer: { AddToCartDomain() }
         )
         
-        await store.send(.didTapMinusButton) { $0.count = -1 }
-        await store.send(.didTapMinusButton) { $0.count = -2 }
-        await store.send(.didTapMinusButton) { $0.count = -3 }
+        await store.send(\.didTapMinusButton) { $0.count = -1 }
+        await store.send(\.didTapMinusButton) { $0.count = -2 }
+        await store.send(\.didTapMinusButton) { $0.count = -3 }
     }
     
     func testUpdatingCounterTappingPlusAndMinusButtons() async {
@@ -65,8 +65,8 @@ class AddToCartDomainTest: XCTestCase {
             reducer: { AddToCartDomain() }
         )
         
-        await store.send(.didTapMinusButton) { $0.count = -1 }
-        await store.send(.didTapPlusButton) { $0.count = 0 }
-        await store.send(.didTapMinusButton) { $0.count = -1 }
+        await store.send(\.didTapMinusButton) { $0.count = -1 }
+        await store.send(\.didTapPlusButton) { $0.count = 0 }
+        await store.send(\.didTapMinusButton) { $0.count = -1 }
     }
 }

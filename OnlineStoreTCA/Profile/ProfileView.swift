@@ -44,14 +44,12 @@ struct ProfileView: View {
     }
 }
 
-struct ProfileView_Previews: PreviewProvider {
-    static var previews: some View {
-        ProfileView(
-            store: Store(initialState: ProfileDomain.State()) {
-                ProfileDomain()
-            } withDependencies: {
-                $0.apiClient.fetchUserProfile = { .sample }
-            }
-        )
-    }
+#Preview {
+    ProfileView(
+        store: Store(initialState: ProfileDomain.State()) {
+            ProfileDomain()
+        } withDependencies: {
+            $0.apiClient.fetchUserProfile = { .sample }
+        }
+    )
 }

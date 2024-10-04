@@ -14,11 +14,11 @@ struct RootView: View {
     var body: some View {
         WithPerceptionTracking {
             TabView(
-                selection: $store.selectedTab.sending(\.tabSelected)
+                selection: $store.selectedTab
             ) {
                 ProductListView(
-                    store: self.store.scope(
-                        state: \.productListState,
+                    store: store.scope(
+                        state: \.productList,
                         action: \.productList
                     )
                 )
@@ -28,8 +28,8 @@ struct RootView: View {
                 }
                 .tag(RootDomain.Tab.products)
                 ProfileView(
-                    store: self.store.scope(
-                        state: \.profileState,
+                    store: store.scope(
+                        state: \.profile,
                         action: \.profile
                     )
                 )
@@ -43,19 +43,17 @@ struct RootView: View {
     }
 }
 
-struct RootView_Previews: PreviewProvider {
-    static var previews: some View {
-        RootView(
-            store: Store(
-                initialState: RootDomain.State()
-            ) {
-                RootDomain()
-            } withDependencies: {
-                $0.apiClient.fetchProducts = { Product.sample }
-                $0.apiClient.sendOrder = { _ in "OK" }
-                $0.apiClient.fetchUserProfile = { UserProfile.sample }
-                $0.uuid = .incrementing
-            }
-        )
-    }
+#Preview {
+    RootView(
+        store: Store(
+            initialState: RootDomain.State()
+        ) {
+            RootDomain()
+        } withDependencies: {
+            $0.apiClient.fetchProducts = { Product.sample }
+            $0.apiClient.sendOrder = { _ in "OK" }
+            $0.apiClient.fetchUserProfile = { UserProfile.sample }
+            $0.uuid = .incrementing
+        }
+    )
 }

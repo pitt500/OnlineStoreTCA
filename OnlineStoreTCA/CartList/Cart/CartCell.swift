@@ -70,17 +70,15 @@ struct CartCell: View {
     }
 }
 
-struct CartCell_Previews: PreviewProvider {
-    static var previews: some View {
-        CartCell(
-            store: Store(
-                initialState: CartItemDomain.State(
-                    id: UUID(),
-                    cartItem: CartItem.sample.first!
-                ),
-                reducer: { CartItemDomain() }
-            )
+@available(iOS 17, *)
+#Preview(traits: .fixedLayout(width: 300, height: 300)) {
+    CartCell(
+        store: Store(
+            initialState: CartItemDomain.State(
+                id: UUID(),
+                cartItem: CartItem.sample.first!
+            ),
+            reducer: { CartItemDomain() }
         )
-        .previewLayout(.fixed(width: 300, height: 300))
-    }
+    )
 }

@@ -8,6 +8,7 @@
 import SwiftUI
 import ComposableArchitecture
 
+@ViewAction(for: CartListDomain.self)
 struct CartListView: View {
     let store: StoreOf<CartListDomain>
     
@@ -22,7 +23,10 @@ struct CartListView: View {
                         } else {
                             List {
                                 ForEach(
-                                    store.scope(state: \.cartItems, action: \.cartItem),
+                                    store.scope(
+                                        state: \.cartItems,
+                                        action: \.cartItem
+                                    ),
                                     id: \.id
                                 ) { store in
                                     CartCell(store: store)
@@ -30,7 +34,7 @@ struct CartListView: View {
                             }
                             .safeAreaInset(edge: .bottom) {
                                 Button {
-                                    store.send(.didPressPayButton)
+                                    send(.didPressPayButton)
                                 } label: {
                                     HStack(alignment: .center) {
                                         Spacer()
@@ -54,20 +58,15 @@ struct CartListView: View {
                             }
                         }
                     }
-                    .navigationTitle("Cart")
-                    .toolbar {
-                        ToolbarItem(placement: .navigationBarLeading) {
-                            Button {
-                                store.send(.didPressCloseButton)
-                            } label: {
-                                Text("Close")
-                            }
-                        }
-                    }
                     .onAppear {
-                        store.send(.getTotalPrice)
+                        send(.getTotalPrice)
                     }
-                    .alert(store: store.scope(state: \.$alert, action: \.alert))
+                    .alert(
+                        store: store.scope(
+                            state: \.$alert,
+                            action: \.alert
+                        )
+                    )
                 }
                 if store.isRequestInProcess {
                     Color.black.opacity(0.2)
@@ -79,26 +78,24 @@ struct CartListView: View {
     }
 }
 
-struct CartListView_Previews: PreviewProvider {
-    static var previews: some View {
-        CartListView(
-            store: Store(
-                initialState: CartListDomain.State(
-                    cartItems: IdentifiedArrayOf(
-                        uniqueElements: CartItem.sample
-                            .map {
-                                CartItemDomain.State(
-                                    id: UUID(),
-                                    cartItem: $0
-                                )
-                            }
-                    )
-                ),
-                reducer: { CartListDomain() },
-                withDependencies: {
-                    $0.apiClient.sendOrder = { _ in "OK" }
-                }
-            )
+#Preview {
+    CartListView(
+        store: Store(
+            initialState: CartListDomain.State(
+                cartItems: IdentifiedArrayOf(
+                    uniqueElements: CartItem.sample
+                        .map {
+                            CartItemDomain.State(
+                                id: UUID(),
+                                cartItem: $0
+                            )
+                        }
+                )
+            ),
+            reducer: { CartListDomain() },
+            withDependencies: {
+                $0.apiClient.sendOrder = { _ in "OK" }
+            }
         )
-    }
+    )
 }
