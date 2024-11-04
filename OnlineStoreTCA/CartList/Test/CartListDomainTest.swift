@@ -153,7 +153,12 @@ class CartListDomainTest: XCTestCase {
             $0.apiClient.sendOrder = { _ in "Success" }
         }
         
+		await store.send(.didPressPayButton) {
+			$0.alert = .confirmationAlert(totalPriceString: "$0.0")
+		}
+		
         await store.send(.alert(.presented(.didConfirmPurchase))) {
+			$0.alert = nil
             $0.dataLoadingStatus = .loading
         }
         
@@ -192,9 +197,14 @@ class CartListDomainTest: XCTestCase {
         ) {
             $0.apiClient.sendOrder = { _ in throw APIClient.Failure() }
         }
+		
+		await store.send(.didPressPayButton) {
+			$0.alert = .confirmationAlert(totalPriceString: "$0.0")
+		}
         
         await store.send(.alert(.presented(.didConfirmPurchase))) {
             $0.dataLoadingStatus = .loading
+			$0.alert = nil
         }
         
         

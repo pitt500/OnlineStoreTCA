@@ -1,5 +1,5 @@
 # Before starting
-- This demo was implemented using version [1.14.0](https://pointfreeco.github.io/swift-composable-architecture/1.14.0/documentation/composablearchitecture/) of TCA.
+- This demo was implemented using version [1.15.2](https://pointfreeco.github.io/swift-composable-architecture/1.14.0/documentation/composablearchitecture/) of TCA.
 - This README is still not fully migrated to 1.14.0. Please expect legacy code until then.
 - The demo runs on iOS 17.6 and above.
 - The [Testing](#testing) section is still a WIP.
@@ -24,12 +24,13 @@ The purpose of this demo is to provide an introduction to the main concepts of T
 * [Dependencies](#dependencies)
 * [Side Effects](#side-effects)
     * [Network Calls](#network-calls)
+* [Navigation](#navigation)
+    * [Alerts](#alerts)
+    * [Sheets](#sheets)
 * [Testing](#testing)
 * [Other Topics](#other-topics)
-    * [Opening Modal Views](#opening-modal-views)
     * [Optional States](#optional-states)
     * [Private Actions](#private-actions)
-    * [Alert Views in SwiftUI](#alert-views-in-swiftui)
     * [Making a Root Domain with Tab View](#making-a-root-domain-with-tab-view)
 * [Contact](#contact)
 
@@ -122,7 +123,7 @@ func reduce(into state: inout State, action: Action) -> EffectTask<Action> {
 5. Once the mutation is done and the reducer returned the effect, the view will render the update in the screen. 
 <img src="./Images/viewUpdateDemo1.png" width="30%" height="30%">
 
-7. To observe state changes in TCA, we need an object called `viewStore`, that in this example is wrapped within WithViewStore view. We can send an action from the view to the store using `viewStore.send()` and an `Action` value.
+6. To observe state changes in TCA, we need an object called `viewStore`, that in this example is wrapped within WithViewStore view. We can send an action from the view to the store using `viewStore.send()` and an `Action` value.
 
 ```swift
 struct ContentView: View {
@@ -422,12 +423,219 @@ struct ProductListDomain: ReducerProtocol {
 
 > To learn more about network requests in TCA, I recommend watching this insightful [video](https://youtu.be/sid-zfggYhQ?list=PLHWvYoDHvsOVo4tklgLW1g7gy4Kmk4kjw&t=144) that explains asynchronous requests. Additionally, you can refer to this informative [video](https://youtu.be/j2qymM6i9n4) that demonstrates the configuration of a real web API call, providing practical insights into the process.
 
-## Testing
+## Navigation
 
-TBD
+ Navigation is a huge and complex topic. Navigation are alerts, confirmation dialogs, sheets, popovers and links. Also, you can add a custom navigations if you want. In this project you will see alerts and sheets.
 
-## Other topics
+### Alerts
 
+The TCA library offers support for `AlertView`, enabling the addition of custom state and a consistent UI building approach without deviating from the TCA architecture. To create your own alert using TCA, follow these steps:
+
+1. Create the alert actions inside of the Action enum of the reducer. The recommended way is create a nested enum inside the action.
+
+```swift
+enum Action: Equatable {
+    enum Alert {
+        case alertAction1
+        case alertAction2
+        ....
+    }
+}
+```
+
+2. Next, create a case alert and use `PresentationAction`.
+
+```swift
+enum Action: Equatable {
+    case alert(PresentationAction<Alert>)
+    case alertButtonTapped
+
+    enum Alert {
+        case alertAction1
+        case alertAction2
+        ....
+    }
+}
+```
+
+`PresentationAction` is a generic that represents the presented actions and an special action named dismiss. This is very useful case because with the dismiss action, the reducer can manage if a side effect is running and remove to the system. More information about effect cancelling in navigations [here](https://www.pointfree.co/collections/composable-architecture/navigation/ep225-composable-navigation-behavior).
+
+```swift
+public enum PresentationAction<Action> {
+  /// An action sent to `nil` out the associated presentation state.
+  case dismiss
+
+  /// An action sent to the associated, non-`nil` presentation state.
+  indirect case presented(Action)
+}
+```
+
+3. Create an alert state inside of the reducer.
+```swift
+@Presents var alert: AlertState<Action.Alert>?
+```
+`@Presents` is a property wrapper that you need to use when creates a navigation state in the reducer. The reason to use `@Presents` is when composing a lots of features together, the root state could overflow the stack. More information [here](https://www.pointfree.co/collections/composable-architecture/navigation/ep230-composable-navigation-stack-vs-heap).
+
+
+4. Extent `AlertState` and create as many alerts as you want. You can create a property wrapper or a function if you need some dynamic information.
+
+```swift
+extension AlertState where Action == CartListDomain.Action.Alert {
+    static var successAlert: AlertState {
+        AlertState {
+            TextState("Thank you!")
+        } actions: {
+            ButtonState(action: .dismissSuccessAlert, label: { TextState("Done") })
+            ButtonState(role: .cancel, action: .didCancelConfirmation, label: { TextState("Cancel") })
+        } message: {
+            TextState("Your order is in process.")
+        }
+    }
+
+    static func confirmationAlert(totalPriceString: String) -> AlertState {
+        AlertState {
+            TextState("Confirm your purchase")
+        } actions: {
+            ButtonState(action: .didConfirmPurchase, label: { TextState("Pay \(totalPriceString)") })
+            ButtonState(role: .cancel, action: .didCancelConfirmation, label: { TextState("Cancel") })
+        } message: {
+            TextState("Do you want to proceed with your purchase of \(totalPriceString)?")
+        }
+    }
+}
+```
+
+5. Inside of the body of the reducer you can set the alert. As the state is an optional value, you need to implement `ifLet` in the reducer. This is a particular modifier that not need a reducer like a tipical `ifLet` reducer. 
+
+Another question is when you use a reducer for navigation, you will use the binding operator `$` in the state. This is because navigation modifiers in SwiftUI use a binding for presenting, usually the `isPresented` boolean. In this case, in order to manage when the alert is presented or no, you use a binding state in the reducer. Now, the reducer is fully synchronized with the view.
+
+```swift
+var body: some ReducerOf<Self> {
+        Reduce { state, action in
+            switch action {
+                case .alert:
+                    return .none
+                case .alertButtonTapped:
+                    state.alert = .successAlert
+                    return .none
+            }
+        }
+        .ifLet(
+            \.$alert, 
+            action: \.alert
+        )
+}
+```
+
+6. Finally, implements `AlertView` modifier in the view. Remember, you use the binding `$` operator.
+
+```swift
+.alert(
+	store: store.scope(
+		state: \.$alert,
+		action: \.alert
+	)
+)
+```
+
+
+<details>
+<summary>See Alerts in previous versions of TCA</summary>
+
+The TCA library also offers support for `AlertView`, enabling the addition of custom state and a consistent UI building approach without deviating from the TCA architecture. To create your own alert using TCA, follow these steps:
+
+1. Create an `AlertState` with actions of your own domain.
+2. Create the actions that will trigger events for the alert:
+    - Initialize AlertState (`didPressPayButton`)
+    - Dismiss the alert (`didCancelConfirmation`)
+    - Execute the alert's handler (`didConfirmPurchase`)
+
+```swift
+struct CartListDomain: ReducerProtocol {
+    struct State: Equatable {
+        var confirmationAlert: AlertState<CartListDomain.Action>?
+        
+        // More properties ...
+    }
+    
+    enum Action: Equatable {
+        case didPressPayButton
+        case didCancelConfirmation
+        case didConfirmPurchase
+        
+        // More actions ...
+    }
+    
+    var body: some ReducerProtocol<State, Action> {
+        Reduce { state, action in
+            switch action {
+            case .didCancelConfirmation:
+                state.confirmationAlert = nil
+                return .none
+            case .didConfirmPurchase:
+                // Sent order and Pay ...
+            case .didPressPayButton:
+                state.confirmationAlert = AlertState(
+                    title: TextState("Confirm your purchase"),
+                    message: TextState("Do you want to proceed with your purchase of \(state.totalPriceString)?"),
+                    buttons: [
+                        .default(
+                            TextState("Pay \(state.totalPriceString)"),
+                            action: .send(.didConfirmPurchase)),
+                        .cancel(TextState("Cancel"), action: .send(.didCancelConfirmation))
+                    ]
+                )
+                return .none
+            // More actions ...
+            }
+        }
+        .forEach(\.cartItems, action: /Action.cartItem(id:action:)) {
+            CartItemDomain()
+        }
+    }
+}              
+```
+</details>
+
+### Sheets
+
+Other type of navigation are sheets. To create your own alert using TCA, follow these steps:
+
+1. As the alerts, create the state. You use `@Presents` to avoid accidentally overflow the stack.
+
+```swift
+@Presents var cartState: CartListDomain.State?
+```
+
+2. Next, create the action. Remember to use PresentationAction inside the case of the sheet.
+
+```swift
+case cart(PresentationAction<CartListDomain.Action>)
+```
+
+3. Create the `ifLet` in the reducer. Here, you need to define the reducer of the destination.
+
+```swift
+.ifLet(\.$cartState, action: \.cart) {
+    CartListDomain()
+}
+```
+
+4. Finally, in the view, you can define the sheet operator like this.
+
+```swift
+.sheet(
+	item: $store.scope(
+		state: \.cartState,
+		action: \.cart
+	)
+) { store in
+	CartListView(store: store)
+}
+```
+
+<details>
+<summary>See Sheets in previous versions of TCA</summary>
 ### Opening Modal Views
 
 If you require to open a view modally in SwiftUI, you will need to use sheet modifier and provide a binding parameter:
@@ -476,6 +684,13 @@ Text("Parent View")
 ```
 
 > If you want to lean more about Binding with TCA and SwiftUI, take a look to this [video](https://youtu.be/Ilr8AsoggIY).
+</details>
+
+## Testing
+
+TBD
+
+## Other topics
 
 ### Optional States
 
@@ -607,63 +822,6 @@ private func resetProductsToZero(
 ```
 
 > For more about private actions, check out this [video](https://youtu.be/7BkZX_7z-jw).
-
-### Alert Views in SwiftUI
-
-The TCA library also offers support for `AlertView`, enabling the addition of custom state and a consistent UI building approach without deviating from the TCA architecture. To create your own alert using TCA, follow these steps:
-
-1. Create an `AlertState with actions of your own domain.
-2. Create the actions that will trigger events for the alert:
-    - Initialize AlertState (`didPressPayButton`)
-    - Dismiss the alert (`didCancelConfirmation`)
-    - Execute the alert's handler (`didConfirmPurchase`)
-
-```swift
-struct CartListDomain: ReducerProtocol {
-    struct State: Equatable {
-        var confirmationAlert: AlertState<CartListDomain.Action>?
-        
-        // More properties ...
-    }
-    
-    enum Action: Equatable {
-        case didPressPayButton
-        case didCancelConfirmation
-        case didConfirmPurchase
-        
-        // More actions ...
-    }
-    
-    var body: some ReducerProtocol<State, Action> {
-        Reduce { state, action in
-            switch action {
-            case .didCancelConfirmation:
-                state.confirmationAlert = nil
-                return .none
-            case .didConfirmPurchase:
-                // Sent order and Pay ...
-            case .didPressPayButton:
-                state.confirmationAlert = AlertState(
-                    title: TextState("Confirm your purchase"),
-                    message: TextState("Do you want to proceed with your purchase of \(state.totalPriceString)?"),
-                    buttons: [
-                        .default(
-                            TextState("Pay \(state.totalPriceString)"),
-                            action: .send(.didConfirmPurchase)),
-                        .cancel(TextState("Cancel"), action: .send(.didCancelConfirmation))
-                    ]
-                )
-                return .none
-            // More actions ...
-            }
-        }
-        .forEach(\.cartItems, action: /Action.cartItem(id:action:)) {
-            CartItemDomain()
-        }
-    }
-}
-                
-```
 
 3. Invoke the UI
 

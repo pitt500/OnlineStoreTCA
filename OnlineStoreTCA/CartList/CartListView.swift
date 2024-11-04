@@ -52,6 +52,12 @@ struct CartListView: View {
                                 .padding()
                                 .disabled(store.isPayButtonDisable)
                             }
+							.alert(
+								store: store.scope(
+									state: \.$alert,
+									action: \.alert
+								)
+							)
                         }
                     }
                     .navigationTitle("Cart")
@@ -67,7 +73,6 @@ struct CartListView: View {
                     .onAppear {
                         store.send(.getTotalPrice)
                     }
-                    .alert(store: store.scope(state: \.$alert, action: \.alert))
                 }
                 if store.isRequestInProcess {
                     Color.black.opacity(0.2)

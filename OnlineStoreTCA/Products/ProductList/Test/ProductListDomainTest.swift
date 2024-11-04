@@ -167,16 +167,19 @@ class ProductListDomainTest: XCTestCase {
         )
         
         await store.send(.setCartView(isPresented: true)) {
-            $0.shouldOpenCart = true
             $0.cartState = expectedCartState
         }
+		
+		await store.send(.cart(.presented(.didPressPayButton))) {
+			$0.cartState?.alert = .confirmationAlert(totalPriceString: "$0.0")
+		}
         
-        await store.send(.cart(.alert(.presented(.dismissSuccessAlert)))) {
+		await store.send(.cart(.presented(.alert(.presented(.dismissSuccessAlert))))) {
             $0.productList[id: id1]?.addToCartState.count = 0
+			$0.cartState?.alert = nil
         }
         
         await store.receive(.closeCart) {
-            $0.shouldOpenCart = false
             $0.cartState = nil
         }
     }
@@ -245,20 +248,21 @@ class ProductListDomainTest: XCTestCase {
         )
         
         await store.send(.setCartView(isPresented: true)) {
-            $0.shouldOpenCart = true
             $0.cartState = expectedCartState
         }
-        await store.send(
-            .cart(
-                .cartItem(
-                    .element(id: id1, action: .deleteCartItem(product: products[0]))
-                )
-            )
-        ) {
-            $0.cartState?.cartItems = []
-        }
-        
-        await store.receive(.cart(.getTotalPrice)) {
+		await store.send(
+			.cart(
+				.presented(
+					.cartItem(
+						.element(id: id1, action: .deleteCartItem(product: products[0]))
+					)
+				)
+			)
+		) {
+			$0.cartState?.cartItems = []
+		}
+		
+		await store.receive(.cart(.presented(.getTotalPrice))) {
             $0.cartState?.totalPrice = 0
             $0.cartState?.isPayButtonDisable = true
         }
