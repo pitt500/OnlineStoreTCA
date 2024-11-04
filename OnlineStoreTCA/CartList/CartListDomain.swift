@@ -17,9 +17,6 @@ struct CartListDomain {
         var cartItems: IdentifiedArrayOf<CartItemDomain.State> = []
         var totalPrice: Double = 0.0
         var isPayButtonDisable = false
-        var confirmationAlert: AlertState<Action>?
-        var errorAlert: AlertState<Action>?
-        var successAlert: AlertState<Action>?
         
         var totalPriceString: String {
             let roundedValue = round(totalPrice * 100) / 100.0
@@ -38,7 +35,6 @@ struct CartListDomain {
         case getTotalPrice
         case didPressPayButton
         case didReceivePurchaseResponse(TaskResult<String>)
-        case didCancelConfirmation
         
         enum Alert: Equatable {
             case didConfirmPurchase
@@ -84,8 +80,8 @@ struct CartListDomain {
                             state.alert = nil
                             return .none
                     }
-                case .alert:
-                    return .none
+				case .alert:
+					return .none
                 case .didPressCloseButton:
                     return .none
                 case let .cartItem(.element(id: id, action: action)):
@@ -103,9 +99,6 @@ struct CartListDomain {
                 case .didPressPayButton:
                     state.alert = .confirmationAlert(totalPriceString: state.totalPriceString)
                     return .none
-                case .didCancelConfirmation:
-                    state.confirmationAlert = nil
-                    return .none
                 case .didReceivePurchaseResponse(.success(let message)):
                     state.dataLoadingStatus = .success
                     state.alert = .successAlert
@@ -118,6 +111,7 @@ struct CartListDomain {
                     return .none
             }
         }
+		.ifLet(\.$alert, action: \.alert)
         .forEach(\.cartItems, action: \.cartItem) {
             CartItemDomain()
         }
@@ -141,7 +135,6 @@ extension AlertState where Action == CartListDomain.Action.Alert {
             TextState("Thank you!")
         } actions: {
             ButtonState(action: .dismissSuccessAlert, label: { TextState("Done") })
-            ButtonState(role: .cancel, action: .didCancelConfirmation, label: { TextState("Cancel") })
         } message: {
             TextState("Your order is in process.")
         }

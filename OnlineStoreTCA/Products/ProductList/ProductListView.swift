@@ -53,20 +53,15 @@ struct ProductListView: View {
                         }
                     }
                 }
-                .sheet(
-                    isPresented: $store.shouldOpenCart.sending(\.setCartView)
-                ) {
-                    if let store = self.store.scope(
-                        state: \.cartState,
-                        action: \.cart
-                    ) {
-                        WithPerceptionTracking {
-                            CartListView(store: store)
-                        }
-                    }
-                }
-                
-            }
+				.sheet(
+					item: $store.scope(
+						state: \.cartState,
+						action: \.cart
+					)
+				) { store in
+					CartListView(store: store)
+				}
+			}
         }
     }
 }
