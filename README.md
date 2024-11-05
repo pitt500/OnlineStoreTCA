@@ -27,6 +27,9 @@ The purpose of this demo is to provide an introduction to the main concepts of T
     * [Alerts](#alerts)
     * [Sheets](#sheets)
 * [Testing](#testing)
+    * [Basics](#testing-basics)
+    * [Side Effects](#testing-side-effects)
+    * [CasePathable](#testing-CasePathable)
 * [Other Topics](#other-topics)
     * [Optional States](#optional-states)
     * [Private Actions](#private-actions)
@@ -687,7 +690,99 @@ Text("Parent View")
 
 ## Testing
 
-TBD
+### Testing Basics
+
+Testing is a crucial part of software development. TCA has its own tools to test reducers in a very simple way.
+
+When you test a reducer, you will use a TestStore class passing an initial state and a reducer like the store that you are using in the production code.
+
+Next, you can send an action but, in this case, send receive a closure that you need to expect the result of this action. For example, when you send increseCounter action, you expect that count is equal to 1 if previously, your state counter is 0.
+
+Finally, you send a decreaseCounter and the expectation of this action is count state equal to 0 because previously count was setted to 1.
+
+```swift
+@MainActor
+class CounterDomainTest: XCTestCase {
+    func testHappyPath() {
+        let store = TestStore(
+            initialState: CounterDomain.State(),
+            reducer: { CounterDomain() }
+        )
+
+        await store.send(.increaseCounter) {
+            $0.count = 1
+        }
+
+        await store.send(.decreaseCounter) {
+            $0.count = 0
+        }
+    }
+}
+```
+
+### Testing Side effects
+
+The first thing is the ability to mock every side effect of the system. To do that TestStore has a closure for this purpose.
+
+Notice that `fetchProducts` action has a side effect. When it finishes, send an action `fetchProductsResponse` back to the system. When you test this, you will use `store.receive` for response actions.
+
+```swift
+@MainActor
+class ProductListDomainTest: XCTestCase {
+    func testSideEffects() {
+        let products: [Product] = ...
+        let store = TestStore(
+            initialState: ProductListDomain.State(),
+            reducer: { ProductListDomain() }
+        ) {
+            $0.apiClient.fetchProducts = { products }
+        }
+
+         await store.send(.fetchProducts) {
+            $0.dataLoadingStatus = .loading
+        }
+        
+        await store.receive(.fetchProductsResponse(.success(products))) {
+            $0.products = products
+            $0.dataLoadingStatus = .success
+        }
+    }
+}
+```
+
+### Testing CasePathable
+
+CasePathable is a nice macro that it has a lot of useful tips. One of those is using keypaths for testing actions. For example, if you have this test.
+
+```swift
+await store.send(
+            .cartItem(
+                .element(
+                    id: cartItemId1,
+                    action: .deleteCartItem(product: Product.sample[0]))
+            )
+        ) {
+            ...
+        }
+```
+
+We can update this with:
+
+```swift
+await store.send(\.cartItem[id: cartItemId1].deleteCartItem, Product.sample[0]) {
+    ...
+}
+```
+
+Another example:
+
+```swift
+await store.send(.alert(.presented(.didConfirmPurchase)))
+```
+
+```swift
+await store.send(\.alert.didConfirmPurchase)
+```
 
 ## Other topics
 
