@@ -61,11 +61,11 @@ class ProductListDomainTest: XCTestCase {
             ]
         )
         
-        await store.send(.fetchProducts) {
+        await store.send(\.fetchProducts) {
             $0.dataLoadingStatus = .loading
         }
         
-        await store.receive(.fetchProductsResponse(.success(products))) {
+        await store.receive(\.fetchProductsResponse, .success(products)) {
             $0.productList = identifiedArray
             $0.dataLoadingStatus = .success
         }
@@ -81,11 +81,11 @@ class ProductListDomainTest: XCTestCase {
             $0.uuid = .incrementing
         }
         
-        await store.send(.fetchProducts) {
+        await store.send(\.fetchProducts) {
             $0.dataLoadingStatus = .loading
         }
         
-        await store.receive(.fetchProductsResponse(.failure(error))) {
+        await store.receive(\.fetchProductsResponse, .failure(error)) {
             $0.productList = []
             $0.dataLoadingStatus = .error
         }
@@ -136,19 +136,11 @@ class ProductListDomainTest: XCTestCase {
             $0.uuid = .incrementing
         }
         
-        await store.send(
-            .product(
-                .element(id: id1, action: .addToCart(.didTapPlusButton))
-            )
-        ) {
+		await store.send(\.product[id: id1].addToCart.didTapPlusButton) {
             $0.productList[id: id1]?.addToCartState.count = 1
         }
         
-        await store.send(
-            .product(
-                .element(id: id1, action: .addToCart(.didTapPlusButton))
-            )
-        ) {
+		await store.send(\.product[id: id1].addToCart.didTapPlusButton) {
             $0.productList[id: id1]?.addToCartState.count = 2
         }
         
@@ -166,20 +158,20 @@ class ProductListDomainTest: XCTestCase {
             )
         )
         
-        await store.send(.setCartView(isPresented: true)) {
+        await store.send(\.setCartView, true) {
             $0.cartState = expectedCartState
         }
 		
-		await store.send(.cart(.presented(.didPressPayButton))) {
+		await store.send(\.cart.didPressPayButton) {
 			$0.cartState?.alert = .confirmationAlert(totalPriceString: "$0.0")
 		}
         
-		await store.send(.cart(.presented(.alert(.presented(.dismissSuccessAlert))))) {
+		await store.send(\.cart.alert.dismissSuccessAlert) {
             $0.productList[id: id1]?.addToCartState.count = 0
 			$0.cartState?.alert = nil
         }
         
-        await store.receive(.closeCart) {
+        await store.receive(\.closeCart) {
             $0.cartState = nil
         }
     }
@@ -247,7 +239,7 @@ class ProductListDomainTest: XCTestCase {
             )
         )
         
-        await store.send(.setCartView(isPresented: true)) {
+        await store.send(\.setCartView, true) {
             $0.cartState = expectedCartState
         }
 		await store.send(
@@ -262,11 +254,11 @@ class ProductListDomainTest: XCTestCase {
 			$0.cartState?.cartItems = []
 		}
 		
-		await store.receive(.cart(.presented(.getTotalPrice))) {
+		await store.receive(\.cart.getTotalPrice) {
             $0.cartState?.totalPrice = 0
             $0.cartState?.isPayButtonDisable = true
         }
-        await store.receive(.resetProduct(product: products[0])) {
+        await store.receive(\.resetProduct, products[0]) {
             $0.productList = identifiedProducts
             $0.productList[id: id1]?.count = 0
         }

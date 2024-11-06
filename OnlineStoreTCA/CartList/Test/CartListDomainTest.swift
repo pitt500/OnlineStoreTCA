@@ -39,11 +39,7 @@ class CartListDomainTest: XCTestCase {
             reducer: { CartListDomain() }
         )
         
-        await store.send(
-            .cartItem(
-                .element(id: cartItemId1, action: .deleteCartItem(product: Product.sample[0]))
-            )
-        ) {
+		await store.send(\.cartItem[id: cartItemId1].deleteCartItem, Product.sample[0]) {
             $0.cartItems = [
                 .init(
                     id: cartItemId2,
@@ -56,7 +52,7 @@ class CartListDomainTest: XCTestCase {
         }
         
         let expectedPrice = Product.sample[1].price * Double(itemQuantity)
-        await store.receive(.getTotalPrice) {
+        await store.receive(\.getTotalPrice) {
             $0.totalPrice = expectedPrice
         }
     }
@@ -88,11 +84,7 @@ class CartListDomainTest: XCTestCase {
             reducer: { CartListDomain() }
         )
         
-        await store.send(
-            .cartItem(
-                .element(id: cartItemId1, action: .deleteCartItem(product: Product.sample[0]))
-            )
-        ) {
+		await store.send(\.cartItem[id: cartItemId1].deleteCartItem, Product.sample[0]) {
             $0.cartItems = [
                 .init(
                     id: cartItemId2,
@@ -105,19 +97,15 @@ class CartListDomainTest: XCTestCase {
         }
         
         let expectedPrice = Product.sample[1].price * Double(itemQuantity)
-        await store.receive(.getTotalPrice) {
+        await store.receive(\.getTotalPrice) {
             $0.totalPrice = expectedPrice
         }
         
-        await store.send(
-            .cartItem(
-                .element(id: cartItemId2, action: .deleteCartItem(product: Product.sample[1]))
-            )
-        ) {
+		await store.send(\.cartItem[id: cartItemId2].deleteCartItem, Product.sample[1]) {
             $0.cartItems = []
         }
         
-        await store.receive(.getTotalPrice) {
+        await store.receive(\.getTotalPrice) {
             $0.totalPrice = 0
             $0.isPayButtonDisable = true
         }
@@ -153,17 +141,17 @@ class CartListDomainTest: XCTestCase {
             $0.apiClient.sendOrder = { _ in "Success" }
         }
         
-		await store.send(.didPressPayButton) {
+		await store.send(\.didPressPayButton) {
 			$0.alert = .confirmationAlert(totalPriceString: "$0.0")
 		}
 		
-        await store.send(.alert(.presented(.didConfirmPurchase))) {
+		await store.send(\.alert.didConfirmPurchase) {
 			$0.alert = nil
             $0.dataLoadingStatus = .loading
         }
         
         
-        await store.receive(.didReceivePurchaseResponse(.success("Success"))) {
+        await store.receive(\.didReceivePurchaseResponse, .success("Success")) {
             $0.dataLoadingStatus = .success
             $0.alert = .successAlert
         }
@@ -198,17 +186,17 @@ class CartListDomainTest: XCTestCase {
             $0.apiClient.sendOrder = { _ in throw APIClient.Failure() }
         }
 		
-		await store.send(.didPressPayButton) {
+		await store.send(\.didPressPayButton) {
 			$0.alert = .confirmationAlert(totalPriceString: "$0.0")
 		}
         
-        await store.send(.alert(.presented(.didConfirmPurchase))) {
+        await store.send(\.alert.didConfirmPurchase) {
             $0.dataLoadingStatus = .loading
 			$0.alert = nil
         }
         
         
-        await store.receive(.didReceivePurchaseResponse(.failure(APIClient.Failure()))) {
+        await store.receive(\.didReceivePurchaseResponse, .failure(APIClient.Failure())) {
             $0.dataLoadingStatus = .error
             $0.alert = .errorAlert
         }

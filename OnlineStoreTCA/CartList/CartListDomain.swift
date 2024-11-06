@@ -36,6 +36,7 @@ struct CartListDomain {
         case didPressPayButton
         case didReceivePurchaseResponse(TaskResult<String>)
         
+		@CasePathable
         enum Alert: Equatable {
             case didConfirmPurchase
             case didCancelConfirmation
